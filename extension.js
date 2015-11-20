@@ -1,25 +1,48 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-var vscode = require('vscode');
+var vscode = require("vscode");
+var markdownlint = require("markdownlint");
+var packageJson = require("./package.json");
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-function activate(context) {
+var newLineRe = /\r\n|\r|\n/;
+var resultLineRe = /^document: (\d+): (MD\d\d\d) (.*)$/;
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-markdownlint" is now active!'); 
+function lint(document) {
+	var options = {
+		"strings": {
+			"document": document.getText()
+		},
+		"config": {
+			"MD013": false
+		}
+	};
+	var diagnostics = [];
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	var disposable = vscode.commands.registerCommand('extension.sayHello', function () {
-		// The code you place here will be executed every time your command is executed
+	markdownlint
+		.sync(options)
+		.toString()
+		.split(newLineRe)
+		.forEach(function forLine(line) {
+			var match = line.match(resultLineRe);
+			if (match) {
+				var lineNumber = parseInt(match[1], 10) - 1;
+				var rule = match[2];
+				var description = match[3];
+				var message = rule + ": " + description;
+				var diagnostic = new vscode.Diagnostic(document.lineAt(lineNumber).range, message, 1 /* Warning */);
+				diagnostics.push(diagnostic);
+			}
+		});
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
-	});
-	
-	context.subscriptions.push(disposable);
+	var diagnosticCollection = vscode.languages.createDiagnosticCollection(packageJson.name);
+	diagnosticCollection.set(document.uri, diagnostics);
 }
+
+function activate(context) {
+	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(function didOpenTextDocument(document) {
+		lint(document);
+	}));
+	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(function didChangeTextDocument(change) {
+		lint(change.document);
+	}));
+}
+
 exports.activate = activate;

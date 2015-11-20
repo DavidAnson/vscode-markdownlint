@@ -7,17 +7,15 @@
 		"vscode": "^0.10.1"
 	},
 	"categories": [
+		"Linters",
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.sayHello"
+		"onLanguage:markdown"
 	],
 	"main": "./extension",
-	"contributes": {
-		"commands": [{
-			"command": "extension.sayHello",
-			"title": "Hello World"
-		}]
+	"dependencies": {
+		"markdownlint": "^0.0.8"
 	},
 	"devDependencies": {
 		"vscode": "0.10.x"
