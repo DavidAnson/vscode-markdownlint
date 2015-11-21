@@ -15,7 +15,8 @@
 	],
 	"main": "./extension",
 	"dependencies": {
-		"markdownlint": "^0.0.8"
+		"markdownlint": "^0.0.8",
+		"opn": "^3.0.3"
 	},
 	"devDependencies": {
 		"vscode": "0.10.x"
