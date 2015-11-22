@@ -1,13 +1,88 @@
-# README
-## This is the README for your extension "vscode-markdownlint" 
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+# markdownlint
 
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
+> Markdown linting and style checking for Visual Studio Code
 
-### For more information
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## Intro
 
-** Enjoy!**
+The [Markdown](https://en.wikipedia.org/wiki/Markdown) markup language is designed to be easy to read, write, and understand.
+It succeeds - and its flexibility is both a benefit and a drawback.
+Many styles are possible, so formatting can be inconsistent.
+Some constructs don't work well in all parsers and should be avoided.
+For example, [here are some common/troublesome Markdown constructs](https://gist.github.com/DavidAnson/006a6c2a2d9d7b21b025).
+
+`markdownlint` is a Visual Studio Code extension that includes a library of rules to encourage standards and consistency for Markdown files.
+It is powered by [markdownlint for Node.js](https://github.com/DavidAnson/markdownlint) which is based on [markdownlint for Ruby](https://github.com/mivok/markdownlint).
+
+## Install
+
+1. Open [Visual Studio Code](https://code.visualstudio.com/)
+1. Press `Ctrl+P` to open the Quick Open dialog
+1. Type `ext install markdownlint` to find the extension
+1. Press `Enter` or click the cloud icon to install it
+1. Restart Visual Studio Code if prompted
+
+## Use
+
+When editing a Markdown file in Code with markdownlint installed, any lines that violate one of markdownlint's rules (see below) will trigger a *Warning* in the editor.
+Warnings are indicated by a wavy green underline and can also be seen by pressing `Ctrl+Shift+M` to open the Errors and Warnings dialog.
+Hover the mouse pointer over a green line to see the warning or press `F8` and `Shift+F8` to cycle through all the warnings (markdownlint warnings all begin with `MD###`).
+For more information about a markdownlint warning, place the cursor on a line and click the light bulb icon or press `Ctrl+.` to open the code action dialog.
+Clicking one of the warnings in the dialog will display that rule's help entry in the default web browser.
+
+## Rules
+
+* **MD001** - Header levels should only increment by one level at a time
+* **MD002** - First header should be a h1 header
+* **MD003** - Header style
+* **MD004** - Unordered list style
+* **MD005** - Inconsistent indentation for list items at the same level
+* **MD006** - Consider starting bulleted lists at the beginning of the line
+* **MD007** - Unordered list indentation
+* **MD009** - Trailing spaces
+* **MD010** - Hard tabs
+* **MD011** - Reversed link syntax
+* **MD012** - Multiple consecutive blank lines
+* **MD013** - Line length
+* **MD014** - Dollar signs used before commands without showing output
+* **MD018** - No space after hash on atx style header
+* **MD019** - Multiple spaces after hash on atx style header
+* **MD020** - No space inside hashes on closed atx style header
+* **MD021** - Multiple spaces inside hashes on closed atx style header
+* **MD022** - Headers should be surrounded by blank lines
+* **MD023** - Headers must start at the beginning of the line
+* **MD024** - Multiple headers with the same content
+* **MD025** - Multiple top level headers in the same document
+* **MD026** - Trailing punctuation in header
+* **MD027** - Multiple spaces after blockquote symbol
+* **MD028** - Blank line inside blockquote
+* **MD029** - Ordered list item prefix
+* **MD030** - Spaces after list markers
+* **MD031** - Fenced code blocks should be surrounded by blank lines
+* **MD032** - Lists should be surrounded by blank lines
+* **MD033** - Inline HTML
+* **MD034** - Bare URL used
+* **MD035** - Horizontal rule style
+* **MD036** - Emphasis used instead of a header
+* **MD037** - Spaces inside emphasis markers
+* **MD038** - Spaces inside code span elements
+* **MD039** - Spaces inside link text
+* **MD040** - Fenced code blocks should have a language specified
+* **MD041** - First line in file should be a top level header
+
+See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
+
+## Suppress
+
+Individual warnings can be suppressed by using inline comments like so:
+
+```md
+<!-- markdownlint-disable MD037 -->
+deliberate space * in * emphasis
+<!-- markdownlint-enable MD037 -->
+```
+
+See [markdownlint's configuration section](https://github.com/DavidAnson/markdownlint#configuration) for more details.
+
+## Coming Soon
+
+* Support for custom configuration files to disable or customize the set of rules for an entire project
