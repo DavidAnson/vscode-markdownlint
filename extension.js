@@ -8,9 +8,9 @@ var extensionName = packageJson.name;
 var openLinkCommandName = extensionName + ".openLink";
 var markdownLanguageId = "markdown";
 var markdownlintRulesMd = "https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md";
+var codeActionPrefix = "Click for more information about ";
 var newLineRe = /\r\n|\r|\n/;
 var resultLineRe = /^document: (\d+): (MD\d\d\d) (.*)$/;
-var messageCodeSuffixRe = /:.*$/;
 var diagnosticCollection = null;
 
 function lint(document) {
@@ -46,29 +46,35 @@ function lint(document) {
 	diagnosticCollection.set(document.uri, diagnostics);
 }
 
-function provideCodeActions(document, range, codeActionContext, cancellationToken) {
+function provideCodeActions(document, range, codeActionContext) {
 	var diagnostics = codeActionContext.diagnostics || [];
 	return diagnostics.map(function forDiagnostic(diagnostic) {
 		return {
-			title: "More information about " + diagnostic.message.replace(messageCodeSuffixRe, "") + "...",
+			title: codeActionPrefix + diagnostic.message.substr(0, 5),
 			command: openLinkCommandName,
 			arguments: [ diagnostic.code ]
 		}
 	});
 }
 
-function activate(context) {	
-	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(function didOpenTextDocument(document) {
-		lint(document);
-	}));
-	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(function didChangeTextDocument(change) {
-		lint(change.document);
-	}));
+function didOpenTextDocument(document) {
+	lint(document);
+}
+
+function didChangeTextDocument(change) {
+	lint(change.document);
+}
+
+function openLink(link) {
+	opn(link);
+}
+
+function activate(context) {
+	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(didOpenTextDocument));
+	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(didChangeTextDocument));
+	context.subscriptions.push(vscode.commands.registerCommand(openLinkCommandName, openLink));
 	context.subscriptions.push(vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
 		provideCodeActions: provideCodeActions
-	}));
-	context.subscriptions.push(vscode.commands.registerCommand(openLinkCommandName, function(link) {
-		opn(link);
 	}));
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionName);
 	context.subscriptions.push(diagnosticCollection);
