@@ -5,7 +5,7 @@
 	"icon": "images/markdownlint-128.png",
 	"version": "0.1.0",
 	"author": "David Anson (http://dlaa.me/)",
-	"publisher": "David Anson",
+	"publisher": "DavidAnson",
 	"license": "MIT",
 	"homepage": "https://github.com/DavidAnson/vscode-markdownlint",
 	"repository": {
