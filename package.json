@@ -1,15 +1,24 @@
 {
 	"name": "vscode-markdownlint",
-	"description": "A style checker and lint extension for Markdown files.",
-	"version": "0.0.1",
+	"displayName": "markdownlint",
+	"description": "Markdown linting and style checking for Visual Studio Code",
+	"icon": "images/markdownlint-128.png",
+	"version": "0.1.0",
+	"author": "David Anson (http://dlaa.me/)",
 	"publisher": "David Anson",
+	"license": "MIT",
+	"homepage": "https://github.com/DavidAnson/vscode-markdownlint",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DavidAnson/vscode-markdownlint.git"
+	},
+	"bugs": "https://github.com/DavidAnson/vscode-markdownlint/issues",
+	"categories": [
+		"Linters"
+	],
 	"engines": {
 		"vscode": "^0.10.1"
 	},
-	"categories": [
-		"Linters",
-		"Other"
-	],
 	"activationEvents": [
 		"onLanguage:markdown"
 	],
@@ -20,5 +29,10 @@
 	},
 	"devDependencies": {
 		"vscode": "0.10.x"
-	}
+	},
+	"keywords": [
+		"markdown",
+		"lint",
+		"md"
+	]
 }
