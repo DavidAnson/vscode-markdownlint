@@ -1,17 +1,22 @@
 var vscode = require("vscode");
 var markdownlint = require("markdownlint");
 var opn = require("opn");
+var fs = require("fs");
+var path = require("path");
 var packageJson = require("./package.json");
 var defaultConfig = require("./default-config.json");
 
 var extensionName = packageJson.name;
 var openLinkCommandName = extensionName + ".openLink";
+var configFileName = ".markdownlint.json";
 var markdownLanguageId = "markdown";
 var markdownlintRulesMd = "https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md";
 var codeActionPrefix = "Click for more information about ";
+var badConfig = "Unable to read configuration file ";
 var newLineRe = /\r\n|\r|\n/;
 var resultLineRe = /^document: (\d+): (MD\d\d\d) (.*)$/;
 var diagnosticCollection = null;
+var customConfig = null;
 
 function lint(document) {
 	if (document.languageId !== markdownLanguageId) {
@@ -22,7 +27,7 @@ function lint(document) {
 		"strings": {
 			"document": document.getText()
 		},
-		"config": defaultConfig
+		"config": customConfig || defaultConfig
 	};
 	var diagnostics = [];
 
@@ -57,6 +62,20 @@ function provideCodeActions(document, range, codeActionContext) {
 	});
 }
 
+function loadCustomConfig() {
+	var rootPath = vscode.workspace.rootPath;
+	if (rootPath) {
+		var configFilePath = path.join(rootPath, configFileName);
+		if (fs.existsSync(configFilePath)) {
+			try {
+				customConfig = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
+			} catch(e) {
+				vscode.window.showWarningMessage(badConfig + "'" + configFilePath + "' (" + (e.message || e.toString()) + ")");
+			}
+		}
+	}
+}
+
 function didOpenTextDocument(document) {
 	lint(document);
 }
@@ -78,6 +97,7 @@ function activate(context) {
 	}));
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionName);
 	context.subscriptions.push(diagnosticCollection);
+	loadCustomConfig();
 }
 
 exports.activate = activate;
