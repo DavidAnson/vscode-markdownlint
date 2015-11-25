@@ -1,3 +1,4 @@
+// Requires
 var vscode = require("vscode");
 var markdownlint = require("markdownlint");
 var opn = require("opn");
@@ -6,6 +7,7 @@ var path = require("path");
 var packageJson = require("./package.json");
 var defaultConfig = require("./default-config.json");
 
+// Constants
 var extensionName = packageJson.name;
 var openLinkCommandName = extensionName + ".openLink";
 var configFileName = ".markdownlint.json";
@@ -15,14 +17,19 @@ var codeActionPrefix = "Click for more information about ";
 var badConfig = "Unable to read configuration file ";
 var newLineRe = /\r\n|\r|\n/;
 var resultLineRe = /^document: (\d+): (MD\d\d\d) (.*)$/;
+
+// Variables
 var diagnosticCollection = null;
 var customConfig = null;
 
+// Lints a Markdown document
 function lint(document) {
+	// Skip if not Markdown
 	if (document.languageId !== markdownLanguageId) {
 		return;
 	}
 
+	// Configure
 	var options = {
 		"strings": {
 			"document": document.getText()
@@ -31,6 +38,7 @@ function lint(document) {
 	};
 	var diagnostics = [];
 
+	// Lint and create Diagnostics
 	markdownlint
 		.sync(options)
 		.toString()
@@ -48,9 +56,11 @@ function lint(document) {
 			}
 		});
 
+	// Publish
 	diagnosticCollection.set(document.uri, diagnostics);
 }
 
+// Implements CodeActionsProvider.provideCodeActions to open info links for rules
 function provideCodeActions(document, range, codeActionContext) {
 	var diagnostics = codeActionContext.diagnostics || [];
 	return diagnostics.map(function forDiagnostic(diagnostic) {
@@ -62,6 +72,7 @@ function provideCodeActions(document, range, codeActionContext) {
 	});
 }
 
+// Loads custom rule configuration
 function loadCustomConfig() {
 	customConfig = null;
 	var rootPath = vscode.workspace.rootPath;
@@ -75,26 +86,37 @@ function loadCustomConfig() {
 			}
 		}
 	}
+
+	// Re-lint all open files
 	(vscode.workspace.textDocuments || []).forEach(lint);
 }
 
+// Handles the didChangeTextDocument event
 function didChangeTextDocument(change) {
 	lint(change.document);
 }
 
+// Opens a link in the default web browser (sanitizing function arguments for opn)
 function openLink(link) {
 	opn(link);
 }
 
 function activate(context) {
+	// Hook up to workspace events
 	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(lint));
 	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(didChangeTextDocument));
+
+	// Register CodeActionsProvider
 	context.subscriptions.push(vscode.commands.registerCommand(openLinkCommandName, openLink));
 	context.subscriptions.push(vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
 		provideCodeActions: provideCodeActions
 	}));
+
+	// Create DiagnosticCollection
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionName);
 	context.subscriptions.push(diagnosticCollection);
+
+	// Hook up to file system changes for custom config file
 	var rootPath = vscode.workspace.rootPath;
 	if (rootPath) {
 		var fileSystemWatcher = vscode.workspace.createFileSystemWatcher(path.join(rootPath, configFileName));
@@ -103,6 +125,8 @@ function activate(context) {
 		context.subscriptions.push(fileSystemWatcher.onDidChange(loadCustomConfig));
 		context.subscriptions.push(fileSystemWatcher.onDidDelete(loadCustomConfig));
 	}
+
+	// Load custom rule config
 	loadCustomConfig();
 }
 
