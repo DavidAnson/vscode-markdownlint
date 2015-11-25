@@ -63,6 +63,7 @@ function provideCodeActions(document, range, codeActionContext) {
 }
 
 function loadCustomConfig() {
+	customConfig = null;
 	var rootPath = vscode.workspace.rootPath;
 	if (rootPath) {
 		var configFilePath = path.join(rootPath, configFileName);
@@ -74,10 +75,7 @@ function loadCustomConfig() {
 			}
 		}
 	}
-}
-
-function didOpenTextDocument(document) {
-	lint(document);
+	(vscode.workspace.textDocuments || []).forEach(lint);
 }
 
 function didChangeTextDocument(change) {
@@ -89,7 +87,7 @@ function openLink(link) {
 }
 
 function activate(context) {
-	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(didOpenTextDocument));
+	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(lint));
 	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(didChangeTextDocument));
 	context.subscriptions.push(vscode.commands.registerCommand(openLinkCommandName, openLink));
 	context.subscriptions.push(vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
@@ -97,6 +95,14 @@ function activate(context) {
 	}));
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionName);
 	context.subscriptions.push(diagnosticCollection);
+	var rootPath = vscode.workspace.rootPath;
+	if (rootPath) {
+		var fileSystemWatcher = vscode.workspace.createFileSystemWatcher(path.join(rootPath, configFileName));
+		context.subscriptions.push(fileSystemWatcher);
+		context.subscriptions.push(fileSystemWatcher.onDidCreate(loadCustomConfig));
+		context.subscriptions.push(fileSystemWatcher.onDidChange(loadCustomConfig));
+		context.subscriptions.push(fileSystemWatcher.onDidDelete(loadCustomConfig));
+	}
 	loadCustomConfig();
 }
 
