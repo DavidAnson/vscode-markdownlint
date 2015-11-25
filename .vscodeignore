@@ -1,6 +1,5 @@
 .vscode/**
 typings/**
-test/**
 .gitignore
+.markdownlint.json
 jsconfig.json
-vsc-extension-quickstart.md

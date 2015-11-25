@@ -11,10 +11,10 @@ markdownlint is a Visual Studio Code extension that includes a library of rules 
 ## Install
 
 1. Open [Visual Studio Code](https://code.visualstudio.com/)
-1. Press `Ctrl+P` to open the Quick Open dialog
-1. Type `ext install markdownlint` to find the extension
-1. Press `Enter` or click the cloud icon to install it
-1. Restart Visual Studio Code if prompted
+2. Press `Ctrl+P` to open the Quick Open dialog
+3. Type `ext install markdownlint` to find the extension
+4. Press `Enter` or click the cloud icon to install it
+5. Restart Visual Studio Code if prompted
 
 ## Use
 
