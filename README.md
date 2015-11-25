@@ -62,9 +62,33 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
 
+## Configure
+
+Rules can be enabled, disabled, and customized for an entire project by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` in the root folder of the project. Doing so overrides the default configuration (which disables `MD013` "Line length"):
+
+```json
+{
+    "MD013": false
+}
+```
+
+For example, a custom configuration file might look like:
+
+```json
+{
+    "default": true,
+    "MD003": { "style": "atx_closed" },
+    "MD007": { "indent": 4 },
+    "MD009": false,
+    "whitespace": false
+}
+```
+
+See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more details. Changes to the configuration file take effect immediately.
+
 ## Suppress
 
-Individual warnings can be suppressed by using inline comments like so:
+Individual warnings can be suppressed with inline comments:
 
 ```md
 <!-- markdownlint-disable MD037 -->
@@ -73,7 +97,3 @@ deliberate space * in * emphasis
 ```
 
 See [markdownlint's configuration section](https://github.com/DavidAnson/markdownlint#configuration) for more details.
-
-## Coming Soon
-
-* Support for custom configuration files to disable or customize the set of rules for an entire project
