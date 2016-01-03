@@ -1,3 +1,5 @@
+"use strict";
+
 // Requires
 var vscode = require("vscode");
 var markdownlint = require("markdownlint");
@@ -20,7 +22,7 @@ var resultLineRe = /^document: (\d+): (MD\d\d\d) (.*)$/;
 var defaultLongLineLength = 80;
 
 // Range expressions
-function getLongLineRe(length) {
+function getLongLineRe (length) {
 	return new RegExp("^(.{" + length + "})(.+)$");
 }
 var atxHeaderSpaceRe = /^\s*#+\s*?\S/;
@@ -65,7 +67,7 @@ var diagnosticCollection = null;
 var customConfig = null;
 
 // Returns the range for a rule
-function rangeForRule(rule, textLine) {
+function rangeForRule (rule, textLine) {
 	var range = textLine.range;
 	var ruleRe = ruleRes[rule];
 	if (ruleRe) {
@@ -83,7 +85,7 @@ function rangeForRule(rule, textLine) {
 }
 
 // Lints a Markdown document
-function lint(document) {
+function lint (document) {
 	// Skip if not Markdown
 	if (document.languageId !== markdownLanguageId) {
 		return;
@@ -103,7 +105,7 @@ function lint(document) {
 		.sync(options)
 		.toString()
 		.split(newLineRe)
-		.forEach(function forLine(line) {
+		.forEach(function forLine (line) {
 			var match = line.match(resultLineRe);
 			if (match) {
 				var lineNumber = parseInt(match[1], 10) - 1;
@@ -122,19 +124,19 @@ function lint(document) {
 }
 
 // Implements CodeActionsProvider.provideCodeActions to open info links for rules
-function provideCodeActions(document, range, codeActionContext) {
+function provideCodeActions (document, range, codeActionContext) {
 	var diagnostics = codeActionContext.diagnostics || [];
-	return diagnostics.map(function forDiagnostic(diagnostic) {
+	return diagnostics.map(function forDiagnostic (diagnostic) {
 		return {
-			title: codeActionPrefix + diagnostic.message.substr(0, 5),
-			command: openLinkCommandName,
-			arguments: [ diagnostic.code ]
-		}
+			"title": codeActionPrefix + diagnostic.message.substr(0, 5),
+			"command": openLinkCommandName,
+			"arguments": [ diagnostic.code ]
+		};
 	});
 }
 
 // Loads custom rule configuration
-function loadCustomConfig() {
+function loadCustomConfig () {
 	customConfig = null;
 	var rootPath = vscode.workspace.rootPath;
 	if (rootPath) {
@@ -145,8 +147,8 @@ function loadCustomConfig() {
 				var md013 = customConfig && customConfig.MD013;
 				var lineLength = (md013 && md013.line_length) || defaultLongLineLength;
 				ruleRes.MD013 = getLongLineRe(lineLength);
-			} catch(e) {
-				vscode.window.showWarningMessage(badConfig + "'" + configFilePath + "' (" + (e.message || e.toString()) + ")");
+			} catch (ex) {
+				vscode.window.showWarningMessage(badConfig + "'" + configFilePath + "' (" + (ex.message || ex.toString()) + ")");
 			}
 		}
 	}
@@ -156,16 +158,16 @@ function loadCustomConfig() {
 }
 
 // Handles the didChangeTextDocument event
-function didChangeTextDocument(change) {
+function didChangeTextDocument (change) {
 	lint(change.document);
 }
 
 // Opens a link in the default web browser (sanitizing function arguments for opn)
-function openLink(link) {
+function openLink (link) {
 	opn(link);
 }
 
-function activate(context) {
+function activate (context) {
 	// Hook up to workspace events
 	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(lint));
 	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(didChangeTextDocument));
@@ -173,7 +175,7 @@ function activate(context) {
 	// Register CodeActionsProvider
 	context.subscriptions.push(vscode.commands.registerCommand(openLinkCommandName, openLink));
 	context.subscriptions.push(vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
-		provideCodeActions: provideCodeActions
+		"provideCodeActions": provideCodeActions
 	}));
 
 	// Create DiagnosticCollection

@@ -13,6 +13,9 @@
 		"url": "https://github.com/DavidAnson/vscode-markdownlint.git"
 	},
 	"bugs": "https://github.com/DavidAnson/vscode-markdownlint/issues",
+	"scripts": {
+		"lint": "eslint *.js"
+	},
 	"categories": [
 		"Linters"
 	],
@@ -28,6 +31,7 @@
 		"opn": "^3.0.3"
 	},
 	"devDependencies": {
+		"eslint": "^1.10.3",
 		"vscode": "0.10.x"
 	},
 	"keywords": [

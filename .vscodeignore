@@ -1,5 +1,6 @@
 .vscode/**
 typings/**
+.eslintrc.json
 .gitignore
 .markdownlint.json
 jsconfig.json
