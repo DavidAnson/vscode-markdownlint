@@ -97,3 +97,9 @@ deliberate space * in * emphasis
 ```
 
 See [markdownlint's configuration section](https://github.com/DavidAnson/markdownlint#configuration) for more details.
+
+## History
+
+* 0.1.0 - Initial release
+* 0.2.0 - Custom configuration
+* 0.3.0 - Focused underlining
