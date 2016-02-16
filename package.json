@@ -29,10 +29,10 @@
 	"main": "./extension",
 	"dependencies": {
 		"markdownlint": "^0.1.1",
-		"opn": "^3.0.3"
+		"opn": "^4.0.0"
 	},
 	"devDependencies": {
-		"eslint": "^1.10.3",
+		"eslint": "^2.1.0",
 		"vscode": "^0.11.1"
 	},
 	"keywords": [
