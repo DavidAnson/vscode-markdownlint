@@ -20,6 +20,7 @@ var badConfig = "Unable to read configuration file ";
 var newLineRe = /\r\n|\r|\n/;
 var resultLineRe = /^document: (\d+): (MD\d\d\d) (.*)$/;
 var defaultLongLineLength = 80;
+var throttleDuration = 500;
 
 // Range expressions
 function getLongLineRe (length) {
@@ -65,6 +66,10 @@ var ruleRes = {
 // Variables
 var diagnosticCollection = null;
 var customConfig = null;
+var throttle = {
+	"document": null,
+	"timeout": null
+};
 
 // Returns the range for a rule
 function rangeForRule (rule, textLine) {
@@ -157,9 +162,29 @@ function loadCustomConfig () {
 	(vscode.workspace.textDocuments || []).forEach(lint);
 }
 
+// Suppresses a pending lint for the specified document
+function suppressLint (document) {
+	if (throttle.timeout && (document === throttle.document)) {
+		clearTimeout(throttle.timeout);
+		throttle.document = null;
+		throttle.timeout = null;
+	}
+}
+
+// Requests a lint of the specified document
+function requestLint (document) {
+	suppressLint(document);
+	throttle.document = document;
+	throttle.timeout = setTimeout(function waitThrottleDuration () {
+		// Do not use throttle.document in this function; it may have changed
+		lint(document);
+		suppressLint(document);
+	}, throttleDuration);
+}
+
 // Handles the didChangeTextDocument event
 function didChangeTextDocument (change) {
-	lint(change.document);
+	requestLint(change.document);
 }
 
 // Opens a link in the default web browser (sanitizing function arguments for opn)
@@ -171,6 +196,7 @@ function activate (context) {
 	// Hook up to workspace events
 	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(lint));
 	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(didChangeTextDocument));
+	context.subscriptions.push(vscode.workspace.onDidCloseTextDocument(suppressLint));
 
 	// Register CodeActionsProvider
 	context.subscriptions.push(vscode.commands.registerCommand(openLinkCommandName, openLink));
