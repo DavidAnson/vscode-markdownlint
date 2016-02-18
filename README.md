@@ -103,3 +103,4 @@ See [markdownlint's configuration section](https://github.com/DavidAnson/markdow
 * 0.1.0 - Initial release
 * 0.2.0 - Custom configuration
 * 0.3.0 - Focused underlining
+* 0.4.0 - Throttle linting
