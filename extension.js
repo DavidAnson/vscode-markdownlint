@@ -11,10 +11,15 @@ var defaultConfig = require("./default-config.json");
 
 // Constants
 var extensionName = packageJson.name;
+var markdownlintVersion = packageJson
+	.dependencies
+	.markdownlint
+	.replace(/[^\d\.]/, "");
 var openLinkCommandName = extensionName + ".openLink";
 var configFileName = ".markdownlint.json";
 var markdownLanguageId = "markdown";
-var markdownlintRulesMd = "https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md";
+var markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
+var markdownlintRulesMdPostfix = "/doc/Rules.md";
 var codeActionPrefix = "Click for more information about ";
 var badConfig = "Unable to read configuration file ";
 var newLineRe = /\r\n|\r|\n/;
@@ -119,7 +124,8 @@ function lint (document) {
 				var message = rule + ": " + description;
 				var range = rangeForRule(rule, document.lineAt(lineNumber));
 				var diagnostic = new vscode.Diagnostic(range, message, 1 /* Warning */);
-				diagnostic.code = markdownlintRulesMd + "#" + rule.toLowerCase() + "---" + description.toLowerCase().replace(/ /g, "-");
+				diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
+					"#" + rule.toLowerCase() + "---" + description.toLowerCase().replace(/ /g, "-");
 				diagnostics.push(diagnostic);
 			}
 		});
