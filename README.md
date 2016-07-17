@@ -33,7 +33,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 ## Rules
 
 * **MD001** *header-increment* - Header levels should only increment by one level at a time
-* **MD002** *first-header-h1* - First header should be a h1 header
+* **MD002** *first-header-h1* - First header should be a top level header
 * **MD003** *header-style* - Header style
 * **MD004** *ul-style* - Unordered list style
 * **MD005** *list-indent* - Inconsistent indentation for list items at the same level
@@ -69,6 +69,8 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **MD039** *no-space-in-links* - Spaces inside link text
 * **MD040** *fenced-code-language* - Fenced code blocks should have a language specified
 * **MD041** *first-line-h1* - First line in file should be a top level header
+* **MD042** *no-empty-links* - No empty links
+* **MD043** *required-headers* - Required header structure
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
 
