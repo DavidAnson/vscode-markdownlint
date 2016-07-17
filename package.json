@@ -28,12 +28,12 @@
 	],
 	"main": "./extension",
 	"dependencies": {
-		"markdownlint": "^0.1.1",
-		"opn": "^4.0.0"
+		"markdownlint": "^0.2.0",
+		"opn": "^4.0.2"
 	},
 	"devDependencies": {
-		"eslint": "^2.1.0",
-		"vscode": "^0.11.1"
+		"eslint": "^3.1.0",
+		"vscode": "^0.11.14"
 	},
 	"keywords": [
 		"markdown",
