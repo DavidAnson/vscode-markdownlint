@@ -1,4 +1,18 @@
 {
 	"MD013": false,
-	"MD029": { "style": "ordered" }
+	"MD029": {
+		"style": "ordered"
+	},
+	"MD043": {
+		"headers": [
+			"# markdownlint",
+			"## Intro",
+			"## Install",
+			"## Use",
+			"## Rules",
+			"## Configure",
+			"## Suppress",
+			"## History"
+		]
+	}
 }

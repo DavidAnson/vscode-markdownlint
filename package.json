@@ -15,7 +15,8 @@
 	"bugs": "https://github.com/DavidAnson/vscode-markdownlint/issues",
 	"scripts": {
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"lint": "eslint *.js"
+		"lint": "eslint *.js",
+		"schema": "node generate-config-schema.js"
 	},
 	"categories": [
 		"Linters"
@@ -23,9 +24,6 @@
 	"engines": {
 		"vscode": "^0.10.8"
 	},
-	"activationEvents": [
-		"onLanguage:markdown"
-	],
 	"main": "./extension",
 	"dependencies": {
 		"markdownlint": "^0.2.0",
@@ -33,11 +31,21 @@
 	},
 	"devDependencies": {
 		"eslint": "^3.1.0",
+		"tv4": "^1.2.7",
 		"vscode": "^0.11.14"
 	},
 	"keywords": [
 		"markdown",
 		"lint",
 		"md"
-	]
+	],
+	"activationEvents": [
+		"onLanguage:markdown"
+	],
+	"contributes": {
+		"jsonValidation": [{
+			"fileMatch": ".markdownlint.json",
+			"url": "./config-schema.json"
+		}]
+	}
 }
