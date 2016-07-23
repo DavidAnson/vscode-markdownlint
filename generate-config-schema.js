@@ -3,8 +3,12 @@
 var fs = require("fs");
 var path = require("path");
 var tv4 = require("tv4");
+var packageJsonPath = "./package.json";
+var packageJson = require(packageJsonPath);
+var defaultConfig = require("./default-config.json");
 var rules = require("./node_modules/markdownlint/lib/rules");
 
+// Schema scaffolding
 var schema = {
 	"title": "Markdownlint configuration schema",
 	"type": "object",
@@ -19,6 +23,7 @@ var schema = {
 };
 var tags = {};
 
+// Add rules
 rules.forEach(function forRule (rule) {
 	rule.tags.forEach(function forTag (tag) {
 		var tagRules = tags[tag] || [];
@@ -190,6 +195,7 @@ rules.forEach(function forRule (rule) {
 	});
 });
 
+// Add tags
 Object.keys(tags).forEach(function forTag (tag) {
 	var scheme = {
 		"description": tag + " - " + tags[tag].join(", "),
@@ -199,8 +205,10 @@ Object.keys(tags).forEach(function forTag (tag) {
 	schema.properties[tag] = scheme;
 });
 
+// Write schema
 fs.writeFileSync("config-schema.json", JSON.stringify(schema, null, "\t"));
 
+// Validate schema
 var testDirectory = "./node_modules/markdownlint/test";
 var testFiles = fs.readdirSync(testDirectory);
 testFiles.forEach(function forFile (file) {
@@ -211,3 +219,9 @@ testFiles.forEach(function forFile (file) {
 		}
 	}
 });
+
+// Update package.json
+var configurationRoot = packageJson.contributes.configuration.properties["markdownlint.config"];
+configurationRoot.default = defaultConfig;
+configurationRoot.properties = schema.properties;
+fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, "\t"));

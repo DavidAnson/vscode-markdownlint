@@ -148,21 +148,25 @@ function provideCodeActions (document, range, codeActionContext) {
 
 // Loads custom rule configuration
 function loadCustomConfig () {
-	customConfig = null;
+	var settings = vscode.workspace.getConfiguration(packageJson.displayName);
+	customConfig = settings.get("config");
+
 	var rootPath = vscode.workspace.rootPath;
 	if (rootPath) {
 		var configFilePath = path.join(rootPath, configFileName);
 		if (fs.existsSync(configFilePath)) {
 			try {
 				customConfig = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
-				var md013 = customConfig && customConfig.MD013;
-				var lineLength = (md013 && md013.line_length) || defaultLongLineLength;
-				ruleRes.MD013 = getLongLineRe(lineLength);
 			} catch (ex) {
 				vscode.window.showWarningMessage(badConfig + "'" + configFilePath + "' (" + (ex.message || ex.toString()) + ")");
 			}
 		}
 	}
+
+	// Convert line length number to RegExp
+	var md013 = customConfig && customConfig.MD013;
+	var lineLength = (md013 && md013.line_length) || defaultLongLineLength;
+	ruleRes.MD013 = getLongLineRe(lineLength);
 
 	// Re-lint all open files
 	(vscode.workspace.textDocuments || []).forEach(lint);
@@ -200,15 +204,18 @@ function openLink (link) {
 
 function activate (context) {
 	// Hook up to workspace events
-	context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(lint));
-	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(didChangeTextDocument));
-	context.subscriptions.push(vscode.workspace.onDidCloseTextDocument(suppressLint));
+	context.subscriptions.push(
+		vscode.workspace.onDidOpenTextDocument(lint),
+		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
+		vscode.workspace.onDidCloseTextDocument(suppressLint),
+		vscode.workspace.onDidChangeConfiguration(loadCustomConfig));
 
 	// Register CodeActionsProvider
-	context.subscriptions.push(vscode.commands.registerCommand(openLinkCommandName, openLink));
-	context.subscriptions.push(vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
-		"provideCodeActions": provideCodeActions
-	}));
+	context.subscriptions.push(
+		vscode.commands.registerCommand(openLinkCommandName, openLink),
+		vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
+			"provideCodeActions": provideCodeActions
+		}));
 
 	// Create DiagnosticCollection
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionName);
@@ -218,10 +225,11 @@ function activate (context) {
 	var rootPath = vscode.workspace.rootPath;
 	if (rootPath) {
 		var fileSystemWatcher = vscode.workspace.createFileSystemWatcher(path.join(rootPath, configFileName));
-		context.subscriptions.push(fileSystemWatcher);
-		context.subscriptions.push(fileSystemWatcher.onDidCreate(loadCustomConfig));
-		context.subscriptions.push(fileSystemWatcher.onDidChange(loadCustomConfig));
-		context.subscriptions.push(fileSystemWatcher.onDidDelete(loadCustomConfig));
+		context.subscriptions.push(
+			fileSystemWatcher,
+			fileSystemWatcher.onDidCreate(loadCustomConfig),
+			fileSystemWatcher.onDidChange(loadCustomConfig),
+			fileSystemWatcher.onDidDelete(loadCustomConfig));
 	}
 
 	// Load custom rule config

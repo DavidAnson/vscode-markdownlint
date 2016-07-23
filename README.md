@@ -78,7 +78,7 @@ See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/bl
 
 ## Configure
 
-Rules can be enabled, disabled, and customized for an entire project by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` in the root folder of the project. Doing so overrides the default configuration (which disables `MD013` "Line length"):
+The default rule configuration disables `MD013`/`line-length` "Line length" because many files include lines longer than the initial limit of 80 characters:
 
 ```json
 {
@@ -86,19 +86,44 @@ Rules can be enabled, disabled, and customized for an entire project by creating
 }
 ```
 
-For example, a custom configuration file (including alias and tag) might look like:
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` in the root folder of a project.
+
+For example, a custom configuration file might look like:
 
 ```json
 {
     "default": true,
     "MD003": { "style": "atx_closed" },
     "MD007": { "indent": 4 },
-    "no-hard-tabs": false,
-    "whitespace": false
+    "no-hard-tabs": false
 }
 ```
 
-See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more details. Changes to the configuration file take effect immediately.
+Rules can also be configured using Code's support for [user and workspace settings](https://code.visualstudio.com/docs/customization/userandworkspace).
+
+For example, the same configuration via `settings.json` might look like:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.config": {
+        "default": true,
+        "MD003": { "style": "atx_closed" },
+        "MD007": { "indent": 4 },
+        "no-hard-tabs": false
+    }
+}
+```
+
+Locations have the following precedence (in decreasing order):
+
+* `.markdownlint.json` file in the root of the project
+* Visual Studio Code user/workspace settings
+* Default configuration (above)
+
+Changes saved to any of the files take effect immediately.
+
+See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration.
 
 ## Suppress
 
