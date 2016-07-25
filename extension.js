@@ -197,6 +197,12 @@ function didChangeTextDocument (change) {
 	requestLint(change.document);
 }
 
+// Handles the didCloseTextDocument event
+function didCloseTextDocument (document) {
+	suppressLint(document);
+	diagnosticCollection.delete(document.uri);
+}
+
 // Opens a link in the default web browser (sanitizing function arguments for opn)
 function openLink (link) {
 	opn(link);
@@ -207,7 +213,7 @@ function activate (context) {
 	context.subscriptions.push(
 		vscode.workspace.onDidOpenTextDocument(lint),
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
-		vscode.workspace.onDidCloseTextDocument(suppressLint),
+		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
 		vscode.workspace.onDidChangeConfiguration(loadCustomConfig));
 
 	// Register CodeActionsProvider
