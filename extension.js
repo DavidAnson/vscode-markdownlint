@@ -33,10 +33,11 @@ function getLongLineRe (length) {
 }
 var atxHeaderSpaceRe = /^\s*#+\s*?\S/;
 var bareUrlRe = /(^|[^(])(https?:\/\/\S*)/;
+var emptyLinkRe = /\[[^\]]*\](?:(?:\((?:#?|(?:<>))\))|(?:\[[^\]]*\]))/;
 var htmlRe = /<[^>]*>/;
 var listItemMarkerRe = /^\s*(?:[\*\+\-]|\d+\.)\s*/;
 var longLineRe = getLongLineRe(defaultLongLineLength);
-var reversedLinkRe = /\([^)]+\)\[[^\]]+\]/;
+var reversedLinkRe = /\([^)]+\)\[[^\]^][^\]]*\]/;
 var spaceAfterBlockQuote = />\s+\S/;
 var spaceBeforeHeaderRe = /^\s+\S/;
 var spaceInsideCodeRe = /`(?:(?:\s[^`]*)|(?:[^`]*\s))`/;
@@ -65,7 +66,8 @@ var ruleRes = {
 	"MD034": bareUrlRe,
 	"MD037": spaceInsideEmphasisRe,
 	"MD038": spaceInsideCodeRe,
-	"MD039": spaceInsideLinkRe
+	"MD039": spaceInsideLinkRe,
+	"MD042": emptyLinkRe
 };
 
 // Variables
