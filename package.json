@@ -4,7 +4,7 @@
 	"description": "Markdown linting and style checking for Visual Studio Code",
 	"icon": "images/markdownlint-128.png",
 	"version": "0.5.0",
-	"author": "David Anson (http://dlaa.me/)",
+	"author": "David Anson (https://dlaa.me/)",
 	"publisher": "DavidAnson",
 	"license": "MIT",
 	"homepage": "https://github.com/DavidAnson/vscode-markdownlint",
@@ -26,12 +26,11 @@
 	},
 	"main": "./extension",
 	"dependencies": {
-		"markdownlint": "^0.2.0",
+		"markdownlint": "^0.3.0",
 		"opn": "^4.0.2"
 	},
 	"devDependencies": {
 		"eslint": "^3.1.1",
-		"tv4": "^1.2.7",
 		"vscode": "^0.11.14"
 	},
 	"keywords": [
@@ -46,7 +45,7 @@
 		"jsonValidation": [
 			{
 				"fileMatch": ".markdownlint.json",
-				"url": "./config-schema.json"
+				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
 			}
 		],
 		"configuration": {
@@ -287,13 +286,35 @@
 						},
 						"MD010": {
 							"description": "MD010/no-hard-tabs - Hard tabs",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"code_blocks": {
+									"description": "Include code blocks",
+									"type": "boolean",
+									"default": true
+								}
+							},
+							"additionalProperties": false
 						},
 						"no-hard-tabs": {
 							"description": "MD010/no-hard-tabs - Hard tabs",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"code_blocks": {
+									"description": "Include code blocks",
+									"type": "boolean",
+									"default": true
+								}
+							},
+							"additionalProperties": false
 						},
 						"MD011": {
 							"description": "MD011/no-reversed-links - Reversed link syntax",
@@ -307,13 +328,35 @@
 						},
 						"MD012": {
 							"description": "MD012/no-multiple-blanks - Multiple consecutive blank lines",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"maximum": {
+									"description": "Consecutive blank lines",
+									"type": "integer",
+									"default": 1
+								}
+							},
+							"additionalProperties": false
 						},
 						"no-multiple-blanks": {
 							"description": "MD012/no-multiple-blanks - Multiple consecutive blank lines",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"maximum": {
+									"description": "Consecutive blank lines",
+									"type": "integer",
+									"default": 1
+								}
+							},
+							"additionalProperties": false
 						},
 						"MD013": {
 							"description": "MD013/line-length - Line length",
@@ -329,12 +372,12 @@
 									"default": 80
 								},
 								"code_blocks": {
-									"description": "Exclude for code blocks",
+									"description": "Include code blocks",
 									"type": "boolean",
 									"default": true
 								},
 								"tables": {
-									"description": "Exclude for tables",
+									"description": "Include tables",
 									"type": "boolean",
 									"default": true
 								}
@@ -355,12 +398,12 @@
 									"default": 80
 								},
 								"code_blocks": {
-									"description": "Exclude for code blocks",
+									"description": "Include code blocks",
 									"type": "boolean",
 									"default": true
 								},
 								"tables": {
-									"description": "Exclude for tables",
+									"description": "Include tables",
 									"type": "boolean",
 									"default": true
 								}
@@ -735,13 +778,35 @@
 						},
 						"MD036": {
 							"description": "MD036/no-emphasis-as-header - Emphasis used instead of a header",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"punctuation": {
+									"description": "Punctuation characters",
+									"type": "string",
+									"default": ".,;:!?"
+								}
+							},
+							"additionalProperties": false
 						},
 						"no-emphasis-as-header": {
 							"description": "MD036/no-emphasis-as-header - Emphasis used instead of a header",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"punctuation": {
+									"description": "Punctuation characters",
+									"type": "string",
+									"default": ".,;:!?"
+								}
+							},
+							"additionalProperties": false
 						},
 						"MD037": {
 							"description": "MD037/no-space-in-emphasis - Spaces inside emphasis markers",
