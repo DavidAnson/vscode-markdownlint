@@ -14,7 +14,7 @@ var extensionName = packageJson.name;
 var markdownlintVersion = packageJson
 	.dependencies
 	.markdownlint
-	.replace(/[^\d\.]/, "");
+	.replace(/[^\d.]/, "");
 var openLinkCommandName = extensionName + ".openLink";
 var configFileName = ".markdownlint.json";
 var markdownLanguageId = "markdown";
