@@ -63,7 +63,7 @@ function lint (document) {
 				var end = start + result.errorRange[1];
 				range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
 			}
-			var diagnostic = new vscode.Diagnostic(range, message, 1 /* Warning */);
+			var diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
 			diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
 				"#" + ruleName.toLowerCase() + "---" + ruleDescription.toLowerCase().replace(/ /g, "-");
 			diagnostics.push(diagnostic);

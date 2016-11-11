@@ -48,7 +48,7 @@
         "no-implicit-coercion": "error",
         "no-implicit-globals": "error",
         "no-implied-eval": "error",
-        "no-inline-comments": "off",
+        "no-inline-comments": "error",
         "no-inner-declarations": "error",
         "no-invalid-regexp": "error",
         "no-invalid-this": "error",
