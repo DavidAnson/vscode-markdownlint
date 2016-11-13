@@ -30,7 +30,7 @@
 		"opn": "^4.0.2"
 	},
 	"devDependencies": {
-		"eslint": "^3.9.1",
+		"eslint": "^3.10.0",
 		"vscode": "^1.0.3",
 		"@types/node": "6.0.46"
 	},
