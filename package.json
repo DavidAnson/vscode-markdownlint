@@ -26,7 +26,7 @@
 	},
 	"main": "./extension",
 	"dependencies": {
-		"markdownlint": "^0.3.0",
+		"markdownlint": "^0.3.1",
 		"opn": "^4.0.2"
 	},
 	"devDependencies": {
