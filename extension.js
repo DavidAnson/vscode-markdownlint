@@ -3,7 +3,6 @@
 // Requires
 var vscode = require("vscode");
 var markdownlint = require("markdownlint");
-var opn = require("opn");
 var fs = require("fs");
 var path = require("path");
 var packageJson = require("./package.json");
@@ -15,7 +14,6 @@ var markdownlintVersion = packageJson
 	.dependencies
 	.markdownlint
 	.replace(/[^\d.]/, "");
-var openLinkCommandName = extensionName + ".openLink";
 var configFileName = ".markdownlint.json";
 var markdownLanguageId = "markdown";
 var markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
@@ -79,8 +77,8 @@ function provideCodeActions (document, range, codeActionContext) {
 	return diagnostics.map(function forDiagnostic (diagnostic) {
 		return {
 			"title": codeActionPrefix + diagnostic.message.substr(0, 5),
-			"command": openLinkCommandName,
-			"arguments": [ diagnostic.code ]
+			"command": "vscode.open",
+			"arguments": [ vscode.Uri.parse(diagnostic.code) ]
 		};
 	});
 }
@@ -137,11 +135,6 @@ function didCloseTextDocument (document) {
 	diagnosticCollection.delete(document.uri);
 }
 
-// Opens a link in the default web browser (sanitizing function arguments for opn)
-function openLink (link) {
-	opn(link);
-}
-
 function activate (context) {
 	// Hook up to workspace events
 	context.subscriptions.push(
@@ -152,7 +145,6 @@ function activate (context) {
 
 	// Register CodeActionsProvider
 	context.subscriptions.push(
-		vscode.commands.registerCommand(openLinkCommandName, openLink),
 		vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
 			"provideCodeActions": provideCodeActions
 		}));
