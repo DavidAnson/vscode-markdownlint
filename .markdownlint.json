@@ -14,5 +14,17 @@
 			"## Suppress",
 			"## History"
 		]
+	},
+	"MD044": {
+		"names": [
+			"CommonMark",
+			"Ctrl",
+			"JavaScript",
+			"Markdown",
+			"markdownlint",
+			"Node.js",
+			"Shift",
+			"Visual Studio Code"
+		]
 	}
 }
