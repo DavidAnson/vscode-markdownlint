@@ -55,6 +55,9 @@ function lint (document) {
 			var ruleName = result.ruleName;
 			var ruleDescription = result.ruleDescription;
 			var message = ruleName + "/" + result.ruleAlias + ": " + ruleDescription;
+			if (result.errorDetail) {
+				message += " [" + result.errorDetail + "]";
+			}
 			var range = document.lineAt(result.lineNumber - 1).range;
 			if (result.errorRange) {
 				var start = result.errorRange[0] - 1;
