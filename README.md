@@ -73,6 +73,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **MD041** *first-line-h1* - First line in file should be a top level header
 * **MD042** *no-empty-links* - No empty links
 * **MD043** *required-headers* - Required header structure
+* **MD044** *proper-names* - Proper names should have the correct capitalization
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
 
