@@ -19,6 +19,9 @@ var markdownLanguageId = "markdown";
 var markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
 var markdownlintRulesMdPostfix = "/doc/Rules.md";
 var codeActionPrefix = "Click for more information about ";
+var configOverride = "The '" + configFileName +
+	"' file in this folder overrides any user/workspace configuration settings for the " +
+	extensionName + " extension.";
 var badConfig = "Unable to read configuration file ";
 var throttleDuration = 500;
 
@@ -97,6 +100,7 @@ function loadCustomConfig () {
 		if (fs.existsSync(configFilePath)) {
 			try {
 				customConfig = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
+				vscode.window.showInformationMessage(configOverride);
 			} catch (ex) {
 				vscode.window.showWarningMessage(badConfig + "'" + configFilePath + "' (" + (ex.message || ex.toString()) + ")");
 			}
