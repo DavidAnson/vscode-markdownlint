@@ -3,7 +3,7 @@
 	"displayName": "markdownlint",
 	"description": "Markdown linting and style checking for Visual Studio Code",
 	"icon": "images/markdownlint-128.png",
-	"version": "0.6.2",
+	"version": "0.7.0",
 	"author": "David Anson (https://dlaa.me/)",
 	"publisher": "DavidAnson",
 	"license": "MIT",
