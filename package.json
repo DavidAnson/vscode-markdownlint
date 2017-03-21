@@ -26,12 +26,12 @@
 	},
 	"main": "./extension",
 	"dependencies": {
-		"markdownlint": "^0.4.0"
+		"markdownlint": "^0.4.1"
 	},
 	"devDependencies": {
-		"eslint": "^3.17.0",
-		"vscode": "^1.0.5",
-		"@types/node": "^7.0.5"
+		"eslint": "^3.18.0",
+		"vscode": "^1.1.0",
+		"@types/node": "^7.0.8"
 	},
 	"keywords": [
 		"markdown",
@@ -953,6 +953,11 @@
 										"type": "string"
 									},
 									"default": null
+								},
+								"code_blocks": {
+									"description": "Include code blocks",
+									"type": "boolean",
+									"default": true
 								}
 							},
 							"additionalProperties": false
@@ -972,6 +977,11 @@
 										"type": "string"
 									},
 									"default": null
+								},
+								"code_blocks": {
+									"description": "Include code blocks",
+									"type": "boolean",
+									"default": true
 								}
 							},
 							"additionalProperties": false
