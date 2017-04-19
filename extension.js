@@ -6,7 +6,6 @@ var markdownlint = require("markdownlint");
 var fs = require("fs");
 var path = require("path");
 var packageJson = require("./package.json");
-var defaultConfig = require("./default-config.json");
 
 // Constants
 var extensionName = packageJson.name;
@@ -45,7 +44,7 @@ function lint (document) {
 		"strings": {
 			"document": document.getText()
 		},
-		"config": customConfig || defaultConfig,
+		"config": customConfig,
 		"resultVersion": 1
 	};
 	var diagnostics = [];
