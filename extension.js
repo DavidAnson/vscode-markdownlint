@@ -18,13 +18,10 @@ var markdownLanguageId = "markdown";
 var markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
 var markdownlintRulesMdPostfix = "/doc/Rules.md";
 var codeActionPrefix = "Click for more information about ";
-var configOverride = "The '" + configFileName +
-	"' file in this folder overrides any user/workspace configuration settings for the " +
-	extensionName + " extension.";
-var badConfig = "Unable to read configuration file ";
 var throttleDuration = 500;
 
 // Variables
+var outputChannel = null;
 var diagnosticCollection = null;
 var customConfig = null;
 var throttle = {
@@ -90,18 +87,26 @@ function provideCodeActions (document, range, codeActionContext) {
 
 // Loads custom rule configuration
 function loadCustomConfig () {
+	var datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
+	outputChannel.appendLine(datePrefix + "INFO: Loading configuration.");
+
+	// Get configuration
 	var settings = vscode.workspace.getConfiguration(packageJson.displayName);
 	customConfig = settings.get("config");
 
+	// Override with .markdownlint.json (if present)
 	var rootPath = vscode.workspace.rootPath;
 	if (rootPath) {
 		var configFilePath = path.join(rootPath, configFileName);
 		if (fs.existsSync(configFilePath)) {
 			try {
 				customConfig = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
-				vscode.window.showInformationMessage(configOverride);
+				outputChannel.appendLine(datePrefix + "INFO: The '" + configFilePath +
+					"' file overrides any user/workspace configuration.");
 			} catch (ex) {
-				vscode.window.showWarningMessage(badConfig + "'" + configFilePath + "' (" + (ex.message || ex.toString()) + ")");
+				outputChannel.appendLine(datePrefix + "ERROR: Unable to read configuration file '" +
+					configFilePath + "' (" + (ex.message || ex.toString()) + ").");
+				outputChannel.show();
 			}
 		}
 	}
@@ -142,6 +147,10 @@ function didCloseTextDocument (document) {
 }
 
 function activate (context) {
+	// Create OutputChannel
+	outputChannel = vscode.window.createOutputChannel(extensionName);
+	context.subscriptions.push(outputChannel);
+
 	// Hook up to workspace events
 	context.subscriptions.push(
 		vscode.workspace.onDidOpenTextDocument(lint),
