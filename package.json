@@ -29,9 +29,9 @@
 		"markdownlint": "^0.4.1"
 	},
 	"devDependencies": {
-		"eslint": "^3.18.0",
+		"eslint": "^3.19.0",
 		"vscode": "^1.1.0",
-		"@types/node": "^7.0.8"
+		"@types/node": "^7.0.13"
 	},
 	"keywords": [
 		"markdown",
