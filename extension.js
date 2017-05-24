@@ -100,7 +100,7 @@ function loadCustomConfig () {
 		var configFilePath = path.join(rootPath, configFileName);
 		if (fs.existsSync(configFilePath)) {
 			try {
-				customConfig = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
+				customConfig = markdownlint.readConfigSync(configFilePath);
 				outputChannel.appendLine(datePrefix + "INFO: The '" + configFilePath +
 					"' file overrides any user/workspace configuration.");
 			} catch (ex) {
