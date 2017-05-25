@@ -104,8 +104,8 @@ To extend a shared configuration file, use the `extends` property:
 
 ```json
 {
-  "extends": "base.json",
-  "no-hard-tabs": false
+    "extends": "base.json",
+    "no-hard-tabs": false
 }
 ```
 
