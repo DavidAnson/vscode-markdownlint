@@ -65,7 +65,7 @@ function lint (document) {
 			}
 			var diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
 			diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
-				"#" + ruleName.toLowerCase() + "---" + ruleDescription.toLowerCase().replace(/ /g, "-");
+				"#" + ruleName.toLowerCase();
 			diagnostics.push(diagnostic);
 		});
 
