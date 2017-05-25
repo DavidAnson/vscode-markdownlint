@@ -64,6 +64,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"extends": {
+							"description": "Path to configuration file to extend",
+							"type": "string",
+							"default": null
+						},
 						"MD001": {
 							"description": "MD001/header-increment - Header levels should only increment by one level at a time",
 							"type": "boolean",
@@ -264,6 +269,11 @@
 									"description": "Spaces for line break",
 									"type": "integer",
 									"default": 0
+								},
+								"list_item_empty_lines": {
+									"description": "Allow spaces for empty lines in list items",
+									"type": "boolean",
+									"default": false
 								}
 							},
 							"additionalProperties": false
@@ -280,6 +290,11 @@
 									"description": "Spaces for line break",
 									"type": "integer",
 									"default": 0
+								},
+								"list_item_empty_lines": {
+									"description": "Allow spaces for empty lines in list items",
+									"type": "boolean",
+									"default": false
 								}
 							},
 							"additionalProperties": false
@@ -870,6 +885,11 @@
 									"description": "Header level",
 									"type": "integer",
 									"default": 1
+								},
+								"front_matter_title": {
+									"description": "RegExp for matching title in front matter",
+									"type": "string",
+									"default": "^\\s*title:"
 								}
 							},
 							"additionalProperties": false
@@ -886,6 +906,11 @@
 									"description": "Header level",
 									"type": "integer",
 									"default": 1
+								},
+								"front_matter_title": {
+									"description": "RegExp for matching title in front matter",
+									"type": "string",
+									"default": "^\\s*title:"
 								}
 							},
 							"additionalProperties": false
