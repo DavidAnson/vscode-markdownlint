@@ -79,7 +79,7 @@ See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/bl
 
 ## Configure
 
-The default rule configuration disables `MD013`/`line-length` "Line length" because many files include lines longer than the initial limit of 80 characters:
+The default rule configuration disables `MD013`/`line-length` because many files include lines longer than the conventional 80 character limit:
 
 ```json
 {
@@ -87,9 +87,9 @@ The default rule configuration disables `MD013`/`line-length` "Line length" beca
 }
 ```
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` in the root folder of a project.
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` in any directory of a project. The rules defined by a `.markdownlint.json` apply to files in the same directory and any sub-directories. Alternatively, rules for a Markdown file are determined by finding the nearest `.markdownlint.json` up the directory tree (and within the current project).
 
-For example, a custom configuration file might look like:
+A custom configuration is often defined by a `.markdownlint.json` in the root of the project:
 
 ```json
 {
@@ -100,18 +100,20 @@ For example, a custom configuration file might look like:
 }
 ```
 
-To extend a shared configuration file, use the `extends` property:
+To extend another configuration file, any `.markdownlint.json` can use the `extends` property to provide a relative path:
 
 ```json
 {
-    "extends": "base.json",
-    "no-hard-tabs": false
+    "extends": "../.markdownlint.json",
+    "no-hard-tabs": true
 }
 ```
 
+Files referenced via `extends` do not need to be part of the current project (but usually are).
+
 Rules can also be configured using Code's support for [user and workspace settings](https://code.visualstudio.com/docs/customization/userandworkspace).
 
-For example, the earlier configuration via `settings.json` might look like:
+The earlier configuration might look like the following in Code's `settings.json`:
 
 ```json
 {
@@ -125,13 +127,15 @@ For example, the earlier configuration via `settings.json` might look like:
 }
 ```
 
-Locations have the following precedence (in decreasing order):
+Rule locations have the following precedence (in decreasing order):
 
+* `.markdownlint.json` file in the same directory
+* `.markdownlint.json` file in a parent directory
 * `.markdownlint.json` file in the root of the project
 * Visual Studio Code user/workspace settings
-* Default configuration (above)
+* Default configuration (see above)
 
-Changes saved to any of these files take effect immediately. (Extended files are not monitored.)
+Changes saved to any of these locations take effect immediately. Files referenced via `extends` are not monitored for changes. Only the last two locations above apply to files outside the project.
 
 See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration.
 

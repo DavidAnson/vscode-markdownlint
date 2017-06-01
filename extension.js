@@ -23,11 +23,55 @@ var throttleDuration = 500;
 // Variables
 var outputChannel = null;
 var diagnosticCollection = null;
-var customConfig = null;
+var workspaceConfig = null;
+var configMap = {};
 var throttle = {
 	"document": null,
 	"timeout": null
 };
+
+// Writes date and message to the output channel
+function outputLine (message) {
+	var datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
+	outputChannel.appendLine(datePrefix + message);
+}
+
+// Returns rule configuration from nearest .markdownlint.json or workspace
+function getConfig (document) {
+	var dir = path.dirname(document.fileName);
+	// While inside the workspace
+	while (!path.relative(vscode.workspace.rootPath, dir).startsWith("..")) {
+		// Use cached configuration if present
+		if (configMap[dir]) {
+			return configMap[dir];
+		}
+		if (configMap[dir] === undefined) {
+			// Look for .markdownlint.json in current directory
+			var configFilePath = path.join(dir, configFileName);
+			if (fs.existsSync(configFilePath)) {
+				outputLine("INFO: Loading custom configuration from '" + configFilePath +
+					"', will override user/workspace/custom configuration for parent directory and children.");
+				try {
+					return (configMap[dir] = markdownlint.readConfigSync(configFilePath));
+				} catch (ex) {
+					outputLine("ERROR: Unable to read configuration file '" +
+						configFilePath + "' (" + (ex.message || ex.toString()) + ").");
+					outputChannel.show();
+				}
+			}
+			// Remember missing or invalid file
+			configMap[dir] = null;
+		}
+		// Move to parent directory, stop if no parent
+		var parent = path.dirname(dir);
+		if (dir === parent) {
+			break;
+		}
+		dir = parent;
+	}
+	// Default to workspace configuration
+	return workspaceConfig;
+}
 
 // Lints a Markdown document
 function lint (document) {
@@ -41,7 +85,7 @@ function lint (document) {
 		"strings": {
 			"document": document.getText()
 		},
-		"config": customConfig,
+		"config": getConfig(document),
 		"resultVersion": 1
 	};
 	var diagnostics = [];
@@ -85,34 +129,23 @@ function provideCodeActions (document, range, codeActionContext) {
 	});
 }
 
-// Loads custom rule configuration
-function loadCustomConfig () {
-	var datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
-	outputChannel.appendLine(datePrefix + "INFO: Loading configuration.");
-
-	// Get configuration
-	var settings = vscode.workspace.getConfiguration(packageJson.displayName);
-	customConfig = settings.get("config");
-
-	// Override with .markdownlint.json (if present)
-	var rootPath = vscode.workspace.rootPath;
-	if (rootPath) {
-		var configFilePath = path.join(rootPath, configFileName);
-		if (fs.existsSync(configFilePath)) {
-			try {
-				customConfig = markdownlint.readConfigSync(configFilePath);
-				outputChannel.appendLine(datePrefix + "INFO: The '" + configFilePath +
-					"' file overrides any user/workspace configuration.");
-			} catch (ex) {
-				outputChannel.appendLine(datePrefix + "ERROR: Unable to read configuration file '" +
-					configFilePath + "' (" + (ex.message || ex.toString()) + ").");
-				outputChannel.show();
-			}
-		}
-	}
-
-	// Re-lint all open files
+// Lint all open files
+function lintOpenFiles () {
 	(vscode.workspace.textDocuments || []).forEach(lint);
+}
+
+// Clears the map of custom configuration files and re-lints open files
+function clearConfigMap () {
+	configMap = {};
+	lintOpenFiles();
+}
+
+// Load workspace configuration
+function loadWorkspaceConfig () {
+	outputLine("INFO: Loading user/workspace configuration from Visual Studio Code preferences.");
+	var settings = vscode.workspace.getConfiguration(packageJson.displayName);
+	workspaceConfig = settings.get("config");
+	lintOpenFiles();
 }
 
 // Suppresses a pending lint for the specified document
@@ -156,7 +189,7 @@ function activate (context) {
 		vscode.workspace.onDidOpenTextDocument(lint),
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
 		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
-		vscode.workspace.onDidChangeConfiguration(loadCustomConfig));
+		vscode.workspace.onDidChangeConfiguration(loadWorkspaceConfig));
 
 	// Register CodeActionsProvider
 	context.subscriptions.push(
@@ -168,19 +201,18 @@ function activate (context) {
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionName);
 	context.subscriptions.push(diagnosticCollection);
 
-	// Hook up to file system changes for custom config file
-	var rootPath = vscode.workspace.rootPath;
-	if (rootPath) {
-		var fileSystemWatcher = vscode.workspace.createFileSystemWatcher(path.join(rootPath, configFileName));
+	// Hook up to file system changes for custom config file(s)
+	if (vscode.workspace.rootPath) {
+		// Use "/" instead of "\" due to bug in VS Code glob implementation
+		var fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/" + configFileName);
 		context.subscriptions.push(
 			fileSystemWatcher,
-			fileSystemWatcher.onDidCreate(loadCustomConfig),
-			fileSystemWatcher.onDidChange(loadCustomConfig),
-			fileSystemWatcher.onDidDelete(loadCustomConfig));
+			fileSystemWatcher.onDidCreate(clearConfigMap),
+			fileSystemWatcher.onDidChange(clearConfigMap),
+			fileSystemWatcher.onDidDelete(clearConfigMap));
 	}
 
-	// Load custom rule config
-	loadCustomConfig();
+	loadWorkspaceConfig();
 }
 
 exports.activate = activate;
