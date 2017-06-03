@@ -40,7 +40,7 @@ function outputLine (message) {
 function getConfig (document) {
 	var dir = path.dirname(document.fileName);
 	// While inside the workspace
-	while (!path.relative(vscode.workspace.rootPath, dir).startsWith("..")) {
+	while (vscode.workspace.rootPath && !path.relative(vscode.workspace.rootPath, dir).startsWith("..")) {
 		// Use cached configuration if present
 		if (configMap[dir]) {
 			return configMap[dir];
