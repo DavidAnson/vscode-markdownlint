@@ -85,8 +85,7 @@ function lint (document) {
 		"strings": {
 			"document": document.getText()
 		},
-		"config": getConfig(document),
-		"resultVersion": 1
+		"config": getConfig(document)
 	};
 	var diagnostics = [];
 
