@@ -9,3 +9,4 @@
 * 0.7.0 - New/improved rules, more details
 * 0.8.0 - Improved rules, shareable config
 * 0.9.0 - Nested .markdownlint.json config
+* 0.10.0 - Ignore comments/TOML, improved rules
