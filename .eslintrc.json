@@ -38,6 +38,7 @@
         "func-name-matching": "error",
         "func-names": "error",
         "func-style": ["error", "declaration"],
+        "function-paren-newline": ["error", "consistent"],
         "generator-star-spacing": "error",
         "getter-return": "error",
         "global-require": "error",

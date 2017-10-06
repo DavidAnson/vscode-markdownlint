@@ -188,13 +188,15 @@ function activate (context) {
 		vscode.workspace.onDidOpenTextDocument(lint),
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
 		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
-		vscode.workspace.onDidChangeConfiguration(loadWorkspaceConfig));
+		vscode.workspace.onDidChangeConfiguration(loadWorkspaceConfig)
+	);
 
 	// Register CodeActionsProvider
 	context.subscriptions.push(
 		vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
 			"provideCodeActions": provideCodeActions
-		}));
+		})
+	);
 
 	// Create DiagnosticCollection
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionName);
@@ -208,7 +210,8 @@ function activate (context) {
 			fileSystemWatcher,
 			fileSystemWatcher.onDidCreate(clearConfigMap),
 			fileSystemWatcher.onDidChange(clearConfigMap),
-			fileSystemWatcher.onDidDelete(clearConfigMap));
+			fileSystemWatcher.onDidDelete(clearConfigMap)
+		);
 	}
 
 	loadWorkspaceConfig();

@@ -22,16 +22,16 @@
 		"Linters"
 	],
 	"engines": {
-		"vscode": "^0.10.8"
+		"vscode": "^1.16.0"
 	},
 	"main": "./extension",
 	"dependencies": {
 		"markdownlint": "~0.6.1"
 	},
 	"devDependencies": {
-		"eslint": "^4.2.0",
-		"vscode": "^1.1.5",
-		"@types/node": "^8.0.28"
+		"eslint": "~4.8.0",
+		"vscode": "~1.1.5",
+		"@types/node": "~8.0.32"
 	},
 	"keywords": [
 		"markdown",
