@@ -36,10 +36,12 @@
 	"keywords": [
 		"markdown",
 		"lint",
+		"CommonMark",
 		"md"
 	],
 	"activationEvents": [
-		"onLanguage:markdown"
+		"onLanguage:markdown",
+		"onCommand:markdownlint.fixLine"
 	],
 	"contributes": {
 		"jsonValidation": [

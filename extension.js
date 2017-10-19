@@ -1,5 +1,7 @@
 "use strict";
 
+/* global Promise */
+
 // Requires
 var vscode = require("vscode");
 var markdownlint = require("markdownlint");
@@ -17,8 +19,73 @@ var configFileName = ".markdownlint.json";
 var markdownLanguageId = "markdown";
 var markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
 var markdownlintRulesMdPostfix = "/doc/Rules.md";
-var codeActionPrefix = "Click for more information about ";
+var clickForInfo = "Click for more information about ";
+var clickToFix = "Click to fix this violation of ";
+var fixLineCommandName = "markdownlint.fixLine";
 var throttleDuration = 500;
+
+// Shared RegExps
+var bareUrlRe = /(?:http|ftp)s?:\/\/[^\s]*/i;
+var reversedLinkRe = /\(([^)]+)\)\[([^\]^][^\]]*)]/;
+var spaceInsideCodeRe = /`(?:\s+([^`]*?)\s*|([^`]*?)\s+)`/;
+var spaceInsideEmphasisRe = /(\*\*?|__?)(?:\s+(.+?)\s*|(.+?)\s+)\1/;
+var spaceInsideLinkRe = /\[(?:\s+([^\]]*?)\s*|([^\]]*?)\s+)](?=\(\S*\))/;
+var trailingSpaceRe = /\s+$/;
+
+// Fix functions
+function removeLeadingWhitespace (text) {
+	return text.replace(/^\s+/, "");
+}
+function removeTrailingWhitespace (text) {
+	return text.replace(trailingSpaceRe, "");
+}
+function replaceTabsWithSpaces (text) {
+	return text.replace(/\t/g, "    ");
+}
+function fixAtxHeaderFormat (text) {
+	return text.replace(/^(\s*#+)\s*(.*)$/, "$1 $2");
+}
+function fixAtxClosedHeaderFormat (text) {
+	return text.replace(/^(\s*#+)\s*(.*?)\s*(#+\s*)$/, "$1 $2 $3");
+}
+function fixBlockquoteSpacing (text) {
+	return text.replace(/^(\s*(> )+)\s+(.*)$/, "$1$3");
+}
+function addBlockquoteJoiner (text) {
+	return text.replace(/^\s*$/, ">");
+}
+function wrapBareUrl (text) {
+	return text.replace(bareUrlRe, "<$&>");
+}
+function fixReversedLink (text) {
+	return text.replace(reversedLinkRe, "[$1]($2)");
+}
+function fixSpaceInEmphasis (text) {
+	return text.replace(spaceInsideEmphasisRe, "$1$2$3$1");
+}
+function fixSpaceInCode (text) {
+	return text.replace(spaceInsideCodeRe, "`$1$2`");
+}
+function fixSpaceInLink (text) {
+	return text.replace(spaceInsideLinkRe, "[$1$2]");
+}
+var fixFunctions = {
+	"MD006": removeLeadingWhitespace,
+	"MD009": removeTrailingWhitespace,
+	"MD010": replaceTabsWithSpaces,
+	"MD011": fixReversedLink,
+	"MD018": fixAtxHeaderFormat,
+	"MD019": fixAtxHeaderFormat,
+	"MD020": fixAtxClosedHeaderFormat,
+	"MD021": fixAtxClosedHeaderFormat,
+	"MD023": removeLeadingWhitespace,
+	"MD027": fixBlockquoteSpacing,
+	"MD028": addBlockquoteJoiner,
+	"MD034": wrapBareUrl,
+	"MD037": fixSpaceInEmphasis,
+	"MD038": fixSpaceInCode,
+	"MD039": fixSpaceInLink
+};
 
 // Variables
 var outputChannel = null;
@@ -116,15 +183,48 @@ function lint (document) {
 	diagnosticCollection.set(document.uri, diagnostics);
 }
 
-// Implements CodeActionsProvider.provideCodeActions to open info links for rules
+// Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
 function provideCodeActions (document, range, codeActionContext) {
+	var codeActions = [];
 	var diagnostics = codeActionContext.diagnostics || [];
-	return diagnostics.map(function forDiagnostic (diagnostic) {
-		return {
-			"title": codeActionPrefix + diagnostic.message.substr(0, 5),
+	diagnostics.forEach(function forDiagnostic (diagnostic) {
+		var ruleNameAlias = diagnostic.message.split(":")[0];
+		var ruleName = ruleNameAlias.split("/")[0];
+		codeActions.push({
+			"title": clickForInfo + ruleNameAlias,
 			"command": "vscode.open",
 			"arguments": [ vscode.Uri.parse(diagnostic.code) ]
-		};
+		});
+		if (diagnostic.range.isSingleLine && fixFunctions[ruleName]) {
+			codeActions.push({
+				"title": clickToFix + ruleNameAlias,
+				"command": fixLineCommandName,
+				"arguments": [
+					diagnostic.range.start.line,
+					ruleName
+				]
+			});
+		}
+	});
+	return codeActions;
+}
+
+// Fixes violations of a rule on a line
+function fixLine (lineIndex, ruleName) {
+	return new Promise(function executor (resolve, reject) {
+		var editor = vscode.window.activeTextEditor;
+		var line = editor && editor.document.lineAt(lineIndex);
+		var range = line && line.range;
+		var text = line && line.text;
+		var fixFunction = fixFunctions[ruleName];
+		var fixedText = fixFunction && fixFunction(text || "");
+		if (editor && fixedText) {
+			editor.edit(function createEdits (editBuilder) {
+				editBuilder.replace(range, fixedText);
+			}).then(resolve, reject);
+		} else {
+			reject();
+		}
 	});
 }
 
@@ -196,6 +296,11 @@ function activate (context) {
 		vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
 			"provideCodeActions": provideCodeActions
 		})
+	);
+
+	// Register Command
+	context.subscriptions.push(
+		vscode.commands.registerCommand(fixLineCommandName, fixLine)
 	);
 
 	// Create DiagnosticCollection

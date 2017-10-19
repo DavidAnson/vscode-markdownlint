@@ -1,6 +1,6 @@
 # markdownlint
 
-> Markdown linting and style checking for Visual Studio Code
+> Markdown/CommonMark linting and style checking for Visual Studio Code
 
 ## Intro
 
@@ -76,6 +76,26 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **[MD044](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md044)** *proper-names* - Proper names should have the correct capitalization
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
+
+The following rules can be automatically fixed by moving the cursor to a rule violation (green underlined text) and typing `Ctrl+.` or clicking the light bulb icon.
+
+* MD006 *ul-start-left*
+* MD009 *no-trailing-spaces*
+* MD010 *no-hard-tabs*
+* MD011 *no-reversed-links*
+* MD018 *no-missing-space-atx*
+* MD019 *no-multiple-space-atx*
+* MD020 *no-missing-space-closed-atx*
+* MD021 *no-multiple-space-closed-atx*
+* MD023 *header-start-left*
+* MD027 *no-multiple-space-blockquote*
+* MD028 *no-blanks-blockquote*
+* MD034 *no-bare-urls*
+* MD037 *no-space-in-emphasis*
+* MD038 *no-space-in-code*
+* MD039 *no-space-in-links*
+
+Fixes can be reverted by `Edit|Undo` or `Ctrl+Z`.
 
 ## Configure
 
