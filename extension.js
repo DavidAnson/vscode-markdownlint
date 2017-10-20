@@ -3,34 +3,34 @@
 /* global Promise */
 
 // Requires
-var vscode = require("vscode");
-var markdownlint = require("markdownlint");
-var fs = require("fs");
-var path = require("path");
-var packageJson = require("./package.json");
+const vscode = require("vscode");
+const markdownlint = require("markdownlint");
+const fs = require("fs");
+const path = require("path");
+const packageJson = require("./package.json");
 
 // Constants
-var extensionName = packageJson.name;
-var markdownlintVersion = packageJson
+const extensionName = packageJson.name;
+const markdownlintVersion = packageJson
 	.dependencies
 	.markdownlint
 	.replace(/[^\d.]/, "");
-var configFileName = ".markdownlint.json";
-var markdownLanguageId = "markdown";
-var markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
-var markdownlintRulesMdPostfix = "/doc/Rules.md";
-var clickForInfo = "Click for more information about ";
-var clickToFix = "Click to fix this violation of ";
-var fixLineCommandName = "markdownlint.fixLine";
-var throttleDuration = 500;
+const configFileName = ".markdownlint.json";
+const markdownLanguageId = "markdown";
+const markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
+const markdownlintRulesMdPostfix = "/doc/Rules.md";
+const clickForInfo = "Click for more information about ";
+const clickToFix = "Click to fix this violation of ";
+const fixLineCommandName = "markdownlint.fixLine";
+const throttleDuration = 500;
 
 // Shared RegExps
-var bareUrlRe = /(?:http|ftp)s?:\/\/[^\s]*/i;
-var reversedLinkRe = /\(([^)]+)\)\[([^\]^][^\]]*)]/;
-var spaceInsideCodeRe = /`(?:\s+([^`]*?)\s*|([^`]*?)\s+)`/;
-var spaceInsideEmphasisRe = /(\*\*?|__?)(?:\s+(.+?)\s*|(.+?)\s+)\1/;
-var spaceInsideLinkRe = /\[(?:\s+([^\]]*?)\s*|([^\]]*?)\s+)](?=\(\S*\))/;
-var trailingSpaceRe = /\s+$/;
+const bareUrlRe = /(?:http|ftp)s?:\/\/[^\s]*/i;
+const reversedLinkRe = /\(([^)]+)\)\[([^\]^][^\]]*)]/;
+const spaceInsideCodeRe = /`(?:\s+([^`]*?)\s*|([^`]*?)\s+)`/;
+const spaceInsideEmphasisRe = /(\*\*?|__?)(?:\s+(.+?)\s*|(.+?)\s+)\1/;
+const spaceInsideLinkRe = /\[(?:\s+([^\]]*?)\s*|([^\]]*?)\s+)](?=\(\S*\))/;
+const trailingSpaceRe = /\s+$/;
 
 // Fix functions
 function removeLeadingWhitespace (text) {
@@ -69,7 +69,7 @@ function fixSpaceInCode (text) {
 function fixSpaceInLink (text) {
 	return text.replace(spaceInsideLinkRe, "[$1$2]");
 }
-var fixFunctions = {
+const fixFunctions = {
 	"MD006": removeLeadingWhitespace,
 	"MD009": removeTrailingWhitespace,
 	"MD010": replaceTabsWithSpaces,
@@ -88,24 +88,24 @@ var fixFunctions = {
 };
 
 // Variables
-var outputChannel = null;
-var diagnosticCollection = null;
-var workspaceConfig = null;
-var configMap = {};
-var throttle = {
+let outputChannel = null;
+let diagnosticCollection = null;
+let workspaceConfig = null;
+let configMap = {};
+const throttle = {
 	"document": null,
 	"timeout": null
 };
 
 // Writes date and message to the output channel
 function outputLine (message) {
-	var datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
+	const datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
 	outputChannel.appendLine(datePrefix + message);
 }
 
 // Returns rule configuration from nearest .markdownlint.json or workspace
 function getConfig (document) {
-	var dir = path.dirname(document.fileName);
+	let dir = path.dirname(document.fileName);
 	// While inside the workspace
 	while (vscode.workspace.rootPath && !path.relative(vscode.workspace.rootPath, dir).startsWith("..")) {
 		// Use cached configuration if present
@@ -114,7 +114,7 @@ function getConfig (document) {
 		}
 		if (configMap[dir] === undefined) {
 			// Look for .markdownlint.json in current directory
-			var configFilePath = path.join(dir, configFileName);
+			const configFilePath = path.join(dir, configFileName);
 			if (fs.existsSync(configFilePath)) {
 				outputLine("INFO: Loading custom configuration from '" + configFilePath +
 					"', will override user/workspace/custom configuration for parent directory and children.");
@@ -130,7 +130,7 @@ function getConfig (document) {
 			configMap[dir] = null;
 		}
 		// Move to parent directory, stop if no parent
-		var parent = path.dirname(dir);
+		const parent = path.dirname(dir);
 		if (dir === parent) {
 			break;
 		}
@@ -148,32 +148,32 @@ function lint (document) {
 	}
 
 	// Configure
-	var options = {
+	const options = {
 		"strings": {
 			"document": document.getText()
 		},
 		"config": getConfig(document)
 	};
-	var diagnostics = [];
+	const diagnostics = [];
 
 	// Lint and create Diagnostics
 	markdownlint
 		.sync(options)
 		.document
 		.forEach(function forResult (result) {
-			var ruleName = result.ruleName;
-			var ruleDescription = result.ruleDescription;
-			var message = ruleName + "/" + result.ruleAlias + ": " + ruleDescription;
+			const ruleName = result.ruleName;
+			const ruleDescription = result.ruleDescription;
+			let message = ruleName + "/" + result.ruleAlias + ": " + ruleDescription;
 			if (result.errorDetail) {
 				message += " [" + result.errorDetail + "]";
 			}
-			var range = document.lineAt(result.lineNumber - 1).range;
+			let range = document.lineAt(result.lineNumber - 1).range;
 			if (result.errorRange) {
-				var start = result.errorRange[0] - 1;
-				var end = start + result.errorRange[1];
+				const start = result.errorRange[0] - 1;
+				const end = start + result.errorRange[1];
 				range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
 			}
-			var diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+			const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
 			diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
 				"#" + ruleName.toLowerCase();
 			diagnostics.push(diagnostic);
@@ -185,11 +185,11 @@ function lint (document) {
 
 // Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
 function provideCodeActions (document, range, codeActionContext) {
-	var codeActions = [];
-	var diagnostics = codeActionContext.diagnostics || [];
+	const codeActions = [];
+	const diagnostics = codeActionContext.diagnostics || [];
 	diagnostics.forEach(function forDiagnostic (diagnostic) {
-		var ruleNameAlias = diagnostic.message.split(":")[0];
-		var ruleName = ruleNameAlias.split("/")[0];
+		const ruleNameAlias = diagnostic.message.split(":")[0];
+		const ruleName = ruleNameAlias.split("/")[0];
 		codeActions.push({
 			"title": clickForInfo + ruleNameAlias,
 			"command": "vscode.open",
@@ -212,12 +212,12 @@ function provideCodeActions (document, range, codeActionContext) {
 // Fixes violations of a rule on a line
 function fixLine (lineIndex, ruleName) {
 	return new Promise(function executor (resolve, reject) {
-		var editor = vscode.window.activeTextEditor;
-		var line = editor && editor.document.lineAt(lineIndex);
-		var range = line && line.range;
-		var text = line && line.text;
-		var fixFunction = fixFunctions[ruleName];
-		var fixedText = fixFunction && fixFunction(text || "");
+		const editor = vscode.window.activeTextEditor;
+		const line = editor && editor.document.lineAt(lineIndex);
+		const range = line && line.range;
+		const text = line && line.text;
+		const fixFunction = fixFunctions[ruleName];
+		const fixedText = fixFunction && fixFunction(text || "");
 		if (editor && fixedText) {
 			editor.edit(function createEdits (editBuilder) {
 				editBuilder.replace(range, fixedText);
@@ -242,7 +242,7 @@ function clearConfigMap () {
 // Load workspace configuration
 function loadWorkspaceConfig () {
 	outputLine("INFO: Loading user/workspace configuration from Visual Studio Code preferences.");
-	var settings = vscode.workspace.getConfiguration(packageJson.displayName);
+	const settings = vscode.workspace.getConfiguration(packageJson.displayName);
 	workspaceConfig = settings.get("config");
 	lintOpenFiles();
 }
@@ -310,7 +310,7 @@ function activate (context) {
 	// Hook up to file system changes for custom config file(s)
 	if (vscode.workspace.rootPath) {
 		// Use "/" instead of "\" due to bug in VS Code glob implementation
-		var fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/" + configFileName);
+		const fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/" + configFileName);
 		context.subscriptions.push(
 			fileSystemWatcher,
 			fileSystemWatcher.onDidCreate(clearConfigMap),
