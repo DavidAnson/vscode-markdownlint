@@ -176,9 +176,9 @@ function lint (document) {
 			const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
 			diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
 				"#" + ruleName.toLowerCase();
+			diagnostic.source = extensionName;
 			diagnostics.push(diagnostic);
 		});
-
 	// Publish
 	diagnosticCollection.set(document.uri, diagnostics);
 }
@@ -187,7 +187,9 @@ function lint (document) {
 function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
-	diagnostics.forEach(function forDiagnostic (diagnostic) {
+	diagnostics.filter(function filterDiagnostic (diagnostic) {
+		return diagnostic.source === extensionName;
+	}).forEach(function forDiagnostic (diagnostic) {
 		const ruleNameAlias = diagnostic.message.split(":")[0];
 		const ruleName = ruleNameAlias.split("/")[0];
 		codeActions.push({
