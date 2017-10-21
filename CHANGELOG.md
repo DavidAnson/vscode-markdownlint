@@ -1,5 +1,6 @@
 # Changes
 
+* 0.11.0 - Automatically fix some rule violations
 * 0.10.0 - Ignore comments/TOML, improved rules
 * 0.9.0 - Nested .markdownlint.json config
 * 0.8.0 - Improved rules, shareable config
