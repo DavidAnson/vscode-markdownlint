@@ -11,6 +11,7 @@ const packageJson = require("./package.json");
 
 // Constants
 const extensionName = packageJson.name;
+const extensionShortName = extensionName.replace(/^vscode-/, "");
 const markdownlintVersion = packageJson
 	.dependencies
 	.markdownlint
@@ -176,7 +177,7 @@ function lint (document) {
 			const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
 			diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
 				"#" + ruleName.toLowerCase();
-			diagnostic.source = extensionName;
+			diagnostic.source = extensionShortName;
 			diagnostics.push(diagnostic);
 		});
 	// Publish
@@ -188,7 +189,7 @@ function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
 	diagnostics.filter(function filterDiagnostic (diagnostic) {
-		return diagnostic.source === extensionName;
+		return diagnostic.source === extensionShortName;
 	}).forEach(function forDiagnostic (diagnostic) {
 		const ruleNameAlias = diagnostic.message.split(":")[0];
 		const ruleName = ruleNameAlias.split("/")[0];
@@ -282,7 +283,7 @@ function didCloseTextDocument (document) {
 
 function activate (context) {
 	// Create OutputChannel
-	outputChannel = vscode.window.createOutputChannel(extensionName);
+	outputChannel = vscode.window.createOutputChannel(extensionShortName);
 	context.subscriptions.push(outputChannel);
 
 	// Hook up to workspace events
@@ -306,7 +307,7 @@ function activate (context) {
 	);
 
 	// Create DiagnosticCollection
-	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionName);
+	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionShortName);
 	context.subscriptions.push(diagnosticCollection);
 
 	// Hook up to file system changes for custom config file(s)
