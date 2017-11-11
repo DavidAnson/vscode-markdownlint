@@ -26,12 +26,12 @@
 	},
 	"main": "./extension",
 	"dependencies": {
-		"markdownlint": "~0.6.1"
+		"markdownlint": "0.6.2"
 	},
 	"devDependencies": {
-		"eslint": "~4.9.0",
+		"eslint": "~4.11.0",
 		"vscode": "~1.1.6",
-		"@types/node": "~8.0.46"
+		"@types/node": "~8.0.51"
 	},
 	"keywords": [
 		"markdown",
