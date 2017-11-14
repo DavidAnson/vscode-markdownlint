@@ -26,7 +26,7 @@
 	},
 	"main": "./extension",
 	"dependencies": {
-		"markdownlint": "0.6.2"
+		"markdownlint": "0.6.3"
 	},
 	"devDependencies": {
 		"eslint": "~4.11.0",
