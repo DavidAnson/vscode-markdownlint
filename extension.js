@@ -30,7 +30,7 @@ const bareUrlRe = /(?:http|ftp)s?:\/\/[^\s]*/i;
 const reversedLinkRe = /\(([^)]+)\)\[([^\]^][^\]]*)]/;
 const spaceInsideCodeRe = /`(?:\s+([^`]*?)\s*|([^`]*?)\s+)`/;
 const spaceInsideEmphasisRe = /(\*\*?|__?)(?:\s+(.+?)\s*|(.+?)\s+)\1/;
-const spaceInsideLinkRe = /\[(?:\s+([^\]]*?)\s*|([^\]]*?)\s+)](?=\(\S*\))/;
+const spaceInsideLinkRe = /\[(?:\s+([^\]]*?)\s*|([^\]]*?)\s+)]/;
 const trailingSpaceRe = /\s+$/;
 
 // Fix functions
@@ -47,7 +47,7 @@ function fixAtxHeaderFormat (text) {
 	return text.replace(/^(\s*#+)\s*(.*)$/, "$1 $2");
 }
 function fixAtxClosedHeaderFormat (text) {
-	return text.replace(/^(\s*#+)\s*(.*?)\s*(#+\s*)$/, "$1 $2 $3");
+	return fixAtxHeaderFormat(text).replace(/^(.*?)\s*(#+\s*)$/, "$1 $2");
 }
 function fixBlockquoteSpacing (text) {
 	return text.replace(/^(\s*(> )+)\s+(.*)$/, "$1$3");
@@ -203,7 +203,7 @@ function provideCodeActions (document, range, codeActionContext) {
 				"title": clickToFix + ruleNameAlias,
 				"command": fixLineCommandName,
 				"arguments": [
-					diagnostic.range.start.line,
+					diagnostic.range,
 					ruleName
 				]
 			});
@@ -213,15 +213,14 @@ function provideCodeActions (document, range, codeActionContext) {
 }
 
 // Fixes violations of a rule on a line
-function fixLine (lineIndex, ruleName) {
+function fixLine (range, ruleName) {
 	return new Promise(function executor (resolve, reject) {
 		const editor = vscode.window.activeTextEditor;
-		const line = editor && editor.document.lineAt(lineIndex);
-		const range = line && line.range;
-		const text = line && line.text;
+		const line = editor && editor.document.lineAt(range.start.line);
+		const text = line && line.text.substring(range.start.character, range.end.character);
 		const fixFunction = fixFunctions[ruleName];
 		const fixedText = fixFunction && fixFunction(text || "");
-		if (editor && fixedText) {
+		if (editor && (typeof fixedText === "string")) {
 			editor.edit(function createEdits (editBuilder) {
 				editBuilder.replace(range, fixedText);
 			}).then(resolve, reject);
