@@ -891,7 +891,7 @@
 								"front_matter_title": {
 									"description": "RegExp for matching title in front matter",
 									"type": "string",
-									"default": "^\\s*title:"
+									"default": "^\\s*title\\s*[:=]"
 								}
 							},
 							"additionalProperties": false
@@ -912,7 +912,7 @@
 								"front_matter_title": {
 									"description": "RegExp for matching title in front matter",
 									"type": "string",
-									"default": "^\\s*title:"
+									"default": "^\\s*title\\s*[:=]"
 								}
 							},
 							"additionalProperties": false
