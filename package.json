@@ -22,7 +22,7 @@
 		"Linters"
 	],
 	"engines": {
-		"vscode": "^1.16.0"
+		"vscode": "^1.18.0"
 	},
 	"main": "./extension",
 	"dependencies": {
@@ -37,7 +37,8 @@
 		"markdown",
 		"lint",
 		"CommonMark",
-		"md"
+		"md",
+		"multi-root ready"
 	],
 	"activationEvents": [
 		"onLanguage:markdown",
@@ -57,6 +58,7 @@
 				"markdownlint.config": {
 					"description": "markdownlint config object",
 					"type": "object",
+					"scope": "resource",
 					"default": {
 						"MD013": false
 					},

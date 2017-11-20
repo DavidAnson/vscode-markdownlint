@@ -10,8 +10,7 @@ const path = require("path");
 const packageJson = require("./package.json");
 
 // Constants
-const extensionName = packageJson.name;
-const extensionShortName = extensionName.replace(/^vscode-/, "");
+const extensionDisplayName = packageJson.displayName;
 const markdownlintVersion = packageJson
 	.dependencies
 	.markdownlint
@@ -91,7 +90,6 @@ const fixFunctions = {
 // Variables
 let outputChannel = null;
 let diagnosticCollection = null;
-let workspaceConfig = null;
 let configMap = {};
 const throttle = {
 	"document": null,
@@ -106,10 +104,11 @@ function outputLine (message) {
 
 // Returns rule configuration from nearest .markdownlint.json or workspace
 function getConfig (document) {
-	let dir = path.dirname(document.fileName);
+	const name = document.fileName;
+	let dir = path.dirname(name);
 	// While inside the workspace
-	while (vscode.workspace.rootPath && !path.relative(vscode.workspace.rootPath, dir).startsWith("..")) {
-		// Use cached configuration if present
+	while (vscode.workspace.getWorkspaceFolder(vscode.Uri.file(dir))) {
+		// Use cached configuration if present for directory
 		if (configMap[dir]) {
 			return configMap[dir];
 		}
@@ -118,7 +117,7 @@ function getConfig (document) {
 			const configFilePath = path.join(dir, configFileName);
 			if (fs.existsSync(configFilePath)) {
 				outputLine("INFO: Loading custom configuration from '" + configFilePath +
-					"', will override user/workspace/custom configuration for parent directory and children.");
+					"', overrides user/workspace/custom configuration for directory and its children.");
 				try {
 					return (configMap[dir] = markdownlint.readConfigSync(configFilePath));
 				} catch (ex) {
@@ -137,8 +136,14 @@ function getConfig (document) {
 		}
 		dir = parent;
 	}
-	// Default to workspace configuration
-	return workspaceConfig;
+	// Use cached configuration if present for file
+	if (configMap[name]) {
+		return configMap[name];
+	}
+	// Use workspace configuration
+	outputLine("INFO: Loading user/workspace configuration for '" + name + "'.");
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
+	return (configMap[name] = configuration.get("config"));
 }
 
 // Lints a Markdown document
@@ -177,7 +182,7 @@ function lint (document) {
 			const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
 			diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
 				"#" + ruleName.toLowerCase();
-			diagnostic.source = extensionShortName;
+			diagnostic.source = extensionDisplayName;
 			diagnostics.push(diagnostic);
 		});
 	// Publish
@@ -189,7 +194,7 @@ function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
 	diagnostics.filter(function filterDiagnostic (diagnostic) {
-		return diagnostic.source === extensionShortName;
+		return diagnostic.source === extensionDisplayName;
 	}).forEach(function forDiagnostic (diagnostic) {
 		const ruleNameAlias = diagnostic.message.split(":")[0];
 		const ruleName = ruleNameAlias.split("/")[0];
@@ -237,15 +242,8 @@ function lintOpenFiles () {
 
 // Clears the map of custom configuration files and re-lints open files
 function clearConfigMap () {
+	outputLine("INFO: Resetting configuration cache due to '" + configFileName + "' or setting change.");
 	configMap = {};
-	lintOpenFiles();
-}
-
-// Load workspace configuration
-function loadWorkspaceConfig () {
-	outputLine("INFO: Loading user/workspace configuration from Visual Studio Code preferences.");
-	const settings = vscode.workspace.getConfiguration(packageJson.displayName);
-	workspaceConfig = settings.get("config");
 	lintOpenFiles();
 }
 
@@ -282,7 +280,7 @@ function didCloseTextDocument (document) {
 
 function activate (context) {
 	// Create OutputChannel
-	outputChannel = vscode.window.createOutputChannel(extensionShortName);
+	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
 	context.subscriptions.push(outputChannel);
 
 	// Hook up to workspace events
@@ -290,7 +288,7 @@ function activate (context) {
 		vscode.workspace.onDidOpenTextDocument(lint),
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
 		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
-		vscode.workspace.onDidChangeConfiguration(loadWorkspaceConfig)
+		vscode.workspace.onDidChangeConfiguration(clearConfigMap)
 	);
 
 	// Register CodeActionsProvider
@@ -306,22 +304,20 @@ function activate (context) {
 	);
 
 	// Create DiagnosticCollection
-	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionShortName);
+	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionDisplayName);
 	context.subscriptions.push(diagnosticCollection);
 
-	// Hook up to file system changes for custom config file(s)
-	if (vscode.workspace.rootPath) {
-		// Use "/" instead of "\" due to bug in VS Code glob implementation
-		const fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/" + configFileName);
-		context.subscriptions.push(
-			fileSystemWatcher,
-			fileSystemWatcher.onDidCreate(clearConfigMap),
-			fileSystemWatcher.onDidChange(clearConfigMap),
-			fileSystemWatcher.onDidDelete(clearConfigMap)
-		);
-	}
+	// Hook up to file system changes for custom config file(s) ("/" vs. "\" due to bug in VS Code glob)
+	const fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/" + configFileName);
+	context.subscriptions.push(
+		fileSystemWatcher,
+		fileSystemWatcher.onDidCreate(clearConfigMap),
+		fileSystemWatcher.onDidChange(clearConfigMap),
+		fileSystemWatcher.onDidDelete(clearConfigMap)
+	);
 
-	loadWorkspaceConfig();
+	// Lint already-open files
+	lintOpenFiles();
 }
 
 exports.activate = activate;
