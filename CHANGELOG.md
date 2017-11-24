@@ -1,5 +1,6 @@
 # Changes
 
+* 0.12.0 - Add support for multi-root workspaces
 * 0.11.0 - Automatically fix some rule violations
 * 0.10.0 - Ignore comments/TOML, improved rules
 * 0.9.0 - Nested .markdownlint.json config
