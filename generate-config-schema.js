@@ -10,4 +10,4 @@ const defaultConfig = require("./default-config.json");
 const configurationRoot = packageJson.contributes.configuration.properties["markdownlint.config"];
 configurationRoot.default = defaultConfig;
 configurationRoot.properties = configurationSchema.properties;
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, "\t"));
+fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, "\t") + "\n");
