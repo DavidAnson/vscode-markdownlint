@@ -106,8 +106,10 @@ function outputLine (message) {
 function getConfig (document) {
 	const name = document.fileName;
 	let dir = path.dirname(name);
+	let workspaceDetail = "not in a workspace folder";
 	// While inside the workspace
 	while (vscode.workspace.getWorkspaceFolder(vscode.Uri.file(dir))) {
+		workspaceDetail = "no configuration file in workspace folder";
 		// Use cached configuration if present for directory
 		if (configMap[dir]) {
 			return configMap[dir];
@@ -141,7 +143,7 @@ function getConfig (document) {
 		return configMap[name];
 	}
 	// Use workspace configuration
-	outputLine("INFO: Loading user/workspace configuration for '" + name + "'.");
+	outputLine("INFO: Loading user/workspace configuration for '" + name + "' (" + workspaceDetail + ").");
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	return (configMap[name] = configuration.get("config"));
 }

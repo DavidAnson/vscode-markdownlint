@@ -107,7 +107,9 @@ The default rule configuration disables `MD013`/`line-length` because many files
 }
 ```
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` in any directory of a project. The rules defined by a `.markdownlint.json` apply to files in the same directory and any sub-directories. Alternatively, rules for a Markdown file are determined by finding the nearest `.markdownlint.json` up the directory tree (and within the current project).
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` in any directory of a project. The rules defined by `.markdownlint.json` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint.json`.
+
+> **Note**: `.markdownlint.json` is used only if a project has been opened. When no folder is open or a file is not part of the current project, normal user and workspace settings apply (see below).
 
 A custom configuration is often defined by a `.markdownlint.json` in the root of the project:
 
@@ -133,7 +135,7 @@ Files referenced via `extends` do not need to be part of the current project (bu
 
 Rules can also be configured using Code's support for [user and workspace settings](https://code.visualstudio.com/docs/customization/userandworkspace).
 
-The earlier configuration might look like the following in Code's `settings.json`:
+The earlier configuration might look like the following in Code's user settings:
 
 ```json
 {
@@ -155,7 +157,7 @@ Rule locations have the following precedence (in decreasing order):
 * Visual Studio Code user/workspace settings
 * Default configuration (see above)
 
-Changes saved to any of these locations take effect immediately. Files referenced via `extends` are not monitored for changes. Only the last two locations above apply to files outside the project.
+Changes saved to any of these locations take effect immediately. Files referenced via `extends` are not monitored for changes. Only the last two locations apply to files outside the project.
 
 See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration.
 
