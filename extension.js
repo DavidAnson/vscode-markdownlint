@@ -169,9 +169,9 @@ function lint (document) {
 		.sync(options)
 		.document
 		.forEach(function forResult (result) {
-			const ruleName = result.ruleName;
+			const ruleName = result.ruleNames[0];
 			const ruleDescription = result.ruleDescription;
-			let message = ruleName + "/" + result.ruleAlias + ": " + ruleDescription;
+			let message = result.ruleNames.join("/") + ": " + ruleDescription;
 			if (result.errorDetail) {
 				message += " [" + result.errorDetail + "]";
 			}

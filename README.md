@@ -74,6 +74,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **[MD042](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md042)** *no-empty-links* - No empty links
 * **[MD043](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md043)** *required-headers* - Required header structure
 * **[MD044](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md044)** *proper-names* - Proper names should have the correct capitalization
+* **[MD045](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md045)** *no-alt-text* - Images should have alternate text (alt text)
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
 
