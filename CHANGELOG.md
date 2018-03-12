@@ -1,5 +1,6 @@
 # Changes
 
+* 0.14.0 - Improved rules
 * 0.13.0 - New/improved rules
 * 0.12.0 - Add support for multi-root workspaces
 * 0.11.0 - Automatically fix some rule violations
