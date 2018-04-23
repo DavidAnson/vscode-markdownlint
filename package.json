@@ -56,10 +56,20 @@
 			"title": "markdownlint configuration",
 			"type": "object",
 			"properties": {
+				"markdownlint.run": {
+					"description": "Run the linter on save (onSave) or on type (onType)",
+					"scope": "resource",
+					"type": "string",
+					"enum": [
+						"onSave",
+						"onType"
+					],
+					"default": "onType"
+				},
 				"markdownlint.config": {
 					"description": "markdownlint config object",
-					"type": "object",
 					"scope": "resource",
+					"type": "object",
 					"default": {
 						"MD013": false
 					},

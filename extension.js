@@ -97,6 +97,7 @@ const fixFunctions = {
 let outputChannel = null;
 let diagnosticCollection = null;
 let configMap = {};
+let runMap = {};
 const throttle = {
 	"document": null,
 	"timeout": null
@@ -255,6 +256,25 @@ function clearConfigMap () {
 	lintOpenFiles();
 }
 
+// Returns the run setting for the document
+function getRun (document) {
+	const name = document.fileName;
+	// Use cached configuration if present for file
+	if (runMap[name]) {
+		return runMap[name];
+	}
+	// Read workspace configuration
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
+	runMap[name] = configuration.get("run");
+	outputLine("INFO: Linting for '" + document.fileName + "' will be run '" + runMap[name] + "'.");
+	return runMap[name];
+}
+
+// Clears the map of run settings
+function clearRunMap () {
+	runMap = {};
+}
+
 // Suppresses a pending lint for the specified document
 function suppressLint (document) {
 	if (throttle.timeout && (document === throttle.document)) {
@@ -275,15 +295,33 @@ function requestLint (document) {
 	}, throttleDuration);
 }
 
-// Handles the didChangeTextDocument event
+// Handles the onDidChangeTextDocument event
 function didChangeTextDocument (change) {
-	requestLint(change.document);
+	const document = change.document;
+	if ((document.languageId === markdownLanguageId) && (getRun(document) === "onType")) {
+		requestLint(document);
+	}
 }
 
-// Handles the didCloseTextDocument event
+// Handles the onDidSaveTextDocument event
+function didSaveTextDocument (document) {
+	if ((document.languageId === markdownLanguageId) && (getRun(document) === "onSave")) {
+		lint(document);
+		suppressLint(document);
+	}
+}
+
+// Handles the onDidCloseTextDocument event
 function didCloseTextDocument (document) {
 	suppressLint(document);
 	diagnosticCollection.delete(document.uri);
+}
+
+// Handles the onDidChangeConfiguration event
+function didChangeConfiguration () {
+	clearConfigMap();
+	clearRunMap();
+	lintOpenFiles();
 }
 
 function activate (context) {
@@ -295,8 +333,9 @@ function activate (context) {
 	context.subscriptions.push(
 		vscode.workspace.onDidOpenTextDocument(lint),
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
+		vscode.workspace.onDidSaveTextDocument(didSaveTextDocument),
 		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
-		vscode.workspace.onDidChangeConfiguration(clearConfigMap)
+		vscode.workspace.onDidChangeConfiguration(didChangeConfiguration)
 	);
 
 	// Register CodeActionsProvider

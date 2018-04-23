@@ -11,6 +11,8 @@
 			"## Use",
 			"## Rules",
 			"## Configure",
+			"### markdownlint.config",
+			"### markdownlint.run",
 			"## Suppress",
 			"## History"
 		]
