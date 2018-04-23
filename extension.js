@@ -156,8 +156,8 @@ function getConfig (document) {
 // Lints a Markdown document
 function lint (document) {
 	// Skip if not Markdown
-	if (document.languageId !== markdownLanguageId ||
-		document.uri.scheme !== "file") {
+	if ((document.languageId !== markdownLanguageId) ||
+		(document.uri.scheme !== "file")) {
 		return;
 	}
 
