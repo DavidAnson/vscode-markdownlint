@@ -17,9 +17,10 @@ const markdownlintVersion = packageJson
 	.replace(/[^\d.]/, "");
 const configFileName = ".markdownlint.json";
 const markdownLanguageId = "markdown";
+const markdownScheme = "file";
 const documentSelector = {
 	"language": markdownLanguageId,
-	"scheme": "file"
+	"scheme": markdownScheme
 };
 
 const markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
@@ -155,9 +156,8 @@ function getConfig (document) {
 
 // Lints a Markdown document
 function lint (document) {
-	// Skip if not Markdown
-	if ((document.languageId !== markdownLanguageId) ||
-		(document.uri.scheme !== "file")) {
+	// Skip if not Markdown or local file
+	if ((document.languageId !== markdownLanguageId) || (document.uri.scheme !== markdownScheme)) {
 		return;
 	}
 
