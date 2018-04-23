@@ -17,6 +17,11 @@ const markdownlintVersion = packageJson
 	.replace(/[^\d.]/, "");
 const configFileName = ".markdownlint.json";
 const markdownLanguageId = "markdown";
+const documentSelector = {
+	"language": markdownLanguageId,
+	"scheme": "file"
+};
+
 const markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
 const markdownlintRulesMdPostfix = "/doc/Rules.md";
 const clickForInfo = "Click for more information about ";
@@ -151,7 +156,8 @@ function getConfig (document) {
 // Lints a Markdown document
 function lint (document) {
 	// Skip if not Markdown
-	if (document.languageId !== markdownLanguageId) {
+	if ((document.languageId !== markdownLanguageId) ||
+		(document.uri.scheme !== "file")) {
 		return;
 	}
 
@@ -295,7 +301,7 @@ function activate (context) {
 
 	// Register CodeActionsProvider
 	context.subscriptions.push(
-		vscode.languages.registerCodeActionsProvider(markdownLanguageId, {
+		vscode.languages.registerCodeActionsProvider(documentSelector, {
 			"provideCodeActions": provideCodeActions
 		})
 	);
