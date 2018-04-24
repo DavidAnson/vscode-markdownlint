@@ -29,10 +29,10 @@
 		"markdownlint": "0.8.1"
 	},
 	"devDependencies": {
-		"eslint": "~4.19.0",
+		"eslint": "~4.19.1",
 		"vscode": "~1.1.14",
-		"vsce": "~1.37.6",
-		"@types/node": "~9.4.7"
+		"vsce": "~1.39.0",
+		"@types/node": "~9.6.6"
 	},
 	"keywords": [
 		"markdown",
