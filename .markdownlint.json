@@ -13,6 +13,7 @@
 			"## Configure",
 			"### markdownlint.config",
 			"### markdownlint.run",
+			"### markdownlint.customRules",
 			"## Suppress",
 			"## History"
 		]

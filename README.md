@@ -179,6 +179,29 @@ If you find this distracting, linting can be configured to run only when the doc
 
 > **Note**: When configured to run `onSave`, the list of reported issues will become outdated while the document is edited and will update when the document is saved.
 
+### markdownlint.customRules
+
+Custom rules can be specified in Code's user/workspace configuration and used to apply additional linting beyond the default set of rules. Custom rules are identified by the path to a JavaScript file or the path to an [npm](https://www.npmjs.com/) package exporting the rule. Paths are relative to the root of the current workspace (or the Code install directory if no folder is open) and can be absolute.
+
+When adding custom rules to a workspace, consider committing those rules under the `.vscode` directory where they will be separate from other files in the workspace and available to anyone who clones the repository.
+
+An example of Code's workspace settings might look like the following:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.customRules": [
+        ".vscode/my-custom-rule.js",
+        ".vscode/rule-as-npm-package",
+        "c:\\absolute\\path\\to\\rule.js"
+    ]
+}
+```
+
+To troubleshoot issues loading or running custom rules, please refer to diagnostic messages from the extension in Code's Output window.
+
+For information about authoring custom rules, see [markdownlint/CustomRules](https://github.com/DavidAnson/markdownlint/blob/master/doc/CustomRules.md).
+
 ## Suppress
 
 Individual warnings can be suppressed with inline comments:

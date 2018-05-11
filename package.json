@@ -66,6 +66,15 @@
 					],
 					"default": "onType"
 				},
+				"markdownlint.customRules": {
+					"description": "Array of paths for custom rules to include when linting",
+					"scope": "window",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": []
+				},
 				"markdownlint.config": {
 					"description": "markdownlint config object",
 					"scope": "resource",

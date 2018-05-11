@@ -98,6 +98,7 @@ let outputChannel = null;
 let diagnosticCollection = null;
 let configMap = {};
 let runMap = {};
+let customRules = null;
 const throttle = {
 	"document": null,
 	"timeout": null
@@ -155,6 +156,52 @@ function getConfig (document) {
 	return (configMap[name] = configuration.get("config"));
 }
 
+// Returns custom rule configuration for user/workspace
+function getCustomRules () {
+	if (!Array.isArray(customRules)) {
+		customRules = [];
+		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
+		const customRulesPaths = configuration.get("customRules");
+		if (customRulesPaths.length) {
+			const customRulesMetadata = configuration.inspect("customRules");
+			const allow = "Allow";
+			const block = "Block";
+			const promise = customRulesMetadata.workspaceValue ?
+				vscode.window.showWarningMessage(
+					"This workspace includes custom rules for Markdown linting. " +
+					"Custom rules include JavaScript that runs within VS Code. " +
+					"Only allow custom rules if you trust the workspace.",
+					allow, block
+				) :
+				Promise.resolve(allow);
+			promise.then((response) => {
+				if (response === allow) {
+					const rootPath = vscode.workspace.workspaceFolders ?
+						vscode.workspace.workspaceFolders[0].uri.fsPath :
+						"";
+					customRulesPaths.forEach(function forPath (rulePath) {
+						const resolvedPath = path.resolve(rootPath, rulePath);
+						try {
+							customRules.push(require(resolvedPath));
+							outputLine("INFO: Loaded custom rule '" + resolvedPath + "'.");
+						} catch (ex) {
+							outputLine("ERROR: Unable to load custom rule '" + resolvedPath +
+								"' (" + (ex.message || ex.toString()) + ").");
+						}
+					});
+					lintOpenFiles();
+				}
+			});
+		}
+	}
+	return customRules;
+}
+
+// Clears the custom rule list
+function clearCustomRules () {
+	customRules = null;
+}
+
 // Lints a Markdown document
 function lint (document) {
 	// Skip if not Markdown or local file
@@ -167,33 +214,38 @@ function lint (document) {
 		"strings": {
 			"document": document.getText()
 		},
-		"config": getConfig(document)
+		"config": getConfig(document),
+		"customRules": getCustomRules()
 	};
 	const diagnostics = [];
 
 	// Lint and create Diagnostics
-	markdownlint
-		.sync(options)
-		.document
-		.forEach(function forResult (result) {
-			const ruleName = result.ruleNames[0];
-			const ruleDescription = result.ruleDescription;
-			let message = result.ruleNames.join("/") + ": " + ruleDescription;
-			if (result.errorDetail) {
-				message += " [" + result.errorDetail + "]";
-			}
-			let range = document.lineAt(result.lineNumber - 1).range;
-			if (result.errorRange) {
-				const start = result.errorRange[0] - 1;
-				const end = start + result.errorRange[1];
-				range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
-			}
-			const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-			diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
-				"#" + ruleName.toLowerCase();
-			diagnostic.source = extensionDisplayName;
-			diagnostics.push(diagnostic);
-		});
+	try {
+		markdownlint
+			.sync(options)
+			.document
+			.forEach(function forResult (result) {
+				const ruleName = result.ruleNames[0];
+				const ruleDescription = result.ruleDescription;
+				let message = result.ruleNames.join("/") + ": " + ruleDescription;
+				if (result.errorDetail) {
+					message += " [" + result.errorDetail + "]";
+				}
+				let range = document.lineAt(result.lineNumber - 1).range;
+				if (result.errorRange) {
+					const start = result.errorRange[0] - 1;
+					const end = start + result.errorRange[1];
+					range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
+				}
+				const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+				diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
+					"#" + ruleName.toLowerCase();
+				diagnostic.source = extensionDisplayName;
+				diagnostics.push(diagnostic);
+			});
+	} catch (ex) {
+		outputLine("ERROR: Exception while linting:\n" + ex.stack);
+	}
 	// Publish
 	diagnosticCollection.set(document.uri, diagnostics);
 }
@@ -321,6 +373,7 @@ function didCloseTextDocument (document) {
 function didChangeConfiguration () {
 	clearConfigMap();
 	clearRunMap();
+	clearCustomRules();
 	lintOpenFiles();
 }
 
