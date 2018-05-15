@@ -302,10 +302,12 @@ function lintOpenFiles () {
 }
 
 // Clears the map of custom configuration files and re-lints open files
-function clearConfigMap () {
+function clearConfigMap (eventUri) {
 	outputLine("INFO: Resetting configuration cache due to '" + configFileName + "' or setting change.");
 	configMap = {};
-	lintOpenFiles();
+	if (eventUri) {
+		lintOpenFiles();
+	}
 }
 
 // Returns the run setting for the document
