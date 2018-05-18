@@ -12,6 +12,7 @@
 			"## Rules",
 			"## Configure",
 			"### markdownlint.config",
+			"### markdownlint.ignore",
 			"### markdownlint.run",
 			"### markdownlint.customRules",
 			"## Suppress",

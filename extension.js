@@ -5,6 +5,7 @@
 // Requires
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
+const minimatch = require("minimatch");
 const fs = require("fs");
 const path = require("path");
 const packageJson = require("./package.json");
@@ -99,6 +100,7 @@ let diagnosticCollection = null;
 let configMap = {};
 let runMap = {};
 let customRules = null;
+let ignores = null;
 const throttle = {
 	"document": null,
 	"timeout": null
@@ -202,6 +204,30 @@ function clearCustomRules () {
 	customRules = null;
 }
 
+// Returns ignore configuration for user/workspace
+function getIgnores () {
+	if (!Array.isArray(ignores)) {
+		ignores = [];
+		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
+		const ignorePaths = configuration.get("ignore");
+		ignorePaths.forEach(function forIgnorePath (ignorePath) {
+			const ignore = minimatch.makeRe(ignorePath, {
+				"dot": true,
+				"nocomment": true
+			});
+			if (ignore) {
+				ignores.push(ignore);
+			}
+		});
+	}
+	return ignores;
+}
+
+// Clears the ignore list
+function clearIgnores () {
+	ignores = null;
+}
+
 // Lints a Markdown document
 function lint (document) {
 	// Skip if not Markdown or local file
@@ -209,43 +235,50 @@ function lint (document) {
 		return;
 	}
 
-	// Configure
-	const options = {
-		"strings": {
-			"document": document.getText()
-		},
-		"config": getConfig(document),
-		"customRules": getCustomRules()
-	};
+	// Check ignore list
 	const diagnostics = [];
+	const relativePath = vscode.workspace.asRelativePath(document.uri, false);
+	const normalizedPath = relativePath.split(path.sep).join("/");
+	if (getIgnores().every((ignore) => !ignore.test(normalizedPath))) {
 
-	// Lint and create Diagnostics
-	try {
-		markdownlint
-			.sync(options)
-			.document
-			.forEach(function forResult (result) {
-				const ruleName = result.ruleNames[0];
-				const ruleDescription = result.ruleDescription;
-				let message = result.ruleNames.join("/") + ": " + ruleDescription;
-				if (result.errorDetail) {
-					message += " [" + result.errorDetail + "]";
-				}
-				let range = document.lineAt(result.lineNumber - 1).range;
-				if (result.errorRange) {
-					const start = result.errorRange[0] - 1;
-					const end = start + result.errorRange[1];
-					range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
-				}
-				const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-				diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
-					"#" + ruleName.toLowerCase();
-				diagnostic.source = extensionDisplayName;
-				diagnostics.push(diagnostic);
-			});
-	} catch (ex) {
-		outputLine("ERROR: Exception while linting:\n" + ex.stack);
+		// Configure
+		const options = {
+			"strings": {
+				"document": document.getText()
+			},
+			"config": getConfig(document),
+			"customRules": getCustomRules()
+		};
+
+		// Lint and create Diagnostics
+		try {
+			markdownlint
+				.sync(options)
+				.document
+				.forEach(function forResult (result) {
+					const ruleName = result.ruleNames[0];
+					const ruleDescription = result.ruleDescription;
+					let message = result.ruleNames.join("/") + ": " + ruleDescription;
+					if (result.errorDetail) {
+						message += " [" + result.errorDetail + "]";
+					}
+					let range = document.lineAt(result.lineNumber - 1).range;
+					if (result.errorRange) {
+						const start = result.errorRange[0] - 1;
+						const end = start + result.errorRange[1];
+						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
+					}
+					const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+					diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
+						"#" + ruleName.toLowerCase();
+					diagnostic.source = extensionDisplayName;
+					diagnostics.push(diagnostic);
+				});
+		} catch (ex) {
+			outputLine("ERROR: Exception while linting:\n" + ex.stack);
+		}
 	}
+
 	// Publish
 	diagnosticCollection.set(document.uri, diagnostics);
 }
@@ -376,6 +409,7 @@ function didChangeConfiguration () {
 	clearConfigMap();
 	clearRunMap();
 	clearCustomRules();
+	clearIgnores();
 	lintOpenFiles();
 }
 

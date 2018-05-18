@@ -164,6 +164,26 @@ Changes saved to any of these locations take effect immediately. Files reference
 
 See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration.
 
+### markdownlint.ignore
+
+If a workspace contains generated content or other Markdown files that trigger warnings but cannot be fixed, it may be helpful to ignore (skip) those files when linting. This can be done by updating the user/workspace configuration with a glob expression matching the relevant file names.
+
+An example from Code's workspace settings might be:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.ignore": [
+        "ignore.md",
+        "directory/ignore.md",
+        "**/ignore.md",
+        "**/*.md"
+    ]
+}
+```
+
+The globbing library used for matching file names is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
+
 ### markdownlint.run
 
 By default, linting is performed as you type or edit a document. Linting is fast and efficient and should not interfere with typical workflows.

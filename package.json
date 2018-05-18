@@ -26,7 +26,8 @@
 	},
 	"main": "./extension",
 	"dependencies": {
-		"markdownlint": "0.8.1"
+		"markdownlint": "0.8.1",
+		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
 		"eslint": "~4.19.1",
@@ -56,6 +57,24 @@
 			"title": "markdownlint configuration",
 			"type": "object",
 			"properties": {
+				"markdownlint.customRules": {
+					"description": "Array of paths for custom rules to include when linting",
+					"scope": "window",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": []
+				},
+				"markdownlint.ignore": {
+					"description": "Array of file names and glob expressions to ignore when linting",
+					"scope": "window",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": []
+				},
 				"markdownlint.run": {
 					"description": "Run the linter on save (onSave) or on type (onType)",
 					"scope": "resource",
@@ -65,15 +84,6 @@
 						"onType"
 					],
 					"default": "onType"
-				},
-				"markdownlint.customRules": {
-					"description": "Array of paths for custom rules to include when linting",
-					"scope": "window",
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"default": []
 				},
 				"markdownlint.config": {
 					"description": "markdownlint config object",
