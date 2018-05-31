@@ -47,11 +47,11 @@ function removeTrailingWhitespace (text) {
 function replaceTabsWithSpaces (text) {
 	return text.replace(/\t/g, "    ");
 }
-function fixAtxHeaderFormat (text) {
+function fixAtxHeadingFormat (text) {
 	return text.replace(/^(\s*#+)\s*(.*)$/, "$1 $2");
 }
-function fixAtxClosedHeaderFormat (text) {
-	return fixAtxHeaderFormat(text).replace(/^(.*?)\s*(#+\s*)$/, "$1 $2");
+function fixAtxClosedHeadingFormat (text) {
+	return fixAtxHeadingFormat(text).replace(/^(.*?)\s*(#+\s*)$/, "$1 $2");
 }
 function fixBlockquoteSpacing (text) {
 	return text.replace(/^(\s*(> )+)\s+(.*)$/, "$1$3");
@@ -79,10 +79,10 @@ const fixFunctions = {
 	"MD009": removeTrailingWhitespace,
 	"MD010": replaceTabsWithSpaces,
 	"MD011": fixReversedLink,
-	"MD018": fixAtxHeaderFormat,
-	"MD019": fixAtxHeaderFormat,
-	"MD020": fixAtxClosedHeaderFormat,
-	"MD021": fixAtxClosedHeaderFormat,
+	"MD018": fixAtxHeadingFormat,
+	"MD019": fixAtxHeadingFormat,
+	"MD020": fixAtxClosedHeadingFormat,
+	"MD021": fixAtxClosedHeadingFormat,
 	"MD023": removeLeadingWhitespace,
 	"MD027": fixBlockquoteSpacing,
 	"MD028": addBlockquoteJoiner,
