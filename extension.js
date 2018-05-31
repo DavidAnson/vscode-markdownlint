@@ -1,7 +1,5 @@
 "use strict";
 
-/* global Promise */
-
 // Requires
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
@@ -181,7 +179,7 @@ function getCustomRules () {
 					const rootPath = vscode.workspace.workspaceFolders ?
 						vscode.workspace.workspaceFolders[0].uri.fsPath :
 						"";
-					customRulesPaths.forEach(function forPath (rulePath) {
+					customRulesPaths.forEach((rulePath) => {
 						const resolvedPath = path.resolve(rootPath, rulePath);
 						try {
 							customRules.push(require(resolvedPath));
@@ -210,7 +208,7 @@ function getIgnores () {
 		ignores = [];
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 		const ignorePaths = configuration.get("ignore");
-		ignorePaths.forEach(function forIgnorePath (ignorePath) {
+		ignorePaths.forEach((ignorePath) => {
 			const ignore = minimatch.makeRe(ignorePath, {
 				"dot": true,
 				"nocomment": true
@@ -255,7 +253,7 @@ function lint (document) {
 			markdownlint
 				.sync(options)
 				.document
-				.forEach(function forResult (result) {
+				.forEach((result) => {
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;
 					let message = result.ruleNames.join("/") + ": " + ruleDescription;
@@ -287,40 +285,40 @@ function lint (document) {
 function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
-	diagnostics.filter(function filterDiagnostic (diagnostic) {
-		return diagnostic.source === extensionDisplayName;
-	}).forEach(function forDiagnostic (diagnostic) {
-		const ruleNameAlias = diagnostic.message.split(":")[0];
-		const ruleName = ruleNameAlias.split("/")[0];
-		codeActions.push({
-			"title": clickForInfo + ruleNameAlias,
-			"command": "vscode.open",
-			"arguments": [ vscode.Uri.parse(diagnostic.code) ]
-		});
-		if (diagnostic.range.isSingleLine && fixFunctions[ruleName]) {
+	diagnostics
+		.filter((diagnostic) => diagnostic.source === extensionDisplayName)
+		.forEach((diagnostic) => {
+			const ruleNameAlias = diagnostic.message.split(":")[0];
+			const ruleName = ruleNameAlias.split("/")[0];
 			codeActions.push({
-				"title": clickToFix + ruleNameAlias,
-				"command": fixLineCommandName,
-				"arguments": [
-					diagnostic.range,
-					ruleName
-				]
+				"title": clickForInfo + ruleNameAlias,
+				"command": "vscode.open",
+				"arguments": [ vscode.Uri.parse(diagnostic.code) ]
 			});
-		}
-	});
+			if (diagnostic.range.isSingleLine && fixFunctions[ruleName]) {
+				codeActions.push({
+					"title": clickToFix + ruleNameAlias,
+					"command": fixLineCommandName,
+					"arguments": [
+						diagnostic.range,
+						ruleName
+					]
+				});
+			}
+		});
 	return codeActions;
 }
 
 // Fixes violations of a rule on a line
 function fixLine (range, ruleName) {
-	return new Promise(function executor (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		const line = editor && editor.document.lineAt(range.start.line);
 		const text = line && line.text.substring(range.start.character, range.end.character);
 		const fixFunction = fixFunctions[ruleName];
 		const fixedText = fixFunction && fixFunction(text || "");
 		if (editor && (typeof fixedText === "string")) {
-			editor.edit(function createEdits (editBuilder) {
+			editor.edit((editBuilder) => {
 				editBuilder.replace(range, fixedText);
 			}).then(resolve, reject);
 		} else {
@@ -375,7 +373,7 @@ function suppressLint (document) {
 function requestLint (document) {
 	suppressLint(document);
 	throttle.document = document;
-	throttle.timeout = setTimeout(function waitThrottleDuration () {
+	throttle.timeout = setTimeout(() => {
 		// Do not use throttle.document in this function; it may have changed
 		lint(document);
 		suppressLint(document);
