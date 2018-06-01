@@ -26,6 +26,7 @@
 	},
 	"main": "./extension",
 	"dependencies": {
+		"js-yaml": "3.11.0",
 		"markdownlint": "0.10.0",
 		"minimatch": "3.0.4"
 	},

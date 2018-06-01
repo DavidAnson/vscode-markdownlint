@@ -4,6 +4,7 @@
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
 const minimatch = require("minimatch");
+const jsYaml = require("js-yaml");
 const fs = require("fs");
 const path = require("path");
 const packageJson = require("./package.json");
@@ -14,7 +15,11 @@ const markdownlintVersion = packageJson
 	.dependencies
 	.markdownlint
 	.replace(/[^\d.]/, "");
-const configFileName = ".markdownlint.json";
+const configFileGlob = ".markdownlint.{json,yaml}";
+const configFileNames = [
+	".markdownlint.json",
+	".markdownlint.yaml"
+];
 const markdownLanguageId = "markdown";
 const markdownScheme = "file";
 const documentSelector = {
@@ -110,7 +115,7 @@ function outputLine (message) {
 	outputChannel.appendLine(datePrefix + message);
 }
 
-// Returns rule configuration from nearest .markdownlint.json or workspace
+// Returns rule configuration from nearest config file or workspace
 function getConfig (document) {
 	const name = document.fileName;
 	let dir = path.dirname(name);
@@ -123,17 +128,22 @@ function getConfig (document) {
 			return configMap[dir];
 		}
 		if (configMap[dir] === undefined) {
-			// Look for .markdownlint.json in current directory
-			const configFilePath = path.join(dir, configFileName);
-			if (fs.existsSync(configFilePath)) {
-				outputLine("INFO: Loading custom configuration from '" + configFilePath +
-					"', overrides user/workspace/custom configuration for directory and its children.");
-				try {
-					return (configMap[dir] = markdownlint.readConfigSync(configFilePath));
-				} catch (ex) {
-					outputLine("ERROR: Unable to read configuration file '" +
-						configFilePath + "' (" + (ex.message || ex.toString()) + ").");
-					outputChannel.show();
+			// Look for config file in current directory
+			for (const configFileName of configFileNames) {
+				const configFilePath = path.join(dir, configFileName);
+				if (fs.existsSync(configFilePath)) {
+					outputLine("INFO: Loading custom configuration from '" + configFilePath +
+						"', overrides user/workspace/custom configuration for directory and its children.");
+					try {
+						return (configMap[dir] = markdownlint.readConfigSync(configFilePath, [
+							JSON.parse,
+							jsYaml.safeLoad
+						]));
+					} catch (ex) {
+						outputLine("ERROR: Unable to read configuration file '" +
+							configFilePath + "' (" + (ex.message || ex.toString()) + ").");
+						outputChannel.show();
+					}
 				}
 			}
 			// Remember missing or invalid file
@@ -334,7 +344,7 @@ function lintOpenFiles () {
 
 // Clears the map of custom configuration files and re-lints open files
 function clearConfigMap (eventUri) {
-	outputLine("INFO: Resetting configuration cache due to '" + configFileName + "' or setting change.");
+	outputLine("INFO: Resetting configuration cache due to '" + configFileGlob + "' or setting change.");
 	configMap = {};
 	if (eventUri) {
 		lintOpenFiles();
@@ -442,7 +452,7 @@ function activate (context) {
 	context.subscriptions.push(diagnosticCollection);
 
 	// Hook up to file system changes for custom config file(s) ("/" vs. "\" due to bug in VS Code glob)
-	const fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/" + configFileName);
+	const fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/" + configFileGlob);
 	context.subscriptions.push(
 		fileSystemWatcher,
 		fileSystemWatcher.onDidCreate(clearConfigMap),

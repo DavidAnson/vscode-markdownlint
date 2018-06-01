@@ -76,7 +76,6 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **[MD044](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md044)** *proper-names* - Proper names should have the correct capitalization
 * **[MD045](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md045)** *no-alt-text* - Images should have alternate text (alt text)
 
-
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
 
 The following rules can be automatically fixed by moving the cursor to a rule violation (green underlined text) and typing `Ctrl+.` or clicking the light bulb icon.
@@ -111,9 +110,9 @@ The default rule configuration disables `MD013`/`line-length` because many files
 }
 ```
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` in any directory of a project. The rules defined by `.markdownlint.json` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint.json`.
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml` in any directory of a project. The rules defined by `.markdownlint.{json,yaml}` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint.{json,yaml}`.
 
-> **Note**: `.markdownlint.json` is used only if a project has been opened. When no folder is open or a file is not part of the current project, normal user and workspace settings apply (see below).
+> **Note**: `.markdownlint.{json,yaml}` is used only if a project has been opened. When no folder is open or a file is not part of the current project, normal user and workspace settings apply (see below). If both `.markdownlint.json` and `.markdownlint.yaml` are present in the same directory, only `.markdownlint.json` is used.
 
 A custom configuration is often defined by a `.markdownlint.json` file in the root of the project:
 
@@ -126,7 +125,7 @@ A custom configuration is often defined by a `.markdownlint.json` file in the ro
 }
 ```
 
-To extend another configuration file, any `.markdownlint.json` can use the `extends` property to provide a relative path:
+To extend another configuration file, any configuration file can use the `extends` property to provide a relative path:
 
 ```json
 {
@@ -155,9 +154,9 @@ The earlier configuration might look like the following in Code's user settings:
 
 Rule locations have the following precedence (in decreasing order):
 
-* `.markdownlint.json` file in the same directory
-* `.markdownlint.json` file in a parent directory
-* `.markdownlint.json` file in the root of the project
+* `.markdownlint.{json,yaml}` file in the same directory
+* `.markdownlint.{json,yaml}` file in a parent directory
+* `.markdownlint.{json,yaml}` file in the root of the project
 * Visual Studio Code user/workspace settings
 * Default configuration (see above)
 
