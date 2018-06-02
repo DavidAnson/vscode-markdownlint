@@ -1,5 +1,6 @@
 # Changes
 
+* 0.18.0 - Add support for YAML config files
 * 0.17.0 - Add support for ignoring files
 * 0.16.0 - Add support for custom rules
 * 0.15.0 - Add option to lint on type or save
