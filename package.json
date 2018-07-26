@@ -26,15 +26,15 @@
 	},
 	"main": "./extension",
 	"dependencies": {
-		"js-yaml": "3.11.0",
-		"markdownlint": "0.10.0",
+		"js-yaml": "3.12.0",
+		"markdownlint": "0.11.0",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"eslint": "~4.19.1",
+		"eslint": "~5.2.0",
 		"vscode": "~1.1.18",
-		"vsce": "~1.41.0",
-		"@types/node": "~10.1.4"
+		"vsce": "~1.44.0",
+		"@types/node": "~10.5.3"
 	},
 	"keywords": [
 		"markdown",
@@ -607,18 +607,66 @@
 						},
 						"MD024": {
 							"description": "MD024/no-duplicate-heading/no-duplicate-header - Multiple headings with the same content",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"allow_different_nesting": {
+									"description": "Only check sibling headings",
+									"type": "boolean",
+									"default": false
+								},
+								"siblings_only": {
+									"description": "Only check sibling headings",
+									"type": "boolean",
+									"default": false
+								}
+							},
+							"additionalProperties": false
 						},
 						"no-duplicate-heading": {
 							"description": "MD024/no-duplicate-heading/no-duplicate-header - Multiple headings with the same content",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"allow_different_nesting": {
+									"description": "Only check sibling headings",
+									"type": "boolean",
+									"default": false
+								},
+								"siblings_only": {
+									"description": "Only check sibling headings",
+									"type": "boolean",
+									"default": false
+								}
+							},
+							"additionalProperties": false
 						},
 						"no-duplicate-header": {
 							"description": "MD024/no-duplicate-heading/no-duplicate-header - Multiple headings with the same content",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"allow_different_nesting": {
+									"description": "Only check sibling headings",
+									"type": "boolean",
+									"default": false
+								},
+								"siblings_only": {
+									"description": "Only check sibling headings",
+									"type": "boolean",
+									"default": false
+								}
+							},
+							"additionalProperties": false
 						},
 						"MD025": {
 							"description": "MD025/single-h1 - Multiple top level headings in the same document",
