@@ -300,20 +300,30 @@ function provideCodeActions (document, range, codeActionContext) {
 		.forEach((diagnostic) => {
 			const ruleNameAlias = diagnostic.message.split(":")[0];
 			const ruleName = ruleNameAlias.split("/")[0];
-			codeActions.push({
-				"title": clickForInfo + ruleNameAlias,
+			// Provide code action for information about the violation
+			const infoTitle = clickForInfo + ruleNameAlias;
+			const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
+			infoAction.command = {
+				"title": infoTitle,
 				"command": "vscode.open",
 				"arguments": [ vscode.Uri.parse(diagnostic.code) ]
-			});
+			};
+			infoAction.diagnostics = [ diagnostic ];
+			codeActions.push(infoAction);
+			// Provide code action to fix the violation
 			if (diagnostic.range.isSingleLine && fixFunctions[ruleName]) {
-				codeActions.push({
-					"title": clickToFix + ruleNameAlias,
+				const fixTitle = clickToFix + ruleNameAlias;
+				const fixAction = new vscode.CodeAction(fixTitle, vscode.CodeActionKind.QuickFix);
+				fixAction.command = {
+					"title": fixTitle,
 					"command": fixLineCommandName,
 					"arguments": [
 						diagnostic.range,
 						ruleName
 					]
-				});
+				};
+				fixAction.diagnostics = [ diagnostic ];
+				codeActions.push(fixAction);
 			}
 		});
 	return codeActions;
