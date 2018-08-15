@@ -22,7 +22,7 @@
 		"Linters"
 	],
 	"engines": {
-		"vscode": "^1.18.0"
+		"vscode": "^1.21.0"
 	},
 	"main": "./extension",
 	"dependencies": {
