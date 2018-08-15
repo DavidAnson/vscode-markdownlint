@@ -1,5 +1,6 @@
 # Changes
 
+* 0.20.0 - Enable actions in Problems pane
 * 0.19.0 - Improved rules
 * 0.18.0 - Add support for YAML config files
 * 0.17.0 - Add support for ignoring files
