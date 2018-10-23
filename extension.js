@@ -192,10 +192,20 @@ function getCustomRules () {
 					customRulesPaths.forEach((rulePath) => {
 						const resolvedPath = path.resolve(rootPath, rulePath);
 						try {
-							customRules.push(require(resolvedPath));
-							outputLine("INFO: Loaded custom rule '" + resolvedPath + "'.");
+							const exports = require(resolvedPath);
+							const rules = Array.isArray(exports) ?
+								exports :
+								[ exports ];
+							rules.forEach((rule) => {
+								if (rule.names && rule.description && rule.tags && rule.function) {
+									customRules.push(rule);
+								} else {
+									outputLine("WARNING: Skipping invalid custom rule.");
+								}
+							});
+							outputLine("INFO: Loaded custom rules from '" + resolvedPath + "'.");
 						} catch (ex) {
-							outputLine("ERROR: Unable to load custom rule '" + resolvedPath +
+							outputLine("ERROR: Unable to load custom rules from '" + resolvedPath +
 								"' (" + (ex.message || ex.toString()) + ").");
 						}
 					});

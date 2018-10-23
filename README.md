@@ -201,7 +201,7 @@ If you find this distracting, linting can be configured to run only when the doc
 
 ### markdownlint.customRules
 
-Custom rules can be specified in Code's user/workspace configuration and used to apply additional linting beyond the default set of rules. Custom rules are identified by the path to a JavaScript file or the path to an [npm](https://www.npmjs.com/) package exporting the rule. Paths are relative to the root of the current workspace (or the Code install directory if no folder is open) and can be absolute.
+Custom rules can be specified in Code's user/workspace configuration and used to apply additional linting beyond the default set of rules. Custom rules are identified by the path to a JavaScript file or the path to an [npm](https://www.npmjs.com/) package exporting the rule(s). Paths are relative to the root of the current workspace (or the Code install directory if no folder is open) and can be absolute.
 
 When adding custom rules to a workspace, consider committing those rules under the `.vscode` directory where they will be separate from other files in the workspace and available to anyone who clones the repository.
 
@@ -212,7 +212,8 @@ An example of Code's workspace settings might look like the following:
     "editor.someSetting": true,
     "markdownlint.customRules": [
         ".vscode/my-custom-rule.js",
-        ".vscode/rule-as-npm-package",
+        ".vscode/my-custom-rule-array.js",
+        ".vscode/npm-package-for-custom-rule",
         "c:\\absolute\\path\\to\\rule.js"
     ]
 }
