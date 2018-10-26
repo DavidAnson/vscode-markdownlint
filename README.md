@@ -201,11 +201,13 @@ If you find this distracting, linting can be configured to run only when the doc
 
 ### markdownlint.customRules
 
-Custom rules can be specified in Code's user/workspace configuration and used to apply additional linting beyond the default set of rules. Custom rules are identified by the path to a JavaScript file or the path to an [npm](https://www.npmjs.com/) package exporting the rule(s). Paths are relative to the root of the current workspace (or the Code install directory if no folder is open) and can be absolute.
+Custom rules can be specified in Code's user/workspace configuration to apply additional linting beyond the default set of rules. Custom rules are specified by the path to a JavaScript file or the path to an [npm](https://www.npmjs.com/) package exporting one rule or an array of rules.
 
-When adding custom rules to a workspace, consider committing those rules under the `.vscode` directory where they will be separate from other files in the workspace and available to anyone who clones the repository.
+Paths are normally relative to the root of the current workspace (or the Code install directory when no folder is open). Paths can also be absolute. When adding custom rules to a workspace, consider committing those rules under the `.vscode` directory where they will be separate from other workspace content and available to everyone who clones the repository.
 
-An example of Code's workspace settings might look like the following:
+Paths of the form `{extension}/path` are relative to the base directory of the Code extension named `extension` (which must already be installed). This syntax allows custom rules to be included within another extension's package and shared across multiple workspaces.
+
+An example of Code's workspace settings for custom rules might look like the following:
 
 ```json
 {
@@ -214,7 +216,9 @@ An example of Code's workspace settings might look like the following:
         ".vscode/my-custom-rule.js",
         ".vscode/my-custom-rule-array.js",
         ".vscode/npm-package-for-custom-rule",
-        "c:\\absolute\\path\\to\\rule.js"
+        "c:\\absolute\\path\\to\\custom\\rule.js",
+        "{publisher.extension-name}/custom-rule.js",
+        "{publisher.extension-name}/npm/rule/package"
     ]
 }
 ```

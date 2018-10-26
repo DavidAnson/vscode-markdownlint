@@ -33,6 +33,7 @@ const clickForInfo = "Click for more information about ";
 const clickToFix = "Click to fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
 const throttleDuration = 500;
+const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 
 // Shared RegExps
 const bareUrlRe = /(?:http|ftp)s?:\/\/[^\s]*/i;
@@ -186,12 +187,24 @@ function getCustomRules () {
 				Promise.resolve(allow);
 			promise.then((response) => {
 				if (response === allow) {
-					const rootPath = vscode.workspace.workspaceFolders ?
+					const workspacePath = vscode.workspace.workspaceFolders ?
 						vscode.workspace.workspaceFolders[0].uri.fsPath :
 						"";
 					customRulesPaths.forEach((rulePath) => {
-						const resolvedPath = path.resolve(rootPath, rulePath);
+						let resolvedPath = null;
 						try {
+							const match = customRuleExtensionPrefixRe.exec(rulePath);
+							if (match) {
+								const extensionName = match[1];
+								const relativePath = match[2];
+								const extension = vscode.extensions.getExtension(extensionName);
+								if (!extension) {
+									throw new Error(`Extension '${extensionName}' not installed`);
+								}
+								resolvedPath = path.resolve(extension.extensionPath, relativePath);
+							} else {
+								resolvedPath = path.resolve(workspacePath, rulePath);
+							}
 							const exports = require(resolvedPath);
 							const rules = Array.isArray(exports) ?
 								exports :
@@ -200,12 +213,12 @@ function getCustomRules () {
 								if (rule.names && rule.description && rule.tags && rule.function) {
 									customRules.push(rule);
 								} else {
-									outputLine("WARNING: Skipping invalid custom rule.");
+									outputLine(`WARNING: Skipping invalid custom rule '${JSON.stringify(rule)}'.`);
 								}
 							});
-							outputLine("INFO: Loaded custom rules from '" + resolvedPath + "'.");
+							outputLine(`INFO: Loaded custom rules from '${resolvedPath}'.`);
 						} catch (ex) {
-							outputLine("ERROR: Unable to load custom rules from '" + resolvedPath +
+							outputLine("ERROR: Unable to load custom rules from '" + (resolvedPath || rulePath) +
 								"' (" + (ex.message || ex.toString()) + ").");
 						}
 					});
