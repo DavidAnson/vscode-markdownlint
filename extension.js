@@ -323,16 +323,6 @@ function provideCodeActions (document, range, codeActionContext) {
 		.forEach((diagnostic) => {
 			const ruleNameAlias = diagnostic.message.split(":")[0];
 			const ruleName = ruleNameAlias.split("/")[0];
-			// Provide code action for information about the violation
-			const infoTitle = clickForInfo + ruleNameAlias;
-			const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
-			infoAction.command = {
-				"title": infoTitle,
-				"command": "vscode.open",
-				"arguments": [ vscode.Uri.parse(diagnostic.code) ]
-			};
-			infoAction.diagnostics = [ diagnostic ];
-			codeActions.push(infoAction);
 			// Provide code action to fix the violation
 			if (diagnostic.range.isSingleLine && fixFunctions[ruleName]) {
 				const fixTitle = clickToFix + ruleNameAlias;
@@ -348,6 +338,16 @@ function provideCodeActions (document, range, codeActionContext) {
 				fixAction.diagnostics = [ diagnostic ];
 				codeActions.push(fixAction);
 			}
+			// Provide code action for information about the violation
+			const infoTitle = clickForInfo + ruleNameAlias;
+			const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
+			infoAction.command = {
+				"title": infoTitle,
+				"command": "vscode.open",
+				"arguments": [ vscode.Uri.parse(diagnostic.code) ]
+			};
+			infoAction.diagnostics = [ diagnostic ];
+			codeActions.push(infoAction);
 		});
 	return codeActions;
 }
