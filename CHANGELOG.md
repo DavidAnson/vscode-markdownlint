@@ -1,5 +1,6 @@
 # Changes
 
+* 0.22.0 - Code action improvements
 * 0.21.0 - Custom rule improvements
 * 0.20.0 - Enable actions in Problems pane
 * 0.19.0 - Improved rules
