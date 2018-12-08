@@ -280,6 +280,7 @@ function lint (document) {
 			"config": getConfig(document),
 			"customRules": getCustomRules()
 		};
+		const customRuleNames = options.customRules.map((rule) => rule.names[0]);
 
 		// Lint and create Diagnostics
 		try {
@@ -300,8 +301,10 @@ function lint (document) {
 						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
 					}
 					const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-					diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
-						"#" + ruleName.toLowerCase();
+					if (!customRuleNames.includes(ruleName)) {
+						diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
+							"#" + ruleName.toLowerCase();
+					}
 					diagnostic.source = extensionDisplayName;
 					diagnostics.push(diagnostic);
 				});
@@ -339,15 +342,17 @@ function provideCodeActions (document, range, codeActionContext) {
 				codeActions.push(fixAction);
 			}
 			// Provide code action for information about the violation
-			const infoTitle = clickForInfo + ruleNameAlias;
-			const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
-			infoAction.command = {
-				"title": infoTitle,
-				"command": "vscode.open",
-				"arguments": [ vscode.Uri.parse(diagnostic.code) ]
-			};
-			infoAction.diagnostics = [ diagnostic ];
-			codeActions.push(infoAction);
+			if (diagnostic.code) {
+				const infoTitle = clickForInfo + ruleNameAlias;
+				const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
+				infoAction.command = {
+					"title": infoTitle,
+					"command": "vscode.open",
+					"arguments": [ vscode.Uri.parse(diagnostic.code) ]
+				};
+				infoAction.diagnostics = [ diagnostic ];
+				codeActions.push(infoAction);
+			}
 		});
 	return codeActions;
 }
