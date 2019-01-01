@@ -280,7 +280,6 @@ function lint (document) {
 			"config": getConfig(document),
 			"customRules": getCustomRules()
 		};
-		const customRuleNames = options.customRules.map((rule) => rule.names[0]);
 
 		// Lint and create Diagnostics
 		try {
@@ -301,10 +300,7 @@ function lint (document) {
 						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
 					}
 					const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-					if (!customRuleNames.includes(ruleName)) {
-						diagnostic.code = markdownlintRulesMdPrefix + markdownlintVersion + markdownlintRulesMdPostfix +
-							"#" + ruleName.toLowerCase();
-					}
+					diagnostic.code = ruleName;
 					diagnostic.source = extensionDisplayName;
 					diagnostics.push(diagnostic);
 				});
@@ -319,13 +315,14 @@ function lint (document) {
 
 // Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
 function provideCodeActions (document, range, codeActionContext) {
+	const customRuleNames = getCustomRules().map((rule) => rule.names[0]);
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
 	diagnostics
 		.filter((diagnostic) => diagnostic.source === extensionDisplayName)
 		.forEach((diagnostic) => {
+			const ruleName = diagnostic.code;
 			const ruleNameAlias = diagnostic.message.split(":")[0];
-			const ruleName = ruleNameAlias.split("/")[0];
 			// Provide code action to fix the violation
 			if (diagnostic.range.isSingleLine && fixFunctions[ruleName]) {
 				const fixTitle = clickToFix + ruleNameAlias;
@@ -342,13 +339,20 @@ function provideCodeActions (document, range, codeActionContext) {
 				codeActions.push(fixAction);
 			}
 			// Provide code action for information about the violation
-			if (diagnostic.code) {
+			if (!customRuleNames.includes(ruleName)) {
 				const infoTitle = clickForInfo + ruleNameAlias;
 				const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
+				const infoUri = [
+					markdownlintRulesMdPrefix,
+					markdownlintVersion,
+					markdownlintRulesMdPostfix,
+					"#",
+					ruleName.toLowerCase()
+				].join("");
 				infoAction.command = {
 					"title": infoTitle,
 					"command": "vscode.open",
-					"arguments": [ vscode.Uri.parse(diagnostic.code) ]
+					"arguments": [ vscode.Uri.parse(infoUri) ]
 				};
 				infoAction.diagnostics = [ diagnostic ];
 				codeActions.push(infoAction);
