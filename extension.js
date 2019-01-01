@@ -136,6 +136,7 @@ function getConfig (document) {
 					outputLine("INFO: Loading custom configuration from '" + configFilePath +
 						"', overrides user/workspace/custom configuration for directory and its children.");
 					try {
+						// @ts-ignore
 						return (configMap[dir] = markdownlint.readConfigSync(configFilePath, [
 							JSON.parse,
 							jsYaml.safeLoad
@@ -286,6 +287,7 @@ function lint (document) {
 			markdownlint
 				.sync(options)
 				.document
+				// @ts-ignore
 				.forEach((result) => {
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;
