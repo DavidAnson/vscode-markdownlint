@@ -284,9 +284,10 @@ function lint (document) {
 	if (getIgnores().every((ignore) => !ignore.test(normalizedPath))) {
 
 		// Configure
+		const uri = document.uri.toString();
 		const options = {
 			"strings": {
-				"document": document.getText()
+				[uri]: document.getText()
 			},
 			"config": getConfig(document),
 			"customRules": getCustomRules()
@@ -295,8 +296,7 @@ function lint (document) {
 		// Lint and create Diagnostics
 		try {
 			markdownlint
-				.sync(options)
-				.document
+				.sync(options)[uri]
 				// @ts-ignore
 				.forEach((result) => {
 					const ruleName = result.ruleNames[0];
