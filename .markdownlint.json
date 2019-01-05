@@ -15,6 +15,7 @@
 			"### markdownlint.ignore",
 			"### markdownlint.run",
 			"### markdownlint.customRules",
+			"### markdownlint.customRulesAlwaysAllow",
 			"## Suppress",
 			"## History"
 		]

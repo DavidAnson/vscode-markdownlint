@@ -57,9 +57,18 @@
 			}
 		],
 		"configuration": {
-			"title": "markdownlint configuration",
+			"title": "markdownlint",
 			"type": "object",
 			"properties": {
+				"markdownlint.customRulesAlwaysAllow": {
+					"description": "Array of workspace paths that load custom rules without prompting",
+					"scope": "application",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": []
+				},
 				"markdownlint.customRules": {
 					"description": "Array of paths for custom rules to include when linting",
 					"scope": "window",

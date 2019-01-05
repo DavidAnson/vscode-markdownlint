@@ -227,6 +227,12 @@ To troubleshoot issues loading or running custom rules, please refer to diagnost
 
 For information about authoring custom rules, see [markdownlint/CustomRules](https://github.com/DavidAnson/markdownlint/blob/master/doc/CustomRules.md).
 
+### markdownlint.customRulesAlwaysAllow
+
+A list of workspace paths for which the user's response to the custom rule prompt was "Always allow". This setting is updated automatically by the extension, but can be modified to reset the prompt for a workspace.
+
+> **Note**: This setting is only valid as a user setting, not as a workspace setting (where it could be set by a malicious workspace).
+
 ## Suppress
 
 Individual warnings can be suppressed with inline comments:

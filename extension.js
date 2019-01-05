@@ -172,22 +172,32 @@ function getConfig (document) {
 function getCustomRules () {
 	if (!Array.isArray(customRules)) {
 		customRules = [];
+		const itemAllow = "Allow";
+		const itemAlwaysAllow = "Always allow";
+		const itemBlock = "Block";
+		const sectionCustomRules = "customRules";
+		const sectionCustomRulesAlwaysAllow = "customRulesAlwaysAllow";
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
-		const customRulesPaths = configuration.get("customRules");
+		const customRulesPaths = configuration.get(sectionCustomRules);
 		if (customRulesPaths.length) {
-			const customRulesMetadata = configuration.inspect("customRules");
-			const allow = "Allow";
-			const block = "Block";
-			const promise = customRulesMetadata.workspaceValue ?
+			const workspaceRootPath = vscode.workspace.rootPath;
+			const allowPaths = configuration.get(sectionCustomRulesAlwaysAllow);
+			const customRulesMetadata = configuration.inspect(sectionCustomRules);
+			const showWarning = customRulesMetadata.workspaceValue && !allowPaths.includes(workspaceRootPath);
+			const promise = showWarning ?
 				vscode.window.showWarningMessage(
 					"This workspace includes custom rules for Markdown linting. " +
 					"Custom rules include JavaScript that runs within VS Code. " +
 					"Only allow custom rules if you trust the workspace.",
-					allow, block
+					itemAllow, itemAlwaysAllow, itemBlock
 				) :
-				Promise.resolve(allow);
+				Promise.resolve(itemAllow);
 			promise.then((response) => {
-				if (response === allow) {
+				if (response === itemAlwaysAllow) {
+					allowPaths.push(workspaceRootPath);
+					configuration.update(sectionCustomRulesAlwaysAllow, allowPaths, vscode.ConfigurationTarget.Global);
+				}
+				if ((response === itemAllow) || (response === itemAlwaysAllow)) {
 					const workspacePath = vscode.workspace.workspaceFolders ?
 						vscode.workspace.workspaceFolders[0].uri.fsPath :
 						"";

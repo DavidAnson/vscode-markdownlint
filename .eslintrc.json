@@ -67,7 +67,7 @@
         "max-depth": ["error", 6],
         "max-len": ["error", 130],
         "max-lines": ["error", 600],
-        "max-lines-per-function": ["error", 65],
+        "max-lines-per-function": ["error", 80],
         "max-nested-callbacks": "error",
         "max-params": "error",
         "max-statements": ["error", 26],
