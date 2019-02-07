@@ -11,10 +11,6 @@ const packageJson = require("./package.json");
 
 // Constants
 const extensionDisplayName = packageJson.displayName;
-const markdownlintVersion = packageJson
-	.dependencies
-	.markdownlint
-	.replace(/[^\d.]/, "");
 const configFileGlob = ".markdownlint.{json,yaml}";
 const configFileNames = [
 	".markdownlint.json",
@@ -27,8 +23,6 @@ const documentSelector = {
 	"scheme": markdownScheme
 };
 
-const markdownlintRulesMdPrefix = "https://github.com/DavidAnson/markdownlint/blob/v";
-const markdownlintRulesMdPostfix = "/doc/Rules.md";
 const clickForInfo = "Click for more information about ";
 const clickToFix = "Click to fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
@@ -99,6 +93,7 @@ const fixFunctions = {
 };
 
 // Variables
+const ruleNameToInformation = {};
 let outputChannel = null;
 let diagnosticCollection = null;
 let configMap = {};
@@ -301,6 +296,7 @@ function lint (document) {
 				.forEach((result) => {
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;
+					ruleNameToInformation[ruleName] = result.ruleInformation;
 					let message = result.ruleNames.join("/") + ": " + ruleDescription;
 					if (result.errorDetail) {
 						message += " [" + result.errorDetail + "]";
@@ -327,7 +323,6 @@ function lint (document) {
 
 // Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
 function provideCodeActions (document, range, codeActionContext) {
-	const customRuleNames = getCustomRules().map((rule) => rule.names[0]);
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
 	diagnostics
@@ -351,20 +346,14 @@ function provideCodeActions (document, range, codeActionContext) {
 				codeActions.push(fixAction);
 			}
 			// Provide code action for information about the violation
-			if (!customRuleNames.includes(ruleName)) {
+			const ruleInformation = ruleNameToInformation[ruleName];
+			if (ruleInformation) {
 				const infoTitle = clickForInfo + ruleNameAlias;
 				const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
-				const infoUri = [
-					markdownlintRulesMdPrefix,
-					markdownlintVersion,
-					markdownlintRulesMdPostfix,
-					"#",
-					ruleName.toLowerCase()
-				].join("");
 				infoAction.command = {
 					"title": infoTitle,
 					"command": "vscode.open",
-					"arguments": [ vscode.Uri.parse(infoUri) ]
+					"arguments": [ vscode.Uri.parse(ruleInformation) ]
 				};
 				infoAction.diagnostics = [ diagnostic ];
 				codeActions.push(infoAction);
