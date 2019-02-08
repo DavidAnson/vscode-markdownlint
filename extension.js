@@ -11,10 +11,11 @@ const packageJson = require("./package.json");
 
 // Constants
 const extensionDisplayName = packageJson.displayName;
-const configFileGlob = ".markdownlint.{json,yaml}";
+const configFileGlob = ".markdownlint.{json,yaml,yml}";
 const configFileNames = [
 	".markdownlint.json",
-	".markdownlint.yaml"
+	".markdownlint.yaml",
+	".markdownlint.yml"
 ];
 const markdownLanguageId = "markdown";
 const markdownScheme = "file";

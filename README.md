@@ -110,9 +110,9 @@ The default rule configuration disables `MD013`/`line-length` because many files
 }
 ```
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml` in any directory of a project. The rules defined by `.markdownlint.{json,yaml}` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint.{json,yaml}`.
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml` (or `.markdownlint.yml`) in any directory of a project. The rules defined by `.markdownlint.{json,yaml,yml}` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint.{json,yaml,yml}`.
 
-> **Note**: `.markdownlint.{json,yaml}` is used only if a project has been opened. When no folder is open or a file is not part of the current project, normal user and workspace settings apply (see below). If both `.markdownlint.json` and `.markdownlint.yaml` are present in the same directory, only `.markdownlint.json` is used.
+> **Note**: `.markdownlint.{json,yaml,yml}` is used only if a project has been opened. When no folder is open or a file is not part of the current project, normal user and workspace settings apply (see below). If multiple of these files are present in the same directory, `.json` will be used instead of `.yaml` or `.yml`; `.yaml` will be used instead of `.yml`.
 
 A custom configuration is often defined by a `.markdownlint.json` file in the root of the project:
 
@@ -154,9 +154,9 @@ The earlier configuration might look like the following in Code's user settings:
 
 Rule locations have the following precedence (in decreasing order):
 
-* `.markdownlint.{json,yaml}` file in the same directory
-* `.markdownlint.{json,yaml}` file in a parent directory
-* `.markdownlint.{json,yaml}` file in the root of the project
+* `.markdownlint.{json,yaml,yml}` file in the same directory
+* `.markdownlint.{json,yaml,yml}` file in a parent directory
+* `.markdownlint.{json,yaml,yml}` file in the root of the project
 * Visual Studio Code user/workspace settings
 * Default configuration (see above)
 
