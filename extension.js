@@ -3,6 +3,7 @@
 // Requires
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
+const markdownItKatex = require("markdown-it-katex");
 const minimatch = require("minimatch");
 const jsYaml = require("js-yaml");
 const fs = require("fs");
@@ -286,7 +287,8 @@ function lint (document) {
 				[uri]: document.getText()
 			},
 			"config": getConfig(document),
-			"customRules": getCustomRules()
+			"customRules": getCustomRules(),
+			"markdownItPlugins": [ [ markdownItKatex ] ]
 		};
 
 		// Lint and create Diagnostics
