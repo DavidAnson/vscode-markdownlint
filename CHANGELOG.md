@@ -1,5 +1,6 @@
 # Changes
 
+* 0.24.0 - Improved rules, custom links, math blocks
 * 0.23.0 - UI and custom rule improvements
 * 0.22.0 - Code action improvements
 * 0.21.0 - Custom rule improvements
