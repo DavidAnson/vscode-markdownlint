@@ -2,16 +2,25 @@
 
 // Requires
 const vscode = require("vscode");
-const markdownlint = require("markdownlint");
-const markdownItKatex = require("markdown-it-katex");
-const minimatch = require("minimatch");
-const jsYaml = require("js-yaml");
-const fs = require("fs");
-const path = require("path");
-const packageJson = require("./package.json");
+
+// Lazy requires
+function lazyRequire (name) {
+	let module = null;
+	return new Proxy({}, {
+		"get": (obj, prop) => {
+			module = module || require(name);
+			return module[prop];
+		}
+	});
+}
+const markdownlint = lazyRequire("markdownlint");
+const minimatch = lazyRequire("minimatch");
+const jsYaml = lazyRequire("js-yaml");
+const fs = lazyRequire("fs");
+const path = lazyRequire("path");
 
 // Constants
-const extensionDisplayName = packageJson.displayName;
+const extensionDisplayName = "markdownlint";
 const configFileGlob = ".markdownlint.{json,yaml,yml}";
 const configFileNames = [
 	".markdownlint.json",
@@ -288,7 +297,7 @@ function lint (document) {
 			},
 			"config": getConfig(document),
 			"customRules": getCustomRules(),
-			"markdownItPlugins": [ [ markdownItKatex ] ]
+			"markdownItPlugins": [ [ require("markdown-it-katex") ] ]
 		};
 
 		// Lint and create Diagnostics
