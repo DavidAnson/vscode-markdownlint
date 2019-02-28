@@ -125,6 +125,7 @@ function outputLine (message) {
 // Returns rule configuration from nearest config file or workspace
 function getConfig (document) {
 	const name = document.fileName;
+	// @ts-ignore
 	let dir = path.dirname(name);
 	let workspaceDetail = "not in a workspace folder";
 	// While inside the workspace
@@ -137,7 +138,9 @@ function getConfig (document) {
 		if (configMap[dir] === undefined) {
 			// Look for config file in current directory
 			for (const configFileName of configFileNames) {
+				// @ts-ignore
 				const configFilePath = path.join(dir, configFileName);
+				// @ts-ignore
 				if (fs.existsSync(configFilePath)) {
 					outputLine("INFO: Loading custom configuration from '" + configFilePath +
 						"', overrides user/workspace/custom configuration for directory and its children.");
@@ -145,7 +148,8 @@ function getConfig (document) {
 						// @ts-ignore
 						return (configMap[dir] = markdownlint.readConfigSync(configFilePath, [
 							JSON.parse,
-							jsYaml.safeLoad
+							// @ts-ignore
+							(content) => jsYaml.safeLoad(content)
 						]));
 					} catch (ex) {
 						outputLine("ERROR: Unable to read configuration file '" +
@@ -157,8 +161,9 @@ function getConfig (document) {
 			// Remember missing or invalid file
 			configMap[dir] = null;
 		}
-		// Move to parent directory, stop if no parent
+		// @ts-ignore
 		const parent = path.dirname(dir);
+		// Move to parent directory, stop if no parent
 		if (dir === parent) {
 			break;
 		}
@@ -218,8 +223,10 @@ function getCustomRules () {
 								if (!extension) {
 									throw new Error(`Extension '${extensionName}' not installed`);
 								}
+								// @ts-ignore
 								resolvedPath = path.resolve(extension.extensionPath, relativePath);
 							} else {
+								// @ts-ignore
 								resolvedPath = path.resolve(workspacePath, rulePath);
 							}
 							const exports = require(resolvedPath);
@@ -259,6 +266,7 @@ function getIgnores () {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 		const ignorePaths = configuration.get("ignore");
 		ignorePaths.forEach((ignorePath) => {
+			// @ts-ignore
 			const ignore = minimatch.makeRe(ignorePath, {
 				"dot": true,
 				"nocomment": true
@@ -286,6 +294,7 @@ function lint (document) {
 	// Check ignore list
 	const diagnostics = [];
 	const relativePath = vscode.workspace.asRelativePath(document.uri, false);
+	// @ts-ignore
 	const normalizedPath = relativePath.split(path.sep).join("/");
 	if (getIgnores().every((ignore) => !ignore.test(normalizedPath))) {
 
@@ -303,8 +312,8 @@ function lint (document) {
 		// Lint and create Diagnostics
 		try {
 			markdownlint
-				.sync(options)[uri]
 				// @ts-ignore
+				.sync(options)[uri]
 				.forEach((result) => {
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;
