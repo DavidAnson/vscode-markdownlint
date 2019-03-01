@@ -246,7 +246,7 @@ function getCustomRules () {
 								"' (" + (ex.message || ex.toString()) + ").");
 						}
 					});
-					lintOpenFiles();
+					lintVisibleFiles();
 				}
 			});
 		}
@@ -401,17 +401,18 @@ function fixLine (range, ruleName) {
 	});
 }
 
-// Lint all open files
-function lintOpenFiles () {
-	(vscode.workspace.textDocuments || []).forEach(lint);
+// Lint all visible files
+function lintVisibleFiles () {
+	diagnosticCollection.clear();
+	vscode.window.visibleTextEditors.forEach((textEditor) => lint(textEditor.document));
 }
 
-// Clears the map of custom configuration files and re-lints open files
+// Clears the map of custom configuration files and re-lints files
 function clearConfigMap (eventUri) {
 	outputLine("INFO: Resetting configuration cache due to '" + configFileGlob + "' or setting change.");
 	configMap = {};
 	if (eventUri) {
-		lintOpenFiles();
+		lintVisibleFiles();
 	}
 }
 
@@ -454,6 +455,11 @@ function requestLint (document) {
 	}, throttleDuration);
 }
 
+// Handles the onDidChangeVisibleTextEditors event
+function didChangeVisibleTextEditors (textEditors) {
+	textEditors.forEach((textEditor) => lint(textEditor.document));
+}
+
 // Handles the onDidChangeTextDocument event
 function didChangeTextDocument (change) {
 	const document = change.document;
@@ -482,7 +488,7 @@ function didChangeConfiguration () {
 	clearRunMap();
 	clearCustomRules();
 	clearIgnores();
-	lintOpenFiles();
+	lintVisibleFiles();
 }
 
 function activate (context) {
@@ -492,7 +498,7 @@ function activate (context) {
 
 	// Hook up to workspace events
 	context.subscriptions.push(
-		vscode.workspace.onDidOpenTextDocument(lint),
+		vscode.window.onDidChangeVisibleTextEditors(didChangeVisibleTextEditors),
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
 		vscode.workspace.onDidSaveTextDocument(didSaveTextDocument),
 		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
@@ -524,8 +530,8 @@ function activate (context) {
 		fileSystemWatcher.onDidDelete(clearConfigMap)
 	);
 
-	// Lint already-open files
-	lintOpenFiles();
+	// Lint already-visible files
+	lintVisibleFiles();
 }
 
 exports.activate = activate;
