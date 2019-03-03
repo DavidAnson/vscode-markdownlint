@@ -28,16 +28,16 @@
 	},
 	"main": "./extension",
 	"dependencies": {
-		"js-yaml": "3.12.1",
+		"js-yaml": "3.12.2",
 		"markdownlint": "0.12.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"eslint": "~5.13.0",
-		"vscode": "~1.1.28",
-		"vsce": "~1.55.0",
-		"@types/node": "~10.12.21"
+		"eslint": "~5.15.0",
+		"vscode": "~1.1.30",
+		"vsce": "~1.57.1",
+		"@types/node": "~11.10.4"
 	},
 	"keywords": [
 		"markdown",

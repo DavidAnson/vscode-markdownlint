@@ -396,7 +396,7 @@ function fixLine (range, ruleName) {
 				editBuilder.replace(range, fixedText);
 			}).then(resolve, reject);
 		} else {
-			reject();
+			reject(new Error("Unable to fix rule violaton."));
 		}
 	});
 }
@@ -508,7 +508,7 @@ function activate (context) {
 	// Register CodeActionsProvider
 	context.subscriptions.push(
 		vscode.languages.registerCodeActionsProvider(documentSelector, {
-			"provideCodeActions": provideCodeActions
+			provideCodeActions
 		})
 	);
 
