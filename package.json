@@ -29,15 +29,15 @@
 	"main": "./extension",
 	"dependencies": {
 		"js-yaml": "3.13.0",
-		"markdownlint": "0.12.0",
+		"markdownlint": "0.13.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"eslint": "~5.15.0",
-		"vscode": "~1.1.30",
-		"vsce": "~1.57.1",
-		"@types/node": "~11.10.4"
+		"eslint": "~5.16.0",
+		"vscode": "~1.1.33",
+		"vsce": "~1.59.0",
+		"@types/node": "~11.13.0"
 	},
 	"keywords": [
 		"markdown",
@@ -478,6 +478,11 @@
 									"type": "integer",
 									"default": 80
 								},
+								"heading_line_length": {
+									"description": "Number of characters for headings",
+									"type": "integer",
+									"default": 80
+								},
 								"code_blocks": {
 									"description": "Include code blocks",
 									"type": "boolean",
@@ -511,6 +516,11 @@
 							"properties": {
 								"line_length": {
 									"description": "Number of characters",
+									"type": "integer",
+									"default": 80
+								},
+								"heading_line_length": {
+									"description": "Number of characters for headings",
 									"type": "integer",
 									"default": 80
 								},
@@ -589,18 +599,66 @@
 						},
 						"MD022": {
 							"description": "MD022/blanks-around-headings/blanks-around-headers - Headings should be surrounded by blank lines",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"lines_above": {
+									"description": "Blank lines above heading",
+									"type": "integer",
+									"default": 1
+								},
+								"lines_below": {
+									"description": "Blank lines below heading",
+									"type": "integer",
+									"default": 1
+								}
+							},
+							"additionalProperties": false
 						},
 						"blanks-around-headings": {
 							"description": "MD022/blanks-around-headings/blanks-around-headers - Headings should be surrounded by blank lines",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"lines_above": {
+									"description": "Blank lines above heading",
+									"type": "integer",
+									"default": 1
+								},
+								"lines_below": {
+									"description": "Blank lines below heading",
+									"type": "integer",
+									"default": 1
+								}
+							},
+							"additionalProperties": false
 						},
 						"blanks-around-headers": {
 							"description": "MD022/blanks-around-headings/blanks-around-headers - Headings should be surrounded by blank lines",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"lines_above": {
+									"description": "Blank lines above heading",
+									"type": "integer",
+									"default": 1
+								},
+								"lines_below": {
+									"description": "Blank lines below heading",
+									"type": "integer",
+									"default": 1
+								}
+							},
+							"additionalProperties": false
 						},
 						"MD023": {
 							"description": "MD023/heading-start-left/header-start-left - Headings must start at the beginning of the line",
@@ -681,7 +739,7 @@
 							"additionalProperties": false
 						},
 						"MD025": {
-							"description": "MD025/single-h1 - Multiple top level headings in the same document",
+							"description": "MD025/single-title/single-h1 - Multiple top level headings in the same document",
 							"type": [
 								"boolean",
 								"object"
@@ -692,12 +750,38 @@
 									"description": "Heading level",
 									"type": "integer",
 									"default": 1
+								},
+								"front_matter_title": {
+									"description": "RegExp for matching title in front matter",
+									"type": "string",
+									"default": "^\\s*title\\s*[:=]"
+								}
+							},
+							"additionalProperties": false
+						},
+						"single-title": {
+							"description": "MD025/single-title/single-h1 - Multiple top level headings in the same document",
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"level": {
+									"description": "Heading level",
+									"type": "integer",
+									"default": 1
+								},
+								"front_matter_title": {
+									"description": "RegExp for matching title in front matter",
+									"type": "string",
+									"default": "^\\s*title\\s*[:=]"
 								}
 							},
 							"additionalProperties": false
 						},
 						"single-h1": {
-							"description": "MD025/single-h1 - Multiple top level headings in the same document",
+							"description": "MD025/single-title/single-h1 - Multiple top level headings in the same document",
 							"type": [
 								"boolean",
 								"object"
@@ -708,6 +792,11 @@
 									"description": "Heading level",
 									"type": "integer",
 									"default": 1
+								},
+								"front_matter_title": {
+									"description": "RegExp for matching title in front matter",
+									"type": "string",
+									"default": "^\\s*title\\s*[:=]"
 								}
 							},
 							"additionalProperties": false
@@ -778,7 +867,8 @@
 									"enum": [
 										"one",
 										"ordered",
-										"one_or_ordered"
+										"one_or_ordered",
+										"zero"
 									],
 									"default": "one_or_ordered"
 								}
@@ -799,7 +889,8 @@
 									"enum": [
 										"one",
 										"ordered",
-										"one_or_ordered"
+										"one_or_ordered",
+										"zero"
 									],
 									"default": "one_or_ordered"
 								}
@@ -1057,7 +1148,28 @@
 							"default": true
 						},
 						"MD041": {
-							"description": "MD041/first-line-h1 - First line in file should be a top level heading",
+							"description": "MD041/first-line-heading/first-line-h1 - First line in file should be a top level heading",
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"level": {
+									"description": "Heading level",
+									"type": "integer",
+									"default": 1
+								},
+								"front_matter_title": {
+									"description": "RegExp for matching title in front matter",
+									"type": "string",
+									"default": "^\\s*title\\s*[:=]"
+								}
+							},
+							"additionalProperties": false
+						},
+						"first-line-heading": {
+							"description": "MD041/first-line-heading/first-line-h1 - First line in file should be a top level heading",
 							"type": [
 								"boolean",
 								"object"
@@ -1078,7 +1190,7 @@
 							"additionalProperties": false
 						},
 						"first-line-h1": {
-							"description": "MD041/first-line-h1 - First line in file should be a top level heading",
+							"description": "MD041/first-line-heading/first-line-h1 - First line in file should be a top level heading",
 							"type": [
 								"boolean",
 								"object"

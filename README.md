@@ -54,7 +54,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **[MD022](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md022)** *blanks-around-headings/blanks-around-headers* - Headings should be surrounded by blank lines
 * **[MD023](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md023)** *heading-start-left/header-start-left* - Headings must start at the beginning of the line
 * **[MD024](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md024)** *no-duplicate-heading/no-duplicate-header* - Multiple headings with the same content
-* **[MD025](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md025)** *single-h1* - Multiple top level headings in the same document
+* **[MD025](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md025)** *single-title/single-h1* - Multiple top level headings in the same document
 * **[MD026](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md026)** *no-trailing-punctuation* - Trailing punctuation in heading
 * **[MD027](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md027)** *no-multiple-space-blockquote* - Multiple spaces after blockquote symbol
 * **[MD028](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md028)** *no-blanks-blockquote* - Blank line inside blockquote
@@ -70,7 +70,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **[MD038](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md038)** *no-space-in-code* - Spaces inside code span elements
 * **[MD039](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md039)** *no-space-in-links* - Spaces inside link text
 * **[MD040](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md040)** *fenced-code-language* - Fenced code blocks should have a language specified
-* **[MD041](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md041)** *first-line-h1* - First line in file should be a top level heading
+* **[MD041](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md041)** *first-line-heading/first-line-h1* - First line in file should be a top level heading
 * **[MD042](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md042)** *no-empty-links* - No empty links
 * **[MD043](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md043)** *required-headings/required-headers* - Required heading structure
 * **[MD044](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md044)** *proper-names* - Proper names should have the correct capitalization
