@@ -246,7 +246,7 @@ function getCustomRules () {
 								"' (" + (ex.message || ex.toString()) + ").");
 						}
 					});
-					lintVisibleFiles();
+					cleanLintVisibleFiles();
 				}
 			});
 		}
@@ -401,10 +401,10 @@ function fixLine (range, ruleName) {
 	});
 }
 
-// Lint all visible files
-function lintVisibleFiles () {
+// Cleanly (i.e., from scratch) lint all visible files
+function cleanLintVisibleFiles () {
 	diagnosticCollection.clear();
-	vscode.window.visibleTextEditors.forEach((textEditor) => lint(textEditor.document));
+	didChangeVisibleTextEditors(vscode.window.visibleTextEditors);
 }
 
 // Clears the map of custom configuration files and re-lints files
@@ -412,7 +412,7 @@ function clearConfigMap (eventUri) {
 	outputLine("INFO: Resetting configuration cache due to '" + configFileGlob + "' or setting change.");
 	configMap = {};
 	if (eventUri) {
-		lintVisibleFiles();
+		cleanLintVisibleFiles();
 	}
 }
 
@@ -488,7 +488,7 @@ function didChangeConfiguration () {
 	clearRunMap();
 	clearCustomRules();
 	clearIgnores();
-	lintVisibleFiles();
+	cleanLintVisibleFiles();
 }
 
 function activate (context) {
@@ -530,8 +530,10 @@ function activate (context) {
 		fileSystemWatcher.onDidDelete(clearConfigMap)
 	);
 
-	// Lint already-visible files
-	lintVisibleFiles();
+	// Request (deferred) lint of active document
+	if (vscode.window.activeTextEditor) {
+		requestLint(vscode.window.activeTextEditor.document);
+	}
 }
 
 exports.activate = activate;
