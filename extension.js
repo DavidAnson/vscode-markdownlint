@@ -37,6 +37,8 @@ const documentSelector = {
 const clickForInfo = "Click for more information about ";
 const clickToFix = "Click to fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
+const clickForConfigureInfo = `Click for details about configuring ${extensionDisplayName} rules`;
+const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 
@@ -346,6 +348,7 @@ function lint (document) {
 function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
+	let showConfigureInfo = false;
 	diagnostics
 		.filter((diagnostic) => diagnostic.source === extensionDisplayName)
 		.forEach((diagnostic) => {
@@ -379,7 +382,18 @@ function provideCodeActions (document, range, codeActionContext) {
 				infoAction.diagnostics = [ diagnostic ];
 				codeActions.push(infoAction);
 			}
+			showConfigureInfo = true;
 		});
+	// Add information about configuring rules
+	if (showConfigureInfo) {
+		const configureInfoAction = new vscode.CodeAction(clickForConfigureInfo, vscode.CodeActionKind.QuickFix);
+		configureInfoAction.command = {
+			"title": clickForConfigureInfo,
+			"command": "vscode.open",
+			"arguments": [ vscode.Uri.parse(clickForConfigureUrl) ]
+		};
+		codeActions.push(configureInfoAction);
+	}
 	return codeActions;
 }
 
