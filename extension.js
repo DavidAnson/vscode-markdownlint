@@ -367,6 +367,8 @@ function provideCodeActions (document, range, codeActionContext) {
 					]
 				};
 				fixAction.diagnostics = [ diagnostic ];
+				// @ts-ignore
+				fixAction.isPreferred = true;
 				codeActions.push(fixAction);
 			}
 			// Provide code action for information about the violation
