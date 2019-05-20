@@ -152,7 +152,7 @@ The earlier configuration might look like the following in Code's user settings:
 }
 ```
 
-Rule locations have the following precedence (in decreasing order):
+Configuration locations have the following precedence (in decreasing order):
 
 * `.markdownlint.{json,yaml,yml}` file in the same directory
 * `.markdownlint.{json,yaml,yml}` file in a parent directory
@@ -160,7 +160,7 @@ Rule locations have the following precedence (in decreasing order):
 * Visual Studio Code user/workspace settings
 * Default configuration (see above)
 
-Changes saved to any of these locations take effect immediately. Files referenced via `extends` are not monitored for changes. Only the bottom two locations apply to files outside the project.
+Once a configuration is found, lower-precedence locations are ignored. Changes saved to any location take effect immediately. Files referenced via `extends` are not monitored for changes. Only the last two locations apply to files outside a project.
 
 See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration.
 
