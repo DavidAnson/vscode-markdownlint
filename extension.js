@@ -312,6 +312,7 @@ function lint (document) {
 			},
 			"config": getConfig(document),
 			"customRules": getCustomRules(),
+			"handleRuleFailures": true,
 			"markdownItPlugins": [ [ require("markdown-it-katex") ] ]
 		};
 
