@@ -75,6 +75,8 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **[MD043](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md043)** *required-headings/required-headers* - Required heading structure
 * **[MD044](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md044)** *proper-names* - Proper names should have the correct capitalization
 * **[MD045](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md045)** *no-alt-text* - Images should have alternate text (alt text)
+* **[MD046](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md046)** *code-block-style* - Code block style
+* **[MD047](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md047)** *single-trailing-newline* - Files should end with a single newline character
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
 
@@ -109,6 +111,8 @@ The default rule configuration disables `MD013`/`line-length` because many files
     "MD013": false
 }
 ```
+
+> **Note**: `MD002`/`first-heading-h1` is disabled by default because it has been deprecated in the `markdownlint` library.
 
 Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml` (or `.markdownlint.yml`) in any directory of a project. The rules defined by `.markdownlint.{json,yaml,yml}` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint.{json,yaml,yml}`.
 
