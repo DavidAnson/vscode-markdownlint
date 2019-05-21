@@ -87,6 +87,9 @@ function fixSpaceInCode (text) {
 function fixSpaceInLink (text) {
 	return text.replace(spaceInsideLinkRe, "[$1$2]");
 }
+function fixTrailingNewline (text) {
+	return text + "\n";
+}
 const fixFunctions = {
 	"MD006": removeLeadingWhitespace,
 	"MD009": removeTrailingWhitespace,
@@ -102,7 +105,8 @@ const fixFunctions = {
 	"MD034": wrapBareUrl,
 	"MD037": fixSpaceInEmphasis,
 	"MD038": fixSpaceInCode,
-	"MD039": fixSpaceInLink
+	"MD039": fixSpaceInLink,
+	"MD047": fixTrailingNewline
 };
 
 // Variables

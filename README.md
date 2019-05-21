@@ -97,6 +97,7 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD037 *no-space-in-emphasis*
 * MD038 *no-space-in-code*
 * MD039 *no-space-in-links*
+* MD047 *single-trailing-newline*
 
 Fixes can be reverted by `Edit|Undo` or `Ctrl+Z`.
 
