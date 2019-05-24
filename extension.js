@@ -33,6 +33,11 @@ const documentSelector = {
 	"language": markdownLanguageId,
 	"scheme": markdownScheme
 };
+const configParsers = [
+	JSON.parse,
+	// @ts-ignore
+	(content) => jsYaml.safeLoad(content)
+];
 
 const clickForInfo = "Click for more information about ";
 const clickToFix = "Click to fix this violation of ";
@@ -123,9 +128,12 @@ const throttle = {
 };
 
 // Writes date and message to the output channel
-function outputLine (message) {
+function outputLine (message, show) {
 	const datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
 	outputChannel.appendLine(datePrefix + message);
+	if (show) {
+		outputChannel.show();
+	}
 }
 
 // Returns rule configuration from nearest config file or workspace
@@ -152,15 +160,10 @@ function getConfig (document) {
 						"', overrides user/workspace/custom configuration for directory and its children.");
 					try {
 						// @ts-ignore
-						return (configMap[dir] = markdownlint.readConfigSync(configFilePath, [
-							JSON.parse,
-							// @ts-ignore
-							(content) => jsYaml.safeLoad(content)
-						]));
+						return (configMap[dir] = markdownlint.readConfigSync(configFilePath, configParsers));
 					} catch (ex) {
 						outputLine("ERROR: Unable to read configuration file '" +
-							configFilePath + "' (" + (ex.message || ex.toString()) + ").");
-						outputChannel.show();
+							configFilePath + "' (" + (ex.message || ex.toString()) + ").", true);
 					}
 				}
 			}
@@ -179,7 +182,7 @@ function getConfig (document) {
 	if (configMap[name]) {
 		return configMap[name];
 	}
-	// Use workspace configuration
+	// Use user/workspace configuration
 	outputLine("INFO: Loading user/workspace configuration for '" + name + "' (" + workspaceDetail + ").");
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	return (configMap[name] = configuration.get("config"));
@@ -243,13 +246,13 @@ function getCustomRules () {
 								if (rule.names && rule.description && rule.tags && rule.function) {
 									customRules.push(rule);
 								} else {
-									outputLine(`WARNING: Skipping invalid custom rule '${JSON.stringify(rule)}'.`);
+									outputLine(`WARNING: Skipping invalid custom rule '${JSON.stringify(rule)}'.`, true);
 								}
 							});
 							outputLine(`INFO: Loaded custom rules from '${resolvedPath}'.`);
 						} catch (ex) {
 							outputLine("ERROR: Unable to load custom rules from '" + (resolvedPath || rulePath) +
-								"' (" + (ex.message || ex.toString()) + ").");
+								"' (" + (ex.message || ex.toString()) + ").", true);
 						}
 					});
 					cleanLintVisibleFiles();
@@ -341,7 +344,7 @@ function lint (document) {
 					diagnostics.push(diagnostic);
 				});
 		} catch (ex) {
-			outputLine("ERROR: Exception while linting:\n" + ex.stack);
+			outputLine("ERROR: Exception while linting:\n" + ex.stack, true);
 		}
 	}
 
