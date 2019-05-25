@@ -157,6 +157,8 @@ The earlier configuration might look like the following in Code's user settings:
 }
 ```
 
+File paths referenced by `extends` from user settings are resolved relative to the user's home directory (ex: `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux).
+
 Configuration locations have the following precedence (in decreasing order):
 
 * `.markdownlint.{json,yaml,yml}` file in the same directory

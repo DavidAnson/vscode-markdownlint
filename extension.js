@@ -17,6 +17,7 @@ const markdownlint = lazyRequire("markdownlint");
 const minimatch = lazyRequire("minimatch");
 const jsYaml = lazyRequire("js-yaml");
 const fs = lazyRequire("fs");
+const os = lazyRequire("os");
 const path = lazyRequire("path");
 
 // Constants
@@ -185,7 +186,24 @@ function getConfig (document) {
 	// Use user/workspace configuration
 	outputLine("INFO: Loading user/workspace configuration for '" + name + "' (" + workspaceDetail + ").");
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-	return (configMap[name] = configuration.get("config"));
+	let userWorkspaceConfig = configuration.get("config");
+	// Bootstrap extend behavior into readConfigSync (if needed)
+	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
+		// @ts-ignore
+		const extendPath = path.resolve(os.homedir(), userWorkspaceConfig.extends);
+		try {
+			// @ts-ignore
+			const extendConfig = markdownlint.readConfigSync(extendPath, configParsers);
+			userWorkspaceConfig = {
+				...extendConfig,
+				...userWorkspaceConfig
+			};
+		} catch (ex) {
+			outputLine("ERROR: Unable to extend configuration file '" +
+				extendPath + "' (" + (ex.message || ex.toString()) + ").", true);
+		}
+	}
+	return (configMap[name] = userWorkspaceConfig);
 }
 
 // Returns custom rule configuration for user/workspace

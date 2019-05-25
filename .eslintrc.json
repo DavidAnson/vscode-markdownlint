@@ -1,15 +1,13 @@
 {
     "parser": "espree",
     "parserOptions": {
-        "ecmaVersion": 6
+        "ecmaVersion": 2018
     },
     "env": {
         "node": true,
         "es6": true
     },
-    "extends":[
-        "eslint:all"
-    ],
+    "extends": "eslint:all",
     "rules": {
         "array-bracket-spacing": ["error", "always"],
         "dot-location": ["error", "property"],
@@ -22,7 +20,7 @@
         "max-len": ["error", 130],
         "max-lines": ["error", 600],
         "max-lines-per-function": ["error", 80],
-        "max-statements": ["error", 26],
+        "max-statements": ["error", 32],
         "no-extra-parens": "off",
         "no-magic-numbers": "off",
         "no-sync": "off",
