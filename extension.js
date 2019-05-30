@@ -45,6 +45,11 @@ const clickToFix = "Click to fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
 const clickForConfigureInfo = `Click for details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
+const clickForConfigSource = `Click to open this document's ${extensionDisplayName} configuration`;
+const openGlobalSettingsCommand = "workbench.action.openGlobalSettings";
+const openWorkspaceSettingsCommand = "workbench.action.openWorkspaceSettings";
+const openFolderSettingsCommand = "workbench.action.openFolderSettings";
+const openCommand = "vscode.open";
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 
@@ -143,6 +148,7 @@ function getConfig (document) {
 	// @ts-ignore
 	let dir = path.dirname(name);
 	let workspaceDetail = "not in a workspace folder";
+
 	// While inside the workspace
 	while (vscode.workspace.getWorkspaceFolder(vscode.Uri.file(dir))) {
 		workspaceDetail = "no configuration file in workspace folder";
@@ -160,8 +166,11 @@ function getConfig (document) {
 					outputLine("INFO: Loading custom configuration from '" + configFilePath +
 						"', overrides user/workspace/custom configuration for directory and its children.");
 					try {
-						// @ts-ignore
-						return (configMap[dir] = markdownlint.readConfigSync(configFilePath, configParsers));
+						return (configMap[dir] = {
+							// @ts-ignore
+							"config": markdownlint.readConfigSync(configFilePath, configParsers),
+							"source": configFilePath
+						});
 					} catch (ex) {
 						outputLine("ERROR: Unable to read configuration file '" +
 							configFilePath + "' (" + (ex.message || ex.toString()) + ").", true);
@@ -179,15 +188,29 @@ function getConfig (document) {
 		}
 		dir = parent;
 	}
+
 	// Use cached configuration if present for file
 	if (configMap[name]) {
 		return configMap[name];
 	}
+
 	// Use user/workspace configuration
 	outputLine("INFO: Loading user/workspace configuration for '" + name + "' (" + workspaceDetail + ").");
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-	let userWorkspaceConfig = configuration.get("config");
-	// Bootstrap extend behavior into readConfigSync (if needed)
+	const sectionConfig = "config";
+	let userWorkspaceConfig = configuration.get(sectionConfig);
+	const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
+	let source = null;
+	if (userWorkspaceConfigMetadata.workspaceFolderValue && (vscode.workspace.workspaceFolders.length > 1)) {
+		// Length check to work around https://github.com/Microsoft/vscode/issues/34386
+		source = openFolderSettingsCommand;
+	} else if (userWorkspaceConfigMetadata.workspaceValue) {
+		source = openWorkspaceSettingsCommand;
+	} else if (userWorkspaceConfigMetadata.globalValue) {
+		source = openGlobalSettingsCommand;
+	}
+
+	// Bootstrap extend behavior into readConfigSync
 	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
 		// @ts-ignore
 		const extendPath = path.resolve(os.homedir(), userWorkspaceConfig.extends);
@@ -203,7 +226,10 @@ function getConfig (document) {
 				extendPath + "' (" + (ex.message || ex.toString()) + ").", true);
 		}
 	}
-	return (configMap[name] = userWorkspaceConfig);
+	return (configMap[name] = {
+		"config": userWorkspaceConfig,
+		source
+	});
 }
 
 // Returns custom rule configuration for user/workspace
@@ -327,11 +353,12 @@ function lint (document) {
 
 		// Configure
 		const uri = document.uri.toString();
+		const {config, source} = getConfig(document);
 		const options = {
 			"strings": {
 				[uri]: document.getText()
 			},
-			"config": getConfig(document),
+			config,
 			"customRules": getCustomRules(),
 			"handleRuleFailures": true,
 			"markdownItPlugins": [ [ require("markdown-it-katex") ] ]
@@ -359,6 +386,8 @@ function lint (document) {
 					const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
 					diagnostic.code = ruleName;
 					diagnostic.source = extensionDisplayName;
+					// @ts-ignore
+					diagnostic.configSource = source;
 					diagnostics.push(diagnostic);
 				});
 		} catch (ex) {
@@ -375,6 +404,7 @@ function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
 	let showConfigureInfo = false;
+	let configSource = null;
 	diagnostics
 		.filter((diagnostic) => diagnostic.source === extensionDisplayName)
 		.forEach((diagnostic) => {
@@ -404,20 +434,39 @@ function provideCodeActions (document, range, codeActionContext) {
 				const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
 				infoAction.command = {
 					"title": infoTitle,
-					"command": "vscode.open",
+					"command": openCommand,
 					"arguments": [ vscode.Uri.parse(ruleInformation) ]
 				};
 				infoAction.diagnostics = [ diagnostic ];
 				codeActions.push(infoAction);
 			}
 			showConfigureInfo = true;
+			configSource = configSource || diagnostic.configSource;
 		});
+	// Open the source for the document's rule configuration
+	if (configSource) {
+		const configSourceIsSettings =
+			(configSource === openGlobalSettingsCommand) ||
+			(configSource === openWorkspaceSettingsCommand) ||
+			(configSource === openFolderSettingsCommand);
+		const infoAction = new vscode.CodeAction(clickForConfigSource, vscode.CodeActionKind.QuickFix);
+		infoAction.command = {
+			"title": clickForConfigSource,
+			"command": configSourceIsSettings ?
+				configSource :
+				openCommand,
+			"arguments": configSourceIsSettings ?
+				null :
+				[ vscode.Uri.file(configSource) ]
+		};
+		codeActions.push(infoAction);
+	}
 	// Add information about configuring rules
 	if (showConfigureInfo) {
 		const configureInfoAction = new vscode.CodeAction(clickForConfigureInfo, vscode.CodeActionKind.QuickFix);
 		configureInfoAction.command = {
 			"title": clickForConfigureInfo,
-			"command": "vscode.open",
+			"command": openCommand,
 			"arguments": [ vscode.Uri.parse(clickForConfigureUrl) ]
 		};
 		codeActions.push(configureInfoAction);
