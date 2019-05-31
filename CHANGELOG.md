@@ -1,5 +1,6 @@
 # Changes
 
+* 0.27.0 - Improved rules and custom rule handling
 * 0.26.0 - Rule, code action, and performance improvements
 * 0.25.0 - Improved startup performance
 * 0.24.0 - Improved rules, custom links, math blocks
