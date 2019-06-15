@@ -340,7 +340,8 @@ function clearIgnores () {
 // Lints a Markdown document
 function lint (document) {
 	// Skip if not Markdown or local file
-	if ((document.languageId !== markdownLanguageId) || (document.uri.scheme !== markdownScheme)) {
+	if ((document.languageId !== markdownLanguageId) ||
+		((document.uri.scheme !== markdownScheme) && (document.uri.scheme !== "untitled"))) {
 		return;
 	}
 
