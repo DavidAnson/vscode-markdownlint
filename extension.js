@@ -622,6 +622,11 @@ function activate (context) {
 		fileSystemWatcher.onDidDelete(clearConfigMap)
 	);
 
+	// Cancel any pending operations during deactivation
+	context.subscriptions.push({
+		"dispose": () => suppressLint(throttle.document)
+	});
+
 	// Request (deferred) lint of active document
 	if (vscode.window.activeTextEditor) {
 		requestLint(vscode.window.activeTextEditor.document);
