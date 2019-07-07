@@ -1,0 +1,23 @@
+{
+	"insertMarkdownLintDisableComment": {
+		"prefix": "markdownlint-disable",
+		"body": "<!-- markdownlint-disable $1 -->",
+		"description": "Disables one or more markdownlint rules by name (e.g. MD013), alias (e.g. first-heading-h1), or tag (e.g. indentation). Multiple rules are space-delimited (e.g. MD018 MD019). If no rules are specified, then all rules are disabled unconditionally. Takes effect starting with the line this comment is on."
+	},
+	"insertMarkdownLintEnableComment": {
+		"prefix": "markdownlint-enable",
+		"body": "<!-- markdownlint-enable $1 -->",
+		"description": "Enables one or more markdownlint rules by name (e.g. MD013), alias (e.g. first-heading-h1), or tag (e.g. indentation). Multiple rules are space-delimited (e.g. MD018 MD019). If no rules are specified, then all rules are enabled unconditionally. Takes effect starting with the line this comment is on."
+	},
+
+	"insertMarkdownLintCaptureComment": {
+		"prefix": "markdownlint-capture",
+		"body": "<!-- markdownlint-capture -->",
+		"description": "Captures the current markdownlint rule configuration. Takes effect on the line this comment is on."
+	},
+	"insertMarkdownLintRestoreComment": {
+		"prefix": "markdownlint-restore",
+		"body": "<!-- markdownlint-restore -->",
+		"description": "Restores the most recently captured markdownlint rule configuration, which by default is the document's initial configuration (i.e. as if every document started with `<!-- markdownlint-capture -->`). Takes effect on the line this comment is on."
+	},
+}
