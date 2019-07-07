@@ -57,6 +57,12 @@
 				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
 			}
 		],
+		"snippets": [
+			{
+				"language": "markdown",
+				"path": "./snippets.json"
+			}
+		],
 		"configuration": {
 			"title": "markdownlint",
 			"type": "object",
