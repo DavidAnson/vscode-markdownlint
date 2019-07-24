@@ -1,0 +1,23 @@
+{
+	"insertMarkdownLintDisableComment": {
+		"prefix": "markdownlint-disable",
+		"body": "<!-- markdownlint-disable ${1:MD000 }-->",
+		"description": "Disables one or more rules by name (MD013), alias (line-length), or tag (whitespace). Multiple rules are space-delimited (MD018 MD019). If no rules are specified, all rules are disabled. Takes effect starting with the line the comment is on."
+	},
+	"insertMarkdownLintEnableComment": {
+		"prefix": "markdownlint-enable",
+		"body": "<!-- markdownlint-enable ${1:MD000 }-->",
+		"description": "Enables one or more rules by name (MD013), alias (line-length), or tag (whitespace). Multiple rules are space-delimited (MD018 MD019). If no rules are specified, all rules are enabled. Takes effect starting with the line the comment is on."
+	},
+
+	"insertMarkdownLintCaptureComment": {
+		"prefix": "markdownlint-capture",
+		"body": "<!-- markdownlint-capture -->",
+		"description": "Captures the current rule configuration. Takes effect starting with the line the comment is on."
+	},
+	"insertMarkdownLintRestoreComment": {
+		"prefix": "markdownlint-restore",
+		"body": "<!-- markdownlint-restore -->",
+		"description": "Restores the most recently captured rule configuration. Defaults to the document's initial configuration. Takes effect starting with the line the comment is on."
+	}
+}
