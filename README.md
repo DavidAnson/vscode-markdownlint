@@ -250,6 +250,13 @@ deliberate space * in * emphasis
 <!-- markdownlint-enable MD037 -->
 ```
 
+The following snippets are available to help (press `Ctrl+Space` for IntelliSense suggestions):
+
+* `markdownlint-disable`
+* `markdownlint-enable`
+* `markdownlint-capture`
+* `markdownlint-restore`
+
 See [markdownlint's configuration section](https://github.com/DavidAnson/markdownlint#configuration) for more details.
 
 ## History
