@@ -1,6 +1,7 @@
-.vscode/**
-typings/**
+.vscode
 .eslintrc.json
 .gitignore
 .markdownlint.json
+default-config.json
+generate-config-schema.js
 jsconfig.json
