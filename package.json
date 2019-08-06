@@ -28,14 +28,14 @@
 	"main": "./extension",
 	"dependencies": {
 		"js-yaml": "3.13.1",
-		"markdownlint": "0.15.0",
+		"markdownlint": "0.16.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
 		"eslint": "~6.1.0",
 		"vsce": "~1.66.0",
-		"@types/node": "~12.6.8",
+		"@types/node": "~12.6.9",
 		"@types/vscode": "~1.31.0"
 	},
 	"keywords": [
@@ -976,13 +976,35 @@
 						},
 						"MD031": {
 							"description": "MD031/blanks-around-fences - Fenced code blocks should be surrounded by blank lines",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"list_items": {
+									"description": "Include list items",
+									"type": "boolean",
+									"default": true
+								}
+							},
+							"additionalProperties": false
 						},
 						"blanks-around-fences": {
 							"description": "MD031/blanks-around-fences - Fenced code blocks should be surrounded by blank lines",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"list_items": {
+									"description": "Include list items",
+									"type": "boolean",
+									"default": true
+								}
+							},
+							"additionalProperties": false
 						},
 						"MD032": {
 							"description": "MD032/blanks-around-lists - Lists should be surrounded by blank lines",
