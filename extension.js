@@ -2,23 +2,16 @@
 
 // Requires
 const vscode = require("vscode");
+const markdownlint = require("markdownlint");
+const fs = require("fs");
+const path = require("path");
 
-// Lazy requires
-function lazyRequire (name) {
-	let module = null;
-	return new Proxy({}, {
-		"get": (obj, prop) => {
-			module = module || require(name);
-			return module[prop];
-		}
-	});
-}
-const markdownlint = lazyRequire("markdownlint");
-const minimatch = lazyRequire("minimatch");
-const jsYaml = lazyRequire("js-yaml");
-const fs = lazyRequire("fs");
-const os = lazyRequire("os");
-const path = lazyRequire("path");
+// Optional requires are inlined to avoid startup cost
+
+// @ts-ignore
+// eslint-disable-next-line camelcase, multiline-ternary, no-undef
+const nodeRequire = (typeof __non_webpack_require__ === "undefined") ? require : __non_webpack_require__;
+// Capture Node.js require implementation for dynamic loading of custom rules
 
 // Constants
 const extensionDisplayName = "markdownlint";
@@ -36,8 +29,7 @@ const documentSelector = {
 };
 const configParsers = [
 	JSON.parse,
-	// @ts-ignore
-	(content) => jsYaml.safeLoad(content)
+	(content) => require("js-yaml").safeLoad(content)
 ];
 
 const clickForInfo = "Click for more information about ";
@@ -145,7 +137,6 @@ function outputLine (message, show) {
 // Returns rule configuration from nearest config file or workspace
 function getConfig (document) {
 	const name = document.fileName;
-	// @ts-ignore
 	let dir = path.dirname(name);
 	let workspaceDetail = "not in a workspace folder";
 
@@ -159,9 +150,7 @@ function getConfig (document) {
 		if (configMap[dir] === undefined) {
 			// Look for config file in current directory
 			for (const configFileName of configFileNames) {
-				// @ts-ignore
 				const configFilePath = path.join(dir, configFileName);
-				// @ts-ignore
 				if (fs.existsSync(configFilePath)) {
 					outputLine("INFO: Loading custom configuration from '" + configFilePath +
 						"', overrides user/workspace/custom configuration for directory and its children.");
@@ -180,7 +169,6 @@ function getConfig (document) {
 			// Remember missing or invalid file
 			configMap[dir] = null;
 		}
-		// @ts-ignore
 		const parent = path.dirname(dir);
 		// Move to parent directory, stop if no parent
 		if (dir === parent) {
@@ -212,8 +200,7 @@ function getConfig (document) {
 
 	// Bootstrap extend behavior into readConfigSync
 	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
-		// @ts-ignore
-		const extendPath = path.resolve(os.homedir(), userWorkspaceConfig.extends);
+		const extendPath = path.resolve(require("os").homedir(), userWorkspaceConfig.extends);
 		try {
 			// @ts-ignore
 			const extendConfig = markdownlint.readConfigSync(extendPath, configParsers);
@@ -276,13 +263,11 @@ function getCustomRules () {
 								if (!extension) {
 									throw new Error(`Extension '${extensionName}' not installed`);
 								}
-								// @ts-ignore
 								resolvedPath = path.resolve(extension.extensionPath, relativePath);
 							} else {
-								// @ts-ignore
 								resolvedPath = path.resolve(workspacePath, rulePath);
 							}
-							const exports = require(resolvedPath);
+							const exports = nodeRequire(resolvedPath);
 							const rules = Array.isArray(exports) ?
 								exports :
 								[ exports ];
@@ -319,8 +304,7 @@ function getIgnores () {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 		const ignorePaths = configuration.get("ignore");
 		ignorePaths.forEach((ignorePath) => {
-			// @ts-ignore
-			const ignore = minimatch.makeRe(ignorePath, {
+			const ignore = require("minimatch").makeRe(ignorePath, {
 				"dot": true,
 				"nocomment": true
 			});
@@ -348,7 +332,6 @@ function lint (document) {
 	// Check ignore list
 	const diagnostics = [];
 	const relativePath = vscode.workspace.asRelativePath(document.uri, false);
-	// @ts-ignore
 	const normalizedPath = relativePath.split(path.sep).join("/");
 	if (getIgnores().every((ignore) => !ignore.test(normalizedPath))) {
 
@@ -368,8 +351,8 @@ function lint (document) {
 		// Lint and create Diagnostics
 		try {
 			markdownlint
-				// @ts-ignore
 				.sync(options)[uri]
+				// @ts-ignore
 				.forEach((result) => {
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;

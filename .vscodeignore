@@ -1,7 +1,10 @@
 .vscode
+node_modules
 .eslintrc.json
 .gitignore
 .markdownlint.json
 default-config.json
+extension.js
 generate-config-schema.js
 jsconfig.json
+webpack.config.js

@@ -16,7 +16,8 @@
 		"url": "https://github.com/DavidAnson/vscode-markdownlint/issues"
 	},
 	"scripts": {
-		"lint": "eslint *.js",
+		"compile": "webpack --mode production",
+		"lint": "eslint --ignore-pattern bundle.js *.js",
 		"schema": "node generate-config-schema.js"
 	},
 	"categories": [
@@ -25,7 +26,7 @@
 	"engines": {
 		"vscode": "^1.31.0"
 	},
-	"main": "./extension",
+	"main": "./bundle",
 	"dependencies": {
 		"js-yaml": "3.13.1",
 		"markdownlint": "0.16.0",
@@ -33,10 +34,12 @@
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
+		"@types/node": "~12.6.9",
+		"@types/vscode": "~1.31.0",
 		"eslint": "~6.1.0",
 		"vsce": "~1.66.0",
-		"@types/node": "~12.6.9",
-		"@types/vscode": "~1.31.0"
+		"webpack": "~4.39.1",
+		"webpack-cli": "~3.3.6"
 	},
 	"keywords": [
 		"markdown",
