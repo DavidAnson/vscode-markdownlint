@@ -1,5 +1,6 @@
 # Changes
 
+* 0.30.0 - Improved rules, startup performance
 * 0.29.0 - Add snippets
 * 0.28.0 - Improved rules, capture/restore
 * 0.27.0 - Improved rules and custom rule handling
