@@ -35,7 +35,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 ## Rules
 
 * **[MD001](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md001)** *heading-increment/header-increment* - Heading levels should only increment by one level at a time
-* **[MD002](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md002)** *first-heading-h1/first-header-h1* - First heading should be a top level heading
+* ~~**[MD002](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md002)** *first-heading-h1/first-header-h1* - First heading should be a top level heading~~
 * **[MD003](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md003)** *heading-style/header-style* - Heading style
 * **[MD004](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md004)** *ul-style* - Unordered list style
 * **[MD005](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md005)** *list-indent* - Inconsistent indentation for list items at the same level
