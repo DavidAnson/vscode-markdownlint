@@ -22,11 +22,18 @@ const configFileNames = [
 	".markdownlint.yml"
 ];
 const markdownLanguageId = "markdown";
-const markdownScheme = "file";
-const documentSelector = {
-	"language": markdownLanguageId,
-	"scheme": markdownScheme
-};
+const markdownSchemeFile = "file";
+const markdownSchemeUntitled = "untitled";
+const documentSelectors = [
+	{
+		"language": markdownLanguageId,
+		"scheme": markdownSchemeFile
+	},
+	{
+		"language": markdownLanguageId,
+		"scheme": markdownSchemeUntitled
+	}
+];
 const configParsers = [
 	JSON.parse,
 	(content) => require("js-yaml").safeLoad(content)
@@ -324,7 +331,7 @@ function clearIgnores () {
 function lint (document) {
 	// Skip if not Markdown or local file
 	if ((document.languageId !== markdownLanguageId) ||
-		((document.uri.scheme !== markdownScheme) && (document.uri.scheme !== "untitled"))) {
+		((document.uri.scheme !== markdownSchemeFile) && (document.uri.scheme !== markdownSchemeUntitled))) {
 		return;
 	}
 
@@ -581,7 +588,7 @@ function activate (context) {
 
 	// Register CodeActionsProvider
 	context.subscriptions.push(
-		vscode.languages.registerCodeActionsProvider(documentSelector, {
+		vscode.languages.registerCodeActionsProvider(documentSelectors, {
 			provideCodeActions
 		})
 	);
