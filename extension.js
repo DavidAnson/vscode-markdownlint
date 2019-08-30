@@ -231,10 +231,12 @@ function getCustomRules () {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 		const customRulesPaths = configuration.get(sectionCustomRules);
 		if (customRulesPaths.length) {
-			const workspaceRootPath = vscode.workspace.rootPath;
+			const workspacePath = vscode.workspace.workspaceFolders ?
+				vscode.workspace.workspaceFolders[0].uri.fsPath :
+				"";
 			const allowPaths = configuration.get(sectionCustomRulesAlwaysAllow);
 			const customRulesMetadata = configuration.inspect(sectionCustomRules);
-			const showWarning = customRulesMetadata.workspaceValue && !allowPaths.includes(workspaceRootPath);
+			const showWarning = customRulesMetadata.workspaceValue && !allowPaths.includes(workspacePath);
 			const promise = showWarning ?
 				vscode.window.showWarningMessage(
 					"This workspace includes custom rules for Markdown linting. " +
@@ -245,13 +247,10 @@ function getCustomRules () {
 				Promise.resolve(itemAllow);
 			promise.then((response) => {
 				if (response === itemAlwaysAllow) {
-					allowPaths.push(workspaceRootPath);
+					allowPaths.push(workspacePath);
 					configuration.update(sectionCustomRulesAlwaysAllow, allowPaths, vscode.ConfigurationTarget.Global);
 				}
 				if ((response === itemAllow) || (response === itemAlwaysAllow)) {
-					const workspacePath = vscode.workspace.workspaceFolders ?
-						vscode.workspace.workspaceFolders[0].uri.fsPath :
-						"";
 					customRulesPaths.forEach((rulePath) => {
 						let resolvedPath = null;
 						try {
