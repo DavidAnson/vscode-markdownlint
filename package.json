@@ -34,12 +34,12 @@
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"@types/node": "~12.6.9",
+		"@types/node": "~12.7.3",
 		"@types/vscode": "~1.31.0",
-		"eslint": "~6.1.0",
+		"eslint": "~6.3.0",
 		"vsce": "~1.66.0",
-		"webpack": "~4.39.1",
-		"webpack-cli": "~3.3.6"
+		"webpack": "~4.39.3",
+		"webpack-cli": "~3.3.7"
 	},
 	"keywords": [
 		"markdown",

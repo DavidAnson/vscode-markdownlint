@@ -249,6 +249,7 @@ function getCustomRules () {
 					"This workspace includes custom rules for Markdown linting. " +
 					"Custom rules include JavaScript that runs within VS Code. " +
 					"Only allow custom rules if you trust the workspace.",
+					// eslint-disable-next-line function-call-argument-newline
 					itemAllow, itemAlwaysAllow, itemBlock
 				) :
 				Promise.resolve(itemAllow);

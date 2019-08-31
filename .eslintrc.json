@@ -12,6 +12,7 @@
         "array-bracket-spacing": ["error", "always"],
         "dot-location": ["error", "property"],
         "func-style": ["error", "declaration"],
+        "function-call-argument-newline": ["error", "consistent"],
         "function-paren-newline": ["error", "consistent"],
         "global-require": "off",
         "indent": ["error", "tab"],
