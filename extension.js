@@ -3,6 +3,7 @@
 // Requires
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
+const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
 const fs = require("fs");
 const path = require("path");
 
@@ -51,73 +52,6 @@ const openFolderSettingsCommand = "workbench.action.openFolderSettings";
 const openCommand = "vscode.open";
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
-
-// Shared RegExps
-const bareUrlRe = /(?:http|ftp)s?:\/\/[^\s]*/i;
-const reversedLinkRe = /\(([^)]+)\)\[([^\]^][^\]]*)]/;
-const spaceInsideCodeRe = /`(?:\s+([^`]*?)\s*|([^`]*?)\s+)`/;
-const spaceInsideEmphasisRe = /(\*\*?|__?)(?:\s+(.+?)\s*|(.+?)\s+)\1/;
-const spaceInsideLinkRe = /\[(?:\s+([^\]]*?)\s*|([^\]]*?)\s+)]/;
-const trailingSpaceRe = /\s+$/;
-
-// Fix functions
-function removeLeadingWhitespace (text) {
-	return text.replace(/^\s+/, "");
-}
-function removeTrailingWhitespace (text) {
-	return text.replace(trailingSpaceRe, "");
-}
-function replaceTabsWithSpaces (text) {
-	return text.replace(/\t/g, "    ");
-}
-function fixAtxHeadingFormat (text) {
-	return text.replace(/^(\s*#+)\s*(.*)$/, "$1 $2");
-}
-function fixAtxClosedHeadingFormat (text) {
-	return fixAtxHeadingFormat(text).replace(/^(.*?)\s*(#+\s*)$/, "$1 $2");
-}
-function fixBlockquoteSpacing (text) {
-	return text.replace(/^(\s*(> )+)\s+(.*)$/, "$1$3");
-}
-function addBlockquoteJoiner (text) {
-	return text.replace(/^\s*$/, ">");
-}
-function wrapBareUrl (text) {
-	return text.replace(bareUrlRe, "<$&>");
-}
-function fixReversedLink (text) {
-	return text.replace(reversedLinkRe, "[$1]($2)");
-}
-function fixSpaceInEmphasis (text) {
-	return text.replace(spaceInsideEmphasisRe, "$1$2$3$1");
-}
-function fixSpaceInCode (text) {
-	return text.replace(spaceInsideCodeRe, "`$1$2`");
-}
-function fixSpaceInLink (text) {
-	return text.replace(spaceInsideLinkRe, "[$1$2]");
-}
-function fixTrailingNewline (text) {
-	return text + "\n";
-}
-const fixFunctions = {
-	"MD006": removeLeadingWhitespace,
-	"MD009": removeTrailingWhitespace,
-	"MD010": replaceTabsWithSpaces,
-	"MD011": fixReversedLink,
-	"MD018": fixAtxHeadingFormat,
-	"MD019": fixAtxHeadingFormat,
-	"MD020": fixAtxClosedHeadingFormat,
-	"MD021": fixAtxClosedHeadingFormat,
-	"MD023": removeLeadingWhitespace,
-	"MD027": fixBlockquoteSpacing,
-	"MD028": addBlockquoteJoiner,
-	"MD034": wrapBareUrl,
-	"MD037": fixSpaceInEmphasis,
-	"MD038": fixSpaceInCode,
-	"MD039": fixSpaceInLink,
-	"MD047": fixTrailingNewline
-};
 
 // Variables
 const ruleNameToInformation = {};
@@ -352,7 +286,8 @@ function lint (document) {
 			config,
 			"customRules": getCustomRules(),
 			"handleRuleFailures": true,
-			"markdownItPlugins": [ [ require("markdown-it-katex") ] ]
+			"markdownItPlugins": [ [ require("markdown-it-katex") ] ],
+			"resultVersion": 3
 		};
 
 		// Lint and create Diagnostics
@@ -379,6 +314,8 @@ function lint (document) {
 					diagnostic.source = extensionDisplayName;
 					// @ts-ignore
 					diagnostic.configSource = source;
+					// @ts-ignore
+					diagnostic.fixInfo = result.fixInfo;
 					diagnostics.push(diagnostic);
 				});
 		} catch (ex) {
@@ -402,15 +339,15 @@ function provideCodeActions (document, range, codeActionContext) {
 			const ruleName = diagnostic.code;
 			const ruleNameAlias = diagnostic.message.split(":")[0];
 			// Provide code action to fix the violation
-			if (diagnostic.range.isSingleLine && fixFunctions[ruleName]) {
+			if (diagnostic.fixInfo) {
 				const fixTitle = clickToFix + ruleNameAlias;
 				const fixAction = new vscode.CodeAction(fixTitle, vscode.CodeActionKind.QuickFix);
 				fixAction.command = {
 					"title": fixTitle,
 					"command": fixLineCommandName,
 					"arguments": [
-						diagnostic.range,
-						ruleName
+						diagnostic.range.start.line,
+						diagnostic.fixInfo
 					]
 				};
 				fixAction.diagnostics = [ diagnostic ];
@@ -466,16 +403,29 @@ function provideCodeActions (document, range, codeActionContext) {
 }
 
 // Fixes violations of a rule on a line
-function fixLine (range, ruleName) {
+function fixLine (lineIndex, fixInfo) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
-		const line = editor && editor.document.lineAt(range.start.line);
-		const text = line && line.text.substring(range.start.character, range.end.character);
-		const fixFunction = fixFunctions[ruleName];
-		const fixedText = fixFunction && fixFunction(text || "");
-		if (editor && (typeof fixedText === "string")) {
+		if (editor) {
+			const lineNumber = fixInfo.lineNumber || (lineIndex + 1);
+			const {text, range} = editor.document.lineAt(lineNumber - 1);
+			const fixedText = markdownlintRuleHelpers.applyFix(text, fixInfo, "\n");
 			editor.edit((editBuilder) => {
-				editBuilder.replace(range, fixedText);
+				if (typeof fixedText === "string") {
+					editBuilder.replace(range, fixedText);
+				} else {
+					let deleteRange = range;
+					if (lineNumber === 1) {
+						if (editor.document.lineCount > 1) {
+							const nextLine = editor.document.lineAt(range.end.line + 1);
+							deleteRange = range.with({"end": nextLine.range.start});
+						}
+					} else {
+						const previousLine = editor.document.lineAt(range.start.line - 1);
+						deleteRange = range.with({"start": previousLine.range.end});
+					}
+					editBuilder.delete(deleteRange);
+				}
 			}).then(resolve, reject);
 		} else {
 			reject(new Error("Unable to fix rule violaton."));

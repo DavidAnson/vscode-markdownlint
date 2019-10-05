@@ -86,17 +86,25 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD009 *no-trailing-spaces*
 * MD010 *no-hard-tabs*
 * MD011 *no-reversed-links*
+* MD012 *no-multiple-blanks*
+* MD014 *commands-show-output*
 * MD018 *no-missing-space-atx*
 * MD019 *no-multiple-space-atx*
 * MD020 *no-missing-space-closed-atx*
 * MD021 *no-multiple-space-closed-atx*
+* MD022 *blanks-around-headings*
 * MD023 *heading-start-left*
+* MD026 *no-trailing-punctuation*
 * MD027 *no-multiple-space-blockquote*
 * MD028 *no-blanks-blockquote*
+* MD030 *list-marker-space*
+* MD031 *blanks-around-fences*
+* MD032 *blanks-around-lists*
 * MD034 *no-bare-urls*
 * MD037 *no-space-in-emphasis*
 * MD038 *no-space-in-code*
 * MD039 *no-space-in-links*
+* MD044 *proper-names*
 * MD047 *single-trailing-newline*
 
 Fixes can be reverted by `Edit|Undo` or `Ctrl+Z`.
