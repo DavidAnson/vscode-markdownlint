@@ -29,7 +29,7 @@
 	"main": "./bundle",
 	"dependencies": {
 		"js-yaml": "3.13.1",
-		"markdownlint": "0.16.0",
+		"markdownlint": "0.17.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
