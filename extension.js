@@ -351,7 +351,6 @@ function provideCodeActions (document, range, codeActionContext) {
 					]
 				};
 				fixAction.diagnostics = [ diagnostic ];
-				// @ts-ignore
 				fixAction.isPreferred = true;
 				codeActions.push(fixAction);
 			}

@@ -24,7 +24,7 @@
 		"Linters"
 	],
 	"engines": {
-		"vscode": "^1.31.0"
+		"vscode": "^1.35.0"
 	},
 	"main": "./bundle",
 	"dependencies": {
@@ -36,7 +36,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "~12.7.11",
-		"@types/vscode": "~1.31.0",
+		"@types/vscode": "~1.35.0",
 		"eslint": "~6.5.1",
 		"vsce": "~1.67.1",
 		"webpack": "~4.41.0",
