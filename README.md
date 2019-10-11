@@ -80,7 +80,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
 
-The following rules can be automatically fixed by moving the cursor to a rule violation (green underlined text) and typing `Ctrl+.` or clicking the light bulb icon.
+The following rules can be automatically fixed by moving the cursor to a rule violation (wavy underlined text) and typing `Ctrl+.` or clicking the light bulb icon.
 
 * MD006 *ul-start-left*
 * MD009 *no-trailing-spaces*
@@ -106,6 +106,8 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD039 *no-space-in-links*
 * MD044 *proper-names*
 * MD047 *single-trailing-newline*
+
+All violations of the above rules in the current document can be fixed at once by running the `markdownlint.fixAll` command, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P` then search for "markdownlint") or by [binding the command to a keyboard shortcut](https://code.visualstudio.com/docs/getstarted/keybindings).
 
 Fixes can be reverted by `Edit|Undo` or `Ctrl+Z`.
 

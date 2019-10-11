@@ -43,6 +43,8 @@ const configParsers = [
 const clickForInfo = "Click for more information about ";
 const clickToFix = "Click to fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
+const fixAllCommandTitle = `Fix supported ${extensionDisplayName} violations in the document`;
+const fixAllCommandName = "markdownlint.fixAll";
 const clickForConfigureInfo = `Click for details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
 const clickForConfigSource = `Click to open this document's ${extensionDisplayName} configuration`;
@@ -262,67 +264,78 @@ function clearIgnores () {
 	ignores = null;
 }
 
+// Wraps getting options and calling into markdownlint
+function markdownlintWrapper (name, text, config) {
+	const options = {
+		"strings": {
+			[name]: text
+		},
+		config,
+		"customRules": getCustomRules(),
+		"handleRuleFailures": true,
+		"markdownItPlugins": [ [ require("markdown-it-katex") ] ],
+		"resultVersion": 3
+	};
+	let results = [];
+	try {
+		// @ts-ignore
+		results = markdownlint.sync(options)[name];
+	} catch (ex) {
+		outputLine("ERROR: Exception while linting:\n" + ex.stack, true);
+	}
+	return results;
+}
+
+// Returns if the document is Markdown
+function isMarkdownDocument (document) {
+	return (
+		(document.languageId === markdownLanguageId) &&
+		(
+			(document.uri.scheme === markdownSchemeFile) ||
+			(document.uri.scheme === markdownSchemeUntitled)
+		)
+	);
+}
+
 // Lints a Markdown document
 function lint (document) {
-	// Skip if not Markdown or local file
-	if ((document.languageId !== markdownLanguageId) ||
-		((document.uri.scheme !== markdownSchemeFile) && (document.uri.scheme !== markdownSchemeUntitled))) {
+	if (!isMarkdownDocument(document)) {
 		return;
 	}
-
 	// Check ignore list
 	const diagnostics = [];
 	const relativePath = vscode.workspace.asRelativePath(document.uri, false);
 	const normalizedPath = relativePath.split(path.sep).join("/");
 	if (getIgnores().every((ignore) => !ignore.test(normalizedPath))) {
-
-		// Configure
-		const uri = document.uri.toString();
+		// Lint
+		const name = document.uri.toString();
+		const text = document.getText();
 		const {config, source} = getConfig(document);
-		const options = {
-			"strings": {
-				[uri]: document.getText()
-			},
-			config,
-			"customRules": getCustomRules(),
-			"handleRuleFailures": true,
-			"markdownItPlugins": [ [ require("markdown-it-katex") ] ],
-			"resultVersion": 3
-		};
-
-		// Lint and create Diagnostics
-		try {
-			markdownlint
-				.sync(options)[uri]
-				// @ts-ignore
-				.forEach((result) => {
-					const ruleName = result.ruleNames[0];
-					const ruleDescription = result.ruleDescription;
-					ruleNameToInformation[ruleName] = result.ruleInformation;
-					let message = result.ruleNames.join("/") + ": " + ruleDescription;
-					if (result.errorDetail) {
-						message += " [" + result.errorDetail + "]";
-					}
-					let range = document.lineAt(result.lineNumber - 1).range;
-					if (result.errorRange) {
-						const start = result.errorRange[0] - 1;
-						const end = start + result.errorRange[1];
-						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
-					}
-					const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-					diagnostic.code = ruleName;
-					diagnostic.source = extensionDisplayName;
-					// @ts-ignore
-					diagnostic.configSource = source;
-					// @ts-ignore
-					diagnostic.fixInfo = result.fixInfo;
-					diagnostics.push(diagnostic);
-				});
-		} catch (ex) {
-			outputLine("ERROR: Exception while linting:\n" + ex.stack, true);
-		}
+		markdownlintWrapper(name, text, config).forEach((result) => {
+			// Create Diagnostics
+			const ruleName = result.ruleNames[0];
+			const ruleDescription = result.ruleDescription;
+			ruleNameToInformation[ruleName] = result.ruleInformation;
+			let message = result.ruleNames.join("/") + ": " + ruleDescription;
+			if (result.errorDetail) {
+				message += " [" + result.errorDetail + "]";
+			}
+			let range = document.lineAt(result.lineNumber - 1).range;
+			if (result.errorRange) {
+				const start = result.errorRange[0] - 1;
+				const end = start + result.errorRange[1];
+				range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
+			}
+			const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+			diagnostic.code = ruleName;
+			diagnostic.source = extensionDisplayName;
+			// @ts-ignore
+			diagnostic.configSource = source;
+			// @ts-ignore
+			diagnostic.fixInfo = result.fixInfo;
+			diagnostics.push(diagnostic);
+		});
 	}
-
 	// Publish
 	diagnosticCollection.set(document.uri, diagnostics);
 }
@@ -331,6 +344,7 @@ function lint (document) {
 function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
 	const diagnostics = codeActionContext.diagnostics || [];
+	const fixInfoDiagnostics = [];
 	let showConfigureInfo = false;
 	let configSource = null;
 	diagnostics
@@ -353,6 +367,7 @@ function provideCodeActions (document, range, codeActionContext) {
 				fixAction.diagnostics = [ diagnostic ];
 				fixAction.isPreferred = true;
 				codeActions.push(fixAction);
+				fixInfoDiagnostics.push(diagnostic);
 			}
 			// Provide code action for information about the violation
 			const ruleInformation = ruleNameToInformation[ruleName];
@@ -370,6 +385,19 @@ function provideCodeActions (document, range, codeActionContext) {
 			showConfigureInfo = true;
 			configSource = configSource || diagnostic.configSource;
 		});
+	if (fixInfoDiagnostics.length) {
+		// Register a "fix all" code action
+		const sourceFixAllAction = new vscode.CodeAction(
+			fixAllCommandTitle,
+			vscode.CodeActionKind.SourceFixAll.append(extensionDisplayName)
+		);
+		sourceFixAllAction.command = {
+			"title": fixAllCommandTitle,
+			"command": fixAllCommandName
+		};
+		sourceFixAllAction.diagnostics = fixInfoDiagnostics;
+		// Hold SourceFixAll support for the next release // codeActions.push(sourceFixAllAction);
+	}
 	// Open the source for the document's rule configuration
 	if (configSource) {
 		const configSourceIsSettings =
@@ -405,30 +433,55 @@ function provideCodeActions (document, range, codeActionContext) {
 function fixLine (lineIndex, fixInfo) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
-		if (editor) {
+		if (editor && fixInfo) {
+			const document = editor.document;
 			const lineNumber = fixInfo.lineNumber || (lineIndex + 1);
-			const {text, range} = editor.document.lineAt(lineNumber - 1);
+			const {text, range} = document.lineAt(lineNumber - 1);
 			const fixedText = markdownlintRuleHelpers.applyFix(text, fixInfo, "\n");
-			editor.edit((editBuilder) => {
+			return editor.edit((editBuilder) => {
 				if (typeof fixedText === "string") {
 					editBuilder.replace(range, fixedText);
 				} else {
 					let deleteRange = range;
 					if (lineNumber === 1) {
-						if (editor.document.lineCount > 1) {
-							const nextLine = editor.document.lineAt(range.end.line + 1);
+						if (document.lineCount > 1) {
+							const nextLine = document.lineAt(range.end.line + 1);
 							deleteRange = range.with({"end": nextLine.range.start});
 						}
 					} else {
-						const previousLine = editor.document.lineAt(range.start.line - 1);
+						const previousLine = document.lineAt(range.start.line - 1);
 						deleteRange = range.with({"start": previousLine.range.end});
 					}
 					editBuilder.delete(deleteRange);
 				}
 			}).then(resolve, reject);
-		} else {
-			reject(new Error("Unable to fix rule violaton."));
 		}
+		return resolve();
+	});
+}
+
+// Fixes all violations in the active document
+function fixAll () {
+	return new Promise((resolve, reject) => {
+		const editor = vscode.window.activeTextEditor;
+		if (editor) {
+			const document = editor.document;
+			if (isMarkdownDocument(document)) {
+				const name = document.uri.toString();
+				const text = document.getText();
+				const {config} = getConfig(document);
+				const errors = markdownlintWrapper(name, text, config);
+				const fixedText = markdownlintRuleHelpers.applyFixes(text, errors);
+				if (text !== fixedText) {
+					return editor.edit((editBuilder) => {
+						const start = document.lineAt(0).range.start;
+						const end = document.lineAt(document.lineCount - 1).range.end;
+						editBuilder.replace(new vscode.Range(start, end), fixedText);
+					}).then(resolve, reject);
+				}
+			}
+		}
+		return resolve();
 	});
 }
 
@@ -543,8 +596,9 @@ function activate (context) {
 		})
 	);
 
-	// Register Command
+	// Register Commands
 	context.subscriptions.push(
+		vscode.commands.registerCommand(fixAllCommandName, fixAll),
 		vscode.commands.registerCommand(fixLineCommandName, fixLine)
 	);
 

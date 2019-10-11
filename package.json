@@ -51,9 +51,24 @@
 	],
 	"activationEvents": [
 		"onLanguage:markdown",
+		"onCommand:markdownlint.fixAll",
 		"onCommand:markdownlint.fixLine"
 	],
 	"contributes": {
+		"commands": [
+			{
+				"command": "markdownlint.fixAll",
+				"title": "Fix supported markdownlint violations in the document"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "markdownlint.fixAll",
+					"when": "editorLangId == markdown"
+				}
+			]
+		},
 		"jsonValidation": [
 			{
 				"fileMatch": ".markdownlint.json",
