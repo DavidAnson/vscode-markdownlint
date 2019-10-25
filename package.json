@@ -29,17 +29,17 @@
 	"main": "./bundle",
 	"dependencies": {
 		"js-yaml": "3.13.1",
-		"markdownlint": "0.17.1",
+		"markdownlint": "0.17.2",
 		"markdownlint-rule-helpers": "0.5.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"@types/node": "~12.7.11",
+		"@types/node": "~12.11.7",
 		"@types/vscode": "~1.35.0",
-		"eslint": "~6.5.1",
-		"vsce": "~1.67.1",
-		"webpack": "~4.41.0",
+		"eslint": "~6.6.0",
+		"vsce": "~1.68.0",
+		"webpack": "~4.41.2",
 		"webpack-cli": "~3.3.9"
 	},
 	"keywords": [
