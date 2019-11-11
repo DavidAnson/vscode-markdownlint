@@ -109,7 +109,15 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 
 All violations of the above rules in the current document can be fixed at once by running the `markdownlint.fixAll` command, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P` then search for "markdownlint") or by [binding the command to a keyboard shortcut](https://code.visualstudio.com/docs/getstarted/keybindings).
 
-Fixes can be reverted by `Edit|Undo` or `Ctrl+Z`.
+To automatically fix these violations when saving a Markdown document, [configure Visual Studio Code's `editor.codeActionsOnSave` setting](https://code.visualstudio.com/docs/getstarted/settings) like so:
+
+```json
+"editor.codeActionsOnSave": {
+    "source.fixAll.markdownlint": true
+}
+```
+
+Automatically-applied fixes can be reverted by `Edit|Undo` or `Ctrl+Z`.
 
 ## Configure
 

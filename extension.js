@@ -396,7 +396,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			"command": fixAllCommandName
 		};
 		sourceFixAllAction.diagnostics = fixInfoDiagnostics;
-		// Hold SourceFixAll support for the next release // codeActions.push(sourceFixAllAction);
+		codeActions.push(sourceFixAllAction);
 	}
 	// Open the source for the document's rule configuration
 	if (configSource) {
