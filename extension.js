@@ -16,11 +16,12 @@ const nodeRequire = (typeof __non_webpack_require__ === "undefined") ? require :
 
 // Constants
 const extensionDisplayName = "markdownlint";
-const configFileGlob = ".markdownlint.{json,yaml,yml}";
+const configFileGlob = ".markdownlint{.json,.yaml,.yml,rc}";
 const configFileNames = [
 	".markdownlint.json",
 	".markdownlint.yaml",
-	".markdownlint.yml"
+	".markdownlint.yml",
+	".markdownlintrc"
 ];
 const markdownLanguageId = "markdown";
 const markdownSchemeFile = "file";
