@@ -96,16 +96,16 @@ function getConfig (document) {
 			for (const configFileName of configFileNames) {
 				const configFilePath = path.join(dir, configFileName);
 				if (fs.existsSync(configFilePath)) {
-					outputLine("INFO: Loading custom configuration from '" + configFilePath +
-						"', overrides user/workspace/custom configuration for directory and its children.");
+					outputLine("INFO: Loading custom configuration from \"" + configFilePath +
+						"\", overrides user/workspace/custom configuration for directory and its children.");
 					try {
 						return (configMap[dir] = {
 							"config": markdownlint.readConfigSync(configFilePath, configParsers),
 							"source": configFilePath
 						});
 					} catch (ex) {
-						outputLine("ERROR: Unable to read configuration file '" +
-							configFilePath + "' (" + (ex.message || ex.toString()) + ").", true);
+						outputLine("ERROR: Unable to read configuration file \"" +
+							configFilePath + "\" (" + (ex.message || ex.toString()) + ").", true);
 					}
 				}
 			}
@@ -126,7 +126,7 @@ function getConfig (document) {
 	}
 
 	// Use user/workspace configuration
-	outputLine("INFO: Loading user/workspace configuration for '" + name + "' (" + workspaceDetail + ").");
+	outputLine("INFO: Loading user/workspace configuration for \"" + name + "\" (" + workspaceDetail + ").");
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	const sectionConfig = "config";
 	let userWorkspaceConfig = configuration.get(sectionConfig);
@@ -151,8 +151,8 @@ function getConfig (document) {
 				...userWorkspaceConfig
 			};
 		} catch (ex) {
-			outputLine("ERROR: Unable to extend configuration file '" +
-				extendPath + "' (" + (ex.message || ex.toString()) + ").", true);
+			outputLine("ERROR: Unable to extend configuration file \"" +
+				extendPath + "\" (" + (ex.message || ex.toString()) + ").", true);
 		}
 	}
 	return (configMap[name] = {
@@ -203,7 +203,7 @@ function getCustomRules () {
 								const relativePath = match[2];
 								const extension = vscode.extensions.getExtension(extensionName);
 								if (!extension) {
-									throw new Error(`Extension '${extensionName}' not installed`);
+									throw new Error(`Extension "${extensionName}" not installed`);
 								}
 								resolvedPath = path.resolve(extension.extensionPath, relativePath);
 							} else {
@@ -217,13 +217,13 @@ function getCustomRules () {
 								if (rule.names && rule.description && rule.tags && rule.function) {
 									customRules.push(rule);
 								} else {
-									outputLine(`WARNING: Skipping invalid custom rule '${JSON.stringify(rule)}'.`, true);
+									outputLine(`WARNING: Skipping invalid custom rule "${JSON.stringify(rule)}".`, true);
 								}
 							});
-							outputLine(`INFO: Loaded custom rules from '${resolvedPath}'.`);
+							outputLine(`INFO: Loaded custom rules from "${resolvedPath}".`);
 						} catch (ex) {
-							outputLine("ERROR: Unable to load custom rules from '" + (resolvedPath || rulePath) +
-								"' (" + (ex.message || ex.toString()) + ").", true);
+							outputLine("ERROR: Unable to load custom rules from \"" + (resolvedPath || rulePath) +
+								"\" (" + (ex.message || ex.toString()) + ").", true);
 						}
 					});
 					cleanLintVisibleFiles();
@@ -491,7 +491,7 @@ function cleanLintVisibleFiles () {
 
 // Clears the map of custom configuration files and re-lints files
 function clearConfigMap (eventUri) {
-	outputLine("INFO: Resetting configuration cache due to '" + configFileGlob + "' or setting change.");
+	outputLine("INFO: Resetting configuration cache due to \"" + configFileGlob + "\" or setting change.");
 	configMap = {};
 	if (eventUri) {
 		cleanLintVisibleFiles();
@@ -508,7 +508,7 @@ function getRun (document) {
 	// Read workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	runMap[name] = configuration.get("run");
-	outputLine("INFO: Linting for '" + document.fileName + "' will be run '" + runMap[name] + "'.");
+	outputLine("INFO: Linting for \"" + document.fileName + "\" will be run \"" + runMap[name] + "\".");
 	return runMap[name];
 }
 
