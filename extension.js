@@ -99,7 +99,6 @@ function getConfig (document) {
 						"', overrides user/workspace/custom configuration for directory and its children.");
 					try {
 						return (configMap[dir] = {
-							// @ts-ignore
 							"config": markdownlint.readConfigSync(configFilePath, configParsers),
 							"source": configFilePath
 						});
@@ -145,7 +144,6 @@ function getConfig (document) {
 	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
 		const extendPath = path.resolve(require("os").homedir(), userWorkspaceConfig.extends);
 		try {
-			// @ts-ignore
 			const extendConfig = markdownlint.readConfigSync(extendPath, configParsers);
 			userWorkspaceConfig = {
 				...extendConfig,
@@ -278,7 +276,6 @@ function markdownlintWrapper (name, text, config) {
 	};
 	let results = [];
 	try {
-		// @ts-ignore
 		results = markdownlint.sync(options)[name];
 	} catch (ex) {
 		outputLine("ERROR: Exception while linting:\n" + ex.stack, true);

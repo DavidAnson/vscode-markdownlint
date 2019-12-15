@@ -77,12 +77,14 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **[MD045](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md045)** *no-alt-text* - Images should have alternate text (alt text)
 * **[MD046](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md046)** *code-block-style* - Code block style
 * **[MD047](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md047)** *single-trailing-newline* - Files should end with a single newline character
+* **[MD048](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md048)** *code-fence-style* - Code fence style
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md) for more details.
 
 The following rules can be automatically fixed by moving the cursor to a rule violation (wavy underlined text) and typing `Ctrl+.` or clicking the light bulb icon.
 
 * MD006 *ul-start-left*
+* MD007 *ul-indent*
 * MD009 *no-trailing-spaces*
 * MD010 *no-hard-tabs*
 * MD011 *no-reversed-links*
@@ -274,6 +276,8 @@ The following snippets are available to help (press `Ctrl+Space` for IntelliSens
 * `markdownlint-enable`
 * `markdownlint-capture`
 * `markdownlint-restore`
+* `markdownlint-disable-file`
+* `markdownlint-enable-file`
 
 See [markdownlint's configuration section](https://github.com/DavidAnson/markdownlint#configuration) for more details.
 

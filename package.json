@@ -29,8 +29,8 @@
 	"main": "./bundle",
 	"dependencies": {
 		"js-yaml": "3.13.1",
-		"markdownlint": "0.17.2",
-		"markdownlint-rule-helpers": "0.5.0",
+		"markdownlint": "0.18.0",
+		"markdownlint-rule-helpers": "0.6.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
