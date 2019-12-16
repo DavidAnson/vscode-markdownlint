@@ -140,6 +140,11 @@
 							"type": "string",
 							"default": null
 						},
+						"$schema": {
+							"description": "JSON Schema URI (used by some editors)",
+							"type": "string",
+							"default": "https://raw.githubusercontent.com/DavidAnson/markdownlint/master/schema/markdownlint-config-schema.json"
+						},
 						"MD001": {
 							"description": "MD001/heading-increment/header-increment - Heading levels should only increment by one level at a time",
 							"type": "boolean",
@@ -390,6 +395,11 @@
 									"description": "Allow spaces for empty lines in list items",
 									"type": "boolean",
 									"default": false
+								},
+								"strict": {
+									"description": "Include unnecessary breaks",
+									"type": "boolean",
+									"default": false
 								}
 							},
 							"additionalProperties": false
@@ -409,6 +419,11 @@
 								},
 								"list_item_empty_lines": {
 									"description": "Allow spaces for empty lines in list items",
+									"type": "boolean",
+									"default": false
+								},
+								"strict": {
+									"description": "Include unnecessary breaks",
 									"type": "boolean",
 									"default": false
 								}
@@ -531,6 +546,11 @@
 									"description": "Include headings",
 									"type": "boolean",
 									"default": true
+								},
+								"strict": {
+									"description": "Strict length checking",
+									"type": "boolean",
+									"default": false
 								}
 							},
 							"additionalProperties": false
@@ -577,6 +597,11 @@
 									"description": "Include headings",
 									"type": "boolean",
 									"default": true
+								},
+								"strict": {
+									"description": "Strict length checking",
+									"type": "boolean",
+									"default": false
 								}
 							},
 							"additionalProperties": false
@@ -1467,6 +1492,48 @@
 							"type": "boolean",
 							"default": true
 						},
+						"MD048": {
+							"description": "MD048/code-fence-style - Code fence style",
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"style": {
+									"description": "Code fence syle",
+									"type": "string",
+									"enum": [
+										"consistent",
+										"backtick",
+										"tilde"
+									],
+									"default": "consistent"
+								}
+							},
+							"additionalProperties": false
+						},
+						"code-fence-style": {
+							"description": "MD048/code-fence-style - Code fence style",
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"style": {
+									"description": "Code fence syle",
+									"type": "string",
+									"enum": [
+										"consistent",
+										"backtick",
+										"tilde"
+									],
+									"default": "consistent"
+								}
+							},
+							"additionalProperties": false
+						},
 						"headings": {
 							"description": "headings - MD001, MD002, MD003, MD018, MD019, MD020, MD021, MD022, MD023, MD024, MD025, MD026, MD036, MD041, MD043",
 							"type": "boolean",
@@ -1518,7 +1585,7 @@
 							"default": true
 						},
 						"code": {
-							"description": "code - MD014, MD031, MD038, MD040, MD046",
+							"description": "code - MD014, MD031, MD038, MD040, MD046, MD048",
 							"type": "boolean",
 							"default": true
 						},
