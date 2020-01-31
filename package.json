@@ -35,11 +35,11 @@
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"@types/node": "~12.12.17",
+		"@types/node": "~13.5.3",
 		"@types/vscode": "~1.35.0",
-		"eslint": "~6.7.2",
+		"eslint": "~6.8.0",
 		"vsce": "~1.71.0",
-		"webpack": "~4.41.2",
+		"webpack": "~4.41.5",
 		"webpack-cli": "~3.3.10"
 	},
 	"keywords": [
