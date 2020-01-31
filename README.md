@@ -39,7 +39,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 * **[MD003](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md003)** *heading-style/header-style* - Heading style
 * **[MD004](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md004)** *ul-style* - Unordered list style
 * **[MD005](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md005)** *list-indent* - Inconsistent indentation for list items at the same level
-* **[MD006](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md006)** *ul-start-left* - Consider starting bulleted lists at the beginning of the line
+* ~~**[MD006](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md006)** *ul-start-left* - Consider starting bulleted lists at the beginning of the line~~
 * **[MD007](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md007)** *ul-indent* - Unordered list indentation
 * **[MD009](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md009)** *no-trailing-spaces* - Trailing spaces
 * **[MD010](https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md010)** *no-hard-tabs* - Hard tabs
