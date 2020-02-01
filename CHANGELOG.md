@@ -1,5 +1,6 @@
 # Changes
 
+* 0.34.0 - Improved rules, new fix, JSONC config
 * 0.33.0 - Improved rules, new fix, new snippets
 * 0.32.0 - Implement fix-on-save
 * 0.31.0 - Automatically fix more rule violations
