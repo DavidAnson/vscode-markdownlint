@@ -37,7 +37,7 @@ const documentSelectors = [
 	}
 ];
 const configParsers = [
-	JSON.parse,
+	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
 	(content) => require("js-yaml").safeLoad(content)
 ];
 
