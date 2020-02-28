@@ -22,6 +22,7 @@ const configFileNames = [
 	".markdownlint.yaml",
 	".markdownlint.yml",
 	".markdownlintrc"
+	".mdlrc"
 ];
 const markdownLanguageId = "markdown";
 const markdownSchemeFile = "file";
