@@ -56,6 +56,15 @@
 		"onCommand:markdownlint.fixLine"
 	],
 	"contributes": {
+		"languages": [
+			{
+				"id": "jsonc",
+				"filenames": [
+					".markdownlint.json",
+					".markdownlintrc"
+				]
+			}
+		],
 		"commands": [
 			{
 				"command": "markdownlint.fixAll",
