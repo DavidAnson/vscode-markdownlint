@@ -30,5 +30,11 @@
 		"prefix": "markdownlint-restore",
 		"body": "<!-- markdownlint-restore -->",
 		"description": "Restores the most recently captured rule configuration. Defaults to the document's initial configuration. Takes effect starting with the line the comment is on."
+	},
+
+	"insertMarkdownLintConfigureFileComment": {
+		"prefix": "markdownlint-configure-file",
+		"body": "<!-- markdownlint-configure-file { ${1:\"MD013\": { \"line_length\": 100 \\}} } -->",
+		"description": "Configures one or more rules by name (MD013), alias (line-length), or tag (whitespace) using the same JSON format as the \"markdownlint.config\" object. Applies to the entire file."
 	}
 }

@@ -83,6 +83,7 @@ See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/bl
 
 The following rules can be automatically fixed by moving the cursor to a rule violation (wavy underlined text) and typing `Ctrl+.` or clicking the light bulb icon.
 
+* MD005 *list-indent*
 * MD006 *ul-start-left*
 * MD007 *ul-indent*
 * MD009 *no-trailing-spaces*
@@ -278,6 +279,7 @@ The following snippets are available to help (press `Ctrl+Space` for IntelliSens
 * `markdownlint-restore`
 * `markdownlint-disable-file`
 * `markdownlint-enable-file`
+* `markdownlint-configure-file`
 
 See [markdownlint's configuration section](https://github.com/DavidAnson/markdownlint#configuration) for more details.
 

@@ -30,8 +30,8 @@
 	"dependencies": {
 		"js-yaml": "3.13.1",
 		"jsonc-parser": "2.2.0",
-		"markdownlint": "0.19.0",
-		"markdownlint-rule-helpers": "0.7.0",
+		"markdownlint": "0.20.1",
+		"markdownlint-rule-helpers": "0.8.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
@@ -562,6 +562,11 @@
 									"description": "Strict length checking",
 									"type": "boolean",
 									"default": false
+								},
+								"stern": {
+									"description": "Stern length checking",
+									"type": "boolean",
+									"default": false
 								}
 							},
 							"additionalProperties": false
@@ -611,6 +616,11 @@
 								},
 								"strict": {
 									"description": "Strict length checking",
+									"type": "boolean",
+									"default": false
+								},
+								"stern": {
+									"description": "Stern length checking",
 									"type": "boolean",
 									"default": false
 								}
