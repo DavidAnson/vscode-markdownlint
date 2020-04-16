@@ -56,15 +56,6 @@
 		"onCommand:markdownlint.fixLine"
 	],
 	"contributes": {
-		"languages": [
-			{
-				"id": "jsonc",
-				"filenames": [
-					".markdownlint.json",
-					".markdownlintrc"
-				]
-			}
-		],
 		"commands": [
 			{
 				"command": "markdownlint.fixAll",
@@ -83,6 +74,14 @@
 			{
 				"fileMatch": ".markdownlint.json",
 				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
+			}
+		],
+		"languages": [
+			{
+				"id": "jsonc",
+				"filenames": [
+					".markdownlintrc"
+				]
 			}
 		],
 		"snippets": [
