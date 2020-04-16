@@ -29,19 +29,19 @@
 	"main": "./bundle",
 	"dependencies": {
 		"js-yaml": "3.13.1",
-		"jsonc-parser": "2.2.0",
+		"jsonc-parser": "2.2.1",
 		"markdownlint": "0.20.1",
 		"markdownlint-rule-helpers": "0.8.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"@types/node": "~13.5.3",
+		"@types/node": "~13.11.1",
 		"@types/vscode": "~1.35.0",
 		"eslint": "~6.8.0",
-		"vsce": "~1.71.0",
-		"webpack": "~4.41.5",
-		"webpack-cli": "~3.3.10"
+		"vsce": "~1.75.0",
+		"webpack": "~4.42.1",
+		"webpack-cli": "~3.3.11"
 	},
 	"keywords": [
 		"markdown",
