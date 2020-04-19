@@ -4,6 +4,7 @@
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
 const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
+const ignore = require("ignore");
 const fs = require("fs");
 const path = require("path");
 
@@ -23,6 +24,8 @@ const configFileNames = [
 	".markdownlint.yml",
 	".markdownlintrc"
 ];
+const ignoreFileName = ".markdownlintignore";
+const fsOptions = {"encoding": "utf8"};
 const markdownLanguageId = "markdown";
 const markdownSchemeFile = "file";
 const markdownSchemeUntitled = "untitled";
@@ -68,6 +71,12 @@ const throttle = {
 	"document": null,
 	"timeout": null
 };
+
+function getWorkspacePath () {
+	return vscode.workspace.workspaceFolders ?
+		vscode.workspace.workspaceFolders[0].uri.fsPath :
+		"";
+}
 
 // Writes date and message to the output channel
 function outputLine (message, show) {
@@ -161,6 +170,18 @@ function getConfig (document) {
 	});
 }
 
+// Clears the map of custom configuration files and re-lints files
+function clearConfigMap (eventUri) {
+	const source = eventUri ?
+		`"${eventUri.fsPath}"` :
+		"setting";
+	outputLine(`INFO: Resetting configuration cache due to ${source} change.`);
+	configMap = {};
+	if (eventUri) {
+		cleanLintVisibleFiles();
+	}
+}
+
 // Returns custom rule configuration for user/workspace
 function getCustomRules () {
 	if (!Array.isArray(customRules)) {
@@ -173,9 +194,7 @@ function getCustomRules () {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 		const customRulesPaths = configuration.get(sectionCustomRules);
 		if (customRulesPaths.length) {
-			const workspacePath = vscode.workspace.workspaceFolders ?
-				vscode.workspace.workspaceFolders[0].uri.fsPath :
-				"";
+			const workspacePath = getWorkspacePath();
 			const allowPaths = configuration.get(sectionCustomRulesAlwaysAllow);
 			const customRulesMetadata = configuration.inspect(sectionCustomRules);
 			const showWarning = customRulesMetadata.workspaceValue && !allowPaths.includes(workspacePath);
@@ -243,15 +262,25 @@ function clearCustomRules () {
 function getIgnores () {
 	if (!Array.isArray(ignores)) {
 		ignores = [];
+		// Handle .markdownlintignore
+		const workspacePath = getWorkspacePath();
+		const ignoreFilePath = path.join(workspacePath, ignoreFileName);
+		if (fs.existsSync(ignoreFilePath)) {
+			const ignoreText = fs.readFileSync(ignoreFilePath, fsOptions);
+			// @ts-ignore
+			const ignoreInstance = ignore().add(ignoreText);
+			ignores.push((file) => ignoreInstance.ignores(file));
+		}
+		// Handle "ignore" configuration
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 		const ignorePaths = configuration.get("ignore");
 		ignorePaths.forEach((ignorePath) => {
-			const ignore = require("minimatch").makeRe(ignorePath, {
+			const ignoreRe = require("minimatch").makeRe(ignorePath, {
 				"dot": true,
 				"nocomment": true
 			});
-			if (ignore) {
-				ignores.push(ignore);
+			if (ignoreRe) {
+				ignores.push((file) => ignoreRe.test(file));
 			}
 		});
 	}
@@ -259,8 +288,15 @@ function getIgnores () {
 }
 
 // Clears the ignore list
-function clearIgnores () {
+function clearIgnores (eventUri) {
+	const source = eventUri ?
+		`"${eventUri.fsPath}"` :
+		"setting";
+	outputLine(`INFO: Resetting ignore configuration due to ${source} change.`);
 	ignores = null;
+	if (eventUri) {
+		cleanLintVisibleFiles();
+	}
 }
 
 // Wraps getting options and calling into markdownlint
@@ -304,7 +340,7 @@ function lint (document) {
 	const diagnostics = [];
 	const relativePath = vscode.workspace.asRelativePath(document.uri, false);
 	const normalizedPath = relativePath.split(path.sep).join("/");
-	if (getIgnores().every((ignore) => !ignore.test(normalizedPath))) {
+	if (getIgnores().every((ignoreTest) => !ignoreTest(normalizedPath))) {
 		// Lint
 		const name = document.uri.toString();
 		const text = document.getText();
@@ -489,15 +525,6 @@ function cleanLintVisibleFiles () {
 	didChangeVisibleTextEditors(vscode.window.visibleTextEditors);
 }
 
-// Clears the map of custom configuration files and re-lints files
-function clearConfigMap (eventUri) {
-	outputLine("INFO: Resetting configuration cache due to \"" + configFileGlob + "\" or setting change.");
-	configMap = {};
-	if (eventUri) {
-		cleanLintVisibleFiles();
-	}
-}
-
 // Returns the run setting for the document
 function getRun (document) {
 	const name = document.fileName;
@@ -605,12 +632,22 @@ function activate (context) {
 	context.subscriptions.push(diagnosticCollection);
 
 	// Hook up to file system changes for custom config file(s) ("/" vs. "\" due to bug in VS Code glob)
-	const fileSystemWatcher = vscode.workspace.createFileSystemWatcher("**/" + configFileGlob);
+	const workspacePath = getWorkspacePath();
+	const relativeConfigFileGlob = new vscode.RelativePattern(workspacePath, "**/" + configFileGlob);
+	const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
 	context.subscriptions.push(
-		fileSystemWatcher,
-		fileSystemWatcher.onDidCreate(clearConfigMap),
-		fileSystemWatcher.onDidChange(clearConfigMap),
-		fileSystemWatcher.onDidDelete(clearConfigMap)
+		configWatcher,
+		configWatcher.onDidCreate(clearConfigMap),
+		configWatcher.onDidChange(clearConfigMap),
+		configWatcher.onDidDelete(clearConfigMap)
+	);
+	const relativeIgnoreFilePath = new vscode.RelativePattern(workspacePath, ignoreFileName);
+	const ignoreWatcher = vscode.workspace.createFileSystemWatcher(relativeIgnoreFilePath);
+	context.subscriptions.push(
+		ignoreWatcher,
+		ignoreWatcher.onDidCreate(clearIgnores),
+		ignoreWatcher.onDidChange(clearIgnores),
+		ignoreWatcher.onDidDelete(clearIgnores)
 	);
 
 	// Cancel any pending operations during deactivation

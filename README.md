@@ -194,9 +194,17 @@ See [markdownlint's options.config section](https://github.com/DavidAnson/markdo
 
 ### markdownlint.ignore
 
-If a workspace contains generated content or other Markdown files that trigger warnings but cannot be fixed, it may be helpful to ignore (skip) those files when linting. This can be done by updating the user/workspace configuration with a glob expression matching the relevant file names.
+If a workspace contains generated content or other Markdown files that trigger warnings but cannot be fixed, it may be helpful to ignore (skip) those files when linting. This can be done by creating a file named `.markdownlintignore` in the root of the project or by updating the user/workspace configuration with a glob expression matching the relevant file names.
 
-An example from Code's workspace settings might be:
+When using a `.markdownlintignore` file, the content of the file follows the rules for [gitignore](https://git-scm.com/docs/gitignore) and may look something like:
+
+```ini
+# Ignore Markdown files in the test directory
+test/*.md
+!test/except/this/one.md
+```
+
+An example of using Code's workspace configuration to ignore files might be:
 
 ```json
 {
@@ -210,7 +218,7 @@ An example from Code's workspace settings might be:
 }
 ```
 
-The globbing library used for matching file names is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
+The globbing library used for matching `markdownlint.ignore` configuration values is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
 
 ### markdownlint.run
 

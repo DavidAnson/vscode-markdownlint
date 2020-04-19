@@ -28,6 +28,7 @@
 	},
 	"main": "./bundle",
 	"dependencies": {
+		"ignore": "5.1.4",
 		"js-yaml": "3.13.1",
 		"jsonc-parser": "2.2.1",
 		"markdownlint": "0.20.1",
