@@ -77,6 +77,14 @@
 				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
 			}
 		],
+		"languages": [
+			{
+				"id": "jsonc",
+				"filenames": [
+					".markdownlintrc"
+				]
+			}
+		],
 		"snippets": [
 			{
 				"language": "markdown",
