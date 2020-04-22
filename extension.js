@@ -49,6 +49,7 @@ const clickToFix = "Click to fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
 const fixAllCommandTitle = `Fix supported ${extensionDisplayName} violations in the document`;
 const fixAllCommandName = "markdownlint.fixAll";
+const toggleLintingCommandName = "markdownlint.toggleLinting";
 const clickForConfigureInfo = `Click for details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
 const clickForConfigSource = `Click to open this document's ${extensionDisplayName} configuration`;
@@ -67,6 +68,7 @@ let configMap = {};
 let runMap = {};
 let customRules = null;
 let ignores = null;
+let lintingEnabled = true;
 const throttle = {
 	"document": null,
 	"timeout": null
@@ -333,7 +335,7 @@ function isMarkdownDocument (document) {
 
 // Lints a Markdown document
 function lint (document) {
-	if (!isMarkdownDocument(document)) {
+	if (!lintingEnabled || !isMarkdownDocument(document)) {
 		return;
 	}
 	// Check ignore list
@@ -519,6 +521,12 @@ function fixAll () {
 	});
 }
 
+// Toggles linting on/off
+function toggleLinting () {
+	lintingEnabled = !lintingEnabled;
+	cleanLintVisibleFiles();
+}
+
 // Cleanly (i.e., from scratch) lint all visible files
 function cleanLintVisibleFiles () {
 	diagnosticCollection.clear();
@@ -624,7 +632,8 @@ function activate (context) {
 	// Register Commands
 	context.subscriptions.push(
 		vscode.commands.registerCommand(fixAllCommandName, fixAll),
-		vscode.commands.registerCommand(fixLineCommandName, fixLine)
+		vscode.commands.registerCommand(fixLineCommandName, fixLine),
+		vscode.commands.registerCommand(toggleLintingCommandName, toggleLinting)
 	);
 
 	// Create DiagnosticCollection

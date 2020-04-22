@@ -61,6 +61,10 @@
 			{
 				"command": "markdownlint.fixAll",
 				"title": "Fix supported markdownlint violations in the document"
+			},
+			{
+				"command": "markdownlint.toggleLinting",
+				"title": "Toggle linting by markdownlint on/off (temporarily)"
 			}
 		],
 		"menus": {
