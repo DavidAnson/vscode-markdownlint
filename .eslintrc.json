@@ -19,7 +19,7 @@
         "linebreak-style": "off",
         "max-depth": ["error", 6],
         "max-len": ["error", 130],
-        "max-lines": ["error", 700],
+        "max-lines": "off",
         "max-lines-per-function": ["error", 90],
         "max-statements": ["error", 40],
         "no-extra-parens": "off",

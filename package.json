@@ -24,7 +24,7 @@
 		"Linters"
 	],
 	"engines": {
-		"vscode": "^1.35.0"
+		"vscode": "^1.37.0"
 	},
 	"main": "./bundle",
 	"dependencies": {
@@ -38,7 +38,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "~13.11.1",
-		"@types/vscode": "~1.35.0",
+		"@types/vscode": "~1.37.0",
 		"eslint": "~6.8.0",
 		"vsce": "~1.75.0",
 		"webpack": "~4.42.1",
@@ -54,13 +54,18 @@
 	"activationEvents": [
 		"onLanguage:markdown",
 		"onCommand:markdownlint.fixAll",
-		"onCommand:markdownlint.fixLine"
+		"onCommand:markdownlint.fixLine",
+		"onCommand:markdownlint.openConfigFile"
 	],
 	"contributes": {
 		"commands": [
 			{
 				"command": "markdownlint.fixAll",
 				"title": "Fix supported markdownlint violations in the document"
+			},
+			{
+				"command": "markdownlint.openConfigFile",
+				"title": "Create or open the markdownlint configuration file for the folder"
 			},
 			{
 				"command": "markdownlint.toggleLinting",
@@ -72,6 +77,10 @@
 				{
 					"command": "markdownlint.fixAll",
 					"when": "editorLangId == markdown"
+				},
+				{
+					"command": "markdownlint.openConfigFile",
+					"when": "workbenchState != empty"
 				}
 			]
 		},

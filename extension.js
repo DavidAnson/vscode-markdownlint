@@ -49,6 +49,7 @@ const clickToFix = "Click to fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
 const fixAllCommandTitle = `Fix supported ${extensionDisplayName} violations in the document`;
 const fixAllCommandName = "markdownlint.fixAll";
+const openConfigFileCommandName = "markdownlint.openConfigFile";
 const toggleLintingCommandName = "markdownlint.toggleLinting";
 const clickForConfigureInfo = `Click for details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
@@ -521,6 +522,39 @@ function fixAll () {
 	});
 }
 
+// Creates or opens the markdownlint configuration file for the folder
+function openConfigFile () {
+	const workspacePath = getWorkspacePath();
+	Promise.all(configFileNames.map((configFileName) => {
+		const filePath = path.join(workspacePath, configFileName);
+		const fileUri = vscode.Uri.file(filePath);
+		return vscode.workspace.fs.stat(fileUri).then(
+			() => fileUri,
+			() => null
+		);
+	})).then((fileUris) => {
+		const validFilePaths = fileUris.filter((filePath) => filePath !== null);
+		if (validFilePaths.length) {
+			// File exists, open it
+			vscode.window.showTextDocument(validFilePaths[0]);
+		} else {
+			// File does not exist, create one
+			const filePath = path.join(workspacePath, configFileNames[0]);
+			const fileUri = vscode.Uri.file(filePath);
+			const newFileUri = fileUri.with({"scheme": "untitled"});
+			vscode.window.showTextDocument(newFileUri).then(
+				(editor) => {
+					editor.edit((editBuilder) => {
+						editBuilder.insert(new vscode.Position(0, 0), "{}");
+					}).then(() => {
+						editor.selection = new vscode.Selection(0, 1, 0, 1);
+					});
+				}
+			);
+		}
+	});
+}
+
 // Toggles linting on/off
 function toggleLinting () {
 	lintingEnabled = !lintingEnabled;
@@ -633,6 +667,7 @@ function activate (context) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(fixAllCommandName, fixAll),
 		vscode.commands.registerCommand(fixLineCommandName, fixLine),
+		vscode.commands.registerCommand(openConfigFileCommandName, openConfigFile),
 		vscode.commands.registerCommand(toggleLintingCommandName, toggleLinting)
 	);
 

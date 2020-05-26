@@ -196,6 +196,8 @@ Once a configuration is found, lower-precedence locations are ignored. Changes s
 
 See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration.
 
+When a workspace is active, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint{.json,.yaml,.yml,rc}` configuration file in the root of the workspace. If none of those files exist, `.markdownlint.json` will be created in the "pending save" state and opened in the editor.
+
 ### markdownlint.ignore
 
 If a workspace contains generated content or other Markdown files that trigger warnings but cannot be fixed, it may be helpful to ignore (skip) those files when linting. This can be done by creating a file named `.markdownlintignore` in the root of the project or by updating the user/workspace configuration with a glob expression matching the relevant file names.
