@@ -62,7 +62,7 @@ const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 
 // Variables
-const ruleNameToInformation = {};
+const ruleNameToInformationUri = {};
 let outputChannel = null;
 let diagnosticCollection = null;
 let configMap = {};
@@ -352,7 +352,8 @@ function lint (document) {
 			// Create Diagnostics
 			const ruleName = result.ruleNames[0];
 			const ruleDescription = result.ruleDescription;
-			ruleNameToInformation[ruleName] = result.ruleInformation;
+			const ruleInformationUri = result.ruleInformation && vscode.Uri.parse(result.ruleInformation);
+			ruleNameToInformationUri[ruleName] = ruleInformationUri;
 			let message = result.ruleNames.join("/") + ": " + ruleDescription;
 			if (result.errorDetail) {
 				message += " [" + result.errorDetail + "]";
@@ -364,7 +365,12 @@ function lint (document) {
 				range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
 			}
 			const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-			diagnostic.code = ruleName;
+			diagnostic.code = ruleInformationUri ?
+				{
+					"value": ruleName,
+					"target": ruleInformationUri
+				} :
+				ruleName;
 			diagnostic.source = extensionDisplayName;
 			// @ts-ignore
 			diagnostic.configSource = source;
@@ -387,7 +393,7 @@ function provideCodeActions (document, range, codeActionContext) {
 	diagnostics
 		.filter((diagnostic) => diagnostic.source === extensionDisplayName)
 		.forEach((diagnostic) => {
-			const ruleName = diagnostic.code;
+			const ruleName = diagnostic.code.value || diagnostic.code;
 			const ruleNameAlias = diagnostic.message.split(":")[0];
 			// Provide code action to fix the violation
 			if (diagnostic.fixInfo) {
@@ -407,14 +413,14 @@ function provideCodeActions (document, range, codeActionContext) {
 				fixInfoDiagnostics.push(diagnostic);
 			}
 			// Provide code action for information about the violation
-			const ruleInformation = ruleNameToInformation[ruleName];
-			if (ruleInformation) {
+			const ruleInformationUri = ruleNameToInformationUri[ruleName];
+			if (ruleInformationUri) {
 				const infoTitle = clickForInfo + ruleNameAlias;
 				const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
 				infoAction.command = {
 					"title": infoTitle,
 					"command": openCommand,
-					"arguments": [ vscode.Uri.parse(ruleInformation) ]
+					"arguments": [ ruleInformationUri ]
 				};
 				infoAction.diagnostics = [ diagnostic ];
 				codeActions.push(infoAction);
