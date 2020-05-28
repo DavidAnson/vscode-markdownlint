@@ -4,7 +4,9 @@ const fs = require("fs");
 const packageJsonPath = "./package.json";
 const packageJson = require(packageJsonPath);
 const configurationSchema = require("./node_modules/markdownlint/schema/markdownlint-config-schema.json");
-const defaultConfig = require("./default-config.json");
+const defaultConfig = {
+	"MD013": false
+};
 
 // Update package.json
 const configurationRoot = packageJson.contributes.configuration.properties["markdownlint.config"];
