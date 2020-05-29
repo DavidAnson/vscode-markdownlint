@@ -28,8 +28,8 @@
 	},
 	"main": "./bundle",
 	"dependencies": {
-		"ignore": "5.1.4",
-		"js-yaml": "3.13.1",
+		"ignore": "5.1.6",
+		"js-yaml": "3.14.0",
 		"jsonc-parser": "2.2.1",
 		"markdownlint": "0.20.3",
 		"markdownlint-rule-helpers": "0.10.0",
