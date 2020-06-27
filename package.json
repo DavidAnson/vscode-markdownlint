@@ -40,7 +40,7 @@
 		"@types/node": "~14.0.5",
 		"@types/vscode": "~1.43.0",
 		"eslint": "~7.1.0",
-		"vsce": "~1.75.0",
+		"vsce": "~1.77.0",
 		"webpack": "~4.43.0",
 		"webpack-cli": "~3.3.11"
 	},
