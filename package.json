@@ -31,8 +31,8 @@
 		"ignore": "5.1.6",
 		"js-yaml": "3.14.0",
 		"jsonc-parser": "2.2.1",
-		"markdownlint": "0.20.3",
-		"markdownlint-rule-helpers": "0.10.0",
+		"markdownlint": "0.20.4",
+		"markdownlint-rule-helpers": "0.11.0",
 		"markdown-it-katex": "2.0.3",
 		"minimatch": "3.0.4"
 	},
