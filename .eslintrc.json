@@ -24,6 +24,7 @@
         "max-statements": ["error", 40],
         "no-extra-parens": "off",
         "no-magic-numbers": "off",
+        "no-promise-executor-return": "off",
         "no-sync": "off",
         "no-tabs": "off",
         "no-ternary": "off",

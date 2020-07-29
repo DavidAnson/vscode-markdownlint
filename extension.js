@@ -640,12 +640,14 @@ function didCloseTextDocument (document) {
 }
 
 // Handles the onDidChangeConfiguration event
-function didChangeConfiguration () {
-	clearConfigMap();
-	clearRunMap();
-	clearCustomRules();
-	clearIgnores();
-	cleanLintVisibleFiles();
+function didChangeConfiguration (change) {
+	if (change.affectsConfiguration(extensionDisplayName)) {
+		clearConfigMap();
+		clearRunMap();
+		clearCustomRules();
+		clearIgnores();
+		cleanLintVisibleFiles();
+	}
 }
 
 function activate (context) {
