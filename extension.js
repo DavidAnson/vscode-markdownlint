@@ -211,6 +211,8 @@ function getCustomRules () {
 				) :
 				Promise.resolve(itemAllow);
 			promise.then((response) => {
+				// Re-clear customRules array to avoid double-pushing in a race condition
+				customRules = [];
 				if (response === itemAlwaysAllow) {
 					allowPaths.push(workspacePath);
 					configuration.update(sectionCustomRulesAlwaysAllow, allowPaths, vscode.ConfigurationTarget.Global);
