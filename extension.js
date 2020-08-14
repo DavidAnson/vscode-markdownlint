@@ -25,7 +25,6 @@ const configFileNames = [
 	".markdownlintrc"
 ];
 const ignoreFileName = ".markdownlintignore";
-const fsOptions = {"encoding": "utf8"};
 const markdownLanguageId = "markdown";
 const markdownSchemeFile = "file";
 const markdownSchemeUntitled = "untitled";
@@ -271,7 +270,7 @@ function getIgnores () {
 		const workspacePath = getWorkspacePath();
 		const ignoreFilePath = path.join(workspacePath, ignoreFileName);
 		if (fs.existsSync(ignoreFilePath)) {
-			const ignoreText = fs.readFileSync(ignoreFilePath, fsOptions);
+			const ignoreText = fs.readFileSync(ignoreFilePath, "utf8");
 			// @ts-ignore
 			const ignoreInstance = ignore().add(ignoreText);
 			ignores.push((file) => ignoreInstance.ignores(file));
