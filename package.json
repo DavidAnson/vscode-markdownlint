@@ -3,11 +3,7 @@
 	"displayName": "markdownlint",
 	"description": "Markdown linting and style checking for Visual Studio Code",
 	"icon": "images/markdownlint-128.png",
-<<<<<<< HEAD
 	"version": "0.36.3",
-=======
-	"version": "0.23.0",
->>>>>>> parent of 330a9bb... Update to version 0.24.0.
 	"author": "David Anson (https://dlaa.me/)",
 	"publisher": "DavidAnson",
 	"license": "MIT",
@@ -32,6 +28,7 @@
 	},
 	"main": "./bundle",
 	"dependencies": {
+<<<<<<< HEAD
 		"ignore": "5.1.6",
 		"js-yaml": "3.14.0",
 		"jsonc-parser": "2.2.1",
@@ -47,6 +44,14 @@
 		"vsce": "~1.78.0",
 		"webpack": "~4.44.1",
 		"webpack-cli": "~3.3.12"
+=======
+		"markdownlint": "^0.4.0"
+	},
+	"devDependencies": {
+		"eslint": "^3.17.0",
+		"vscode": "^1.0.5",
+		"@types/node": "^7.0.5"
+>>>>>>> parent of e2a8005... Update dependencies: markdownlint to 0.4.1, eslint to 3.18.0, vscode to 1.1.0, @types/node to 7.0.8.
 	},
 	"keywords": [
 		"markdown",
@@ -1444,11 +1449,6 @@
 										"type": "string"
 									},
 									"default": null
-								},
-								"code_blocks": {
-									"description": "Include code blocks",
-									"type": "boolean",
-									"default": true
 								}
 							},
 							"additionalProperties": false
@@ -1468,11 +1468,6 @@
 										"type": "string"
 									},
 									"default": null
-								},
-								"code_blocks": {
-									"description": "Include code blocks",
-									"type": "boolean",
-									"default": true
 								}
 							},
 							"additionalProperties": false
