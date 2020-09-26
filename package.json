@@ -28,20 +28,20 @@
 	},
 	"main": "./bundle",
 	"dependencies": {
-		"ignore": "5.1.6",
+		"ignore": "5.1.8",
 		"js-yaml": "3.14.0",
-		"jsonc-parser": "2.2.1",
-		"markdownlint": "0.20.4",
-		"markdownlint-rule-helpers": "0.11.0",
-		"markdown-it-katex": "2.0.3",
+		"jsonc-parser": "2.3.1",
+		"markdownlint": "0.21.0",
+		"markdownlint-rule-helpers": "0.12.0",
+		"@iktakahiro/markdown-it-katex": "4.0.0",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"@types/node": "~14.0.27",
+		"@types/node": "~14.11.2",
 		"@types/vscode": "~1.43.0",
-		"eslint": "~7.6.0",
-		"vsce": "~1.78.0",
-		"webpack": "~4.44.1",
+		"eslint": "~7.9.0",
+		"vsce": "~1.80.0",
+		"webpack": "~4.44.2",
 		"webpack-cli": "~3.3.12"
 	},
 	"keywords": [
@@ -166,7 +166,7 @@
 						"$schema": {
 							"description": "JSON Schema URI (used by some editors)",
 							"type": "string",
-							"default": "https://raw.githubusercontent.com/DavidAnson/markdownlint/master/schema/markdownlint-config-schema.json"
+							"default": "https://raw.githubusercontent.com/DavidAnson/markdownlint/main/schema/markdownlint-config-schema.json"
 						},
 						"MD001": {
 							"description": "MD001/heading-increment/header-increment - Heading levels should only increment by one level at a time",

@@ -312,7 +312,7 @@ function markdownlintWrapper (name, text, config) {
 		config,
 		"customRules": getCustomRules(),
 		"handleRuleFailures": true,
-		"markdownItPlugins": [ [ require("markdown-it-katex") ] ],
+		"markdownItPlugins": [ [ require("@iktakahiro/markdown-it-katex") ] ],
 		"resultVersion": 3
 	};
 	let results = [];
