@@ -86,7 +86,7 @@
 		},
 		"jsonValidation": [
 			{
-				"fileMatch": ".markdownlint.json",
+				"fileMatch": [ ".markdownlint.json", ".markdownlint.jsonc" ],
 				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
 			}
 		],
