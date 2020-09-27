@@ -147,6 +147,7 @@ function getConfig (document) {
 	let userWorkspaceConfig = configuration.get(sectionConfig);
 	const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
 	let source = null;
+	let extendBase = getWorkspacePath();
 	if (userWorkspaceConfigMetadata.workspaceFolderValue && (vscode.workspace.workspaceFolders.length > 1)) {
 		// Length check to work around https://github.com/Microsoft/vscode/issues/34386
 		source = openFolderSettingsCommand;
@@ -154,11 +155,12 @@ function getConfig (document) {
 		source = openWorkspaceSettingsCommand;
 	} else if (userWorkspaceConfigMetadata.globalValue) {
 		source = openGlobalSettingsCommand;
+		extendBase = require("os").homedir();
 	}
 
 	// Bootstrap extend behavior into readConfigSync
 	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
-		const extendPath = path.resolve(require("os").homedir(), userWorkspaceConfig.extends);
+		const extendPath = path.resolve(extendBase, userWorkspaceConfig.extends);
 		try {
 			const extendConfig = markdownlint.readConfigSync(extendPath, configParsers);
 			userWorkspaceConfig = {

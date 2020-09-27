@@ -21,7 +21,7 @@
         "max-len": ["error", 130],
         "max-lines": "off",
         "max-lines-per-function": ["error", 90],
-        "max-statements": ["error", 40],
+        "max-statements": "off",
         "no-extra-parens": "off",
         "no-magic-numbers": "off",
         "no-promise-executor-return": "off",
