@@ -44,6 +44,8 @@ const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
 	(content) => require("js-yaml").safeLoad(content)
 ];
+const codeActionKindQuickFix = vscode.CodeActionKind.QuickFix;
+const codeActionKindSourceFixAll = vscode.CodeActionKind.SourceFixAll.append(extensionDisplayName);
 
 const clickForInfo = "Click for more information about ";
 const clickToFix = "Click to fix this violation of ";
@@ -401,7 +403,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			// Provide code action to fix the violation
 			if (diagnostic.fixInfo) {
 				const fixTitle = clickToFix + ruleNameAlias;
-				const fixAction = new vscode.CodeAction(fixTitle, vscode.CodeActionKind.QuickFix);
+				const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
 				fixAction.command = {
 					"title": fixTitle,
 					"command": fixLineCommandName,
@@ -419,7 +421,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			const ruleInformationUri = ruleNameToInformationUri[ruleName];
 			if (ruleInformationUri) {
 				const infoTitle = clickForInfo + ruleNameAlias;
-				const infoAction = new vscode.CodeAction(infoTitle, vscode.CodeActionKind.QuickFix);
+				const infoAction = new vscode.CodeAction(infoTitle, codeActionKindQuickFix);
 				infoAction.command = {
 					"title": infoTitle,
 					"command": openCommand,
@@ -435,7 +437,7 @@ function provideCodeActions (document, range, codeActionContext) {
 		// Register a "fix all" code action
 		const sourceFixAllAction = new vscode.CodeAction(
 			fixAllCommandTitle,
-			vscode.CodeActionKind.SourceFixAll.append(extensionDisplayName)
+			codeActionKindSourceFixAll
 		);
 		sourceFixAllAction.command = {
 			"title": fixAllCommandTitle,
@@ -450,7 +452,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			(configSource === openGlobalSettingsCommand) ||
 			(configSource === openWorkspaceSettingsCommand) ||
 			(configSource === openFolderSettingsCommand);
-		const infoAction = new vscode.CodeAction(clickForConfigSource, vscode.CodeActionKind.QuickFix);
+		const infoAction = new vscode.CodeAction(clickForConfigSource, codeActionKindQuickFix);
 		infoAction.command = {
 			"title": clickForConfigSource,
 			"command": configSourceIsSettings ?
@@ -464,7 +466,7 @@ function provideCodeActions (document, range, codeActionContext) {
 	}
 	// Add information about configuring rules
 	if (showConfigureInfo) {
-		const configureInfoAction = new vscode.CodeAction(clickForConfigureInfo, vscode.CodeActionKind.QuickFix);
+		const configureInfoAction = new vscode.CodeAction(clickForConfigureInfo, codeActionKindQuickFix);
 		configureInfoAction.command = {
 			"title": clickForConfigureInfo,
 			"command": openCommand,
@@ -668,10 +670,17 @@ function activate (context) {
 	);
 
 	// Register CodeActionsProvider
+	const codeActionProvider = {
+		provideCodeActions
+	};
+	const codeActionProviderMetadata = {
+		"providedCodeActionKinds": [
+			codeActionKindQuickFix,
+			codeActionKindSourceFixAll
+		]
+	};
 	context.subscriptions.push(
-		vscode.languages.registerCodeActionsProvider(documentSelectors, {
-			provideCodeActions
-		})
+		vscode.languages.registerCodeActionsProvider(documentSelectors, codeActionProvider, codeActionProviderMetadata)
 	);
 
 	// Register Commands
