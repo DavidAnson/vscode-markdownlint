@@ -17,9 +17,11 @@ const nodeRequire = (typeof __non_webpack_require__ === "undefined") ? require :
 
 // Constants
 const extensionDisplayName = "markdownlint";
-const configFileGlob = ".markdownlint{.json,.yaml,.yml,rc}";
+const configFileGlob = ".markdownlint{.jsonc,.json,.yaml,.yml,rc}";
+const markdownlintJson = ".markdownlint.json";
 const configFileNames = [
-	".markdownlint.json",
+	".markdownlint.jsonc",
+	markdownlintJson,
 	".markdownlint.yaml",
 	".markdownlint.yml",
 	".markdownlintrc"
@@ -546,7 +548,7 @@ function openConfigFile () {
 			vscode.window.showTextDocument(validFilePaths[0]);
 		} else {
 			// File does not exist, create one
-			const filePath = path.join(workspacePath, configFileNames[0]);
+			const filePath = path.join(workspacePath, markdownlintJson);
 			const fileUri = vscode.Uri.file(filePath);
 			const newFileUri = fileUri.with({"scheme": "untitled"});
 			vscode.window.showTextDocument(newFileUri).then(

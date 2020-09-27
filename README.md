@@ -140,9 +140,9 @@ The default rule configuration disables `MD013`/`line-length` because many files
 
 > **Note**: `MD002`/`first-heading-h1` is disabled by default because it has been deprecated in the `markdownlint` library.
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.json` (or `.markdownlintrc`) or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml` (or `.markdownlint.yml`) in any directory of a project. The rules defined by `.markdownlint{.json,.yaml,.yml,rc}` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint{.json,.yaml,.yml,rc}`.
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json`/`.markdownlintrc` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` in any directory of a project. The rules defined by `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint{.jsonc,.json,.yaml,.yml,rc}`.
 
-> **Note**: `.markdownlint{.json,.yaml,.yml,rc}` is used only if a project has been opened. When no folder is open or a file is not part of the current project, normal user and workspace settings apply (see below). If multiple of these files are present in the same directory, `.markdownlint.json` will be used instead of `.markdownlint.yaml` will be used instead of `.markdownlint.yml` will be used instead of `.markdownlintrc`.
+> **Note**: `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` is used only if a project has been opened. When no folder is open or a file is not part of the current project, normal user and workspace settings apply (see below). If multiple of these files are present in the same directory, `.markdownlint.jsonc` will be used instead of `.markdownlint.json` will be used instead of `.markdownlint.yaml` will be used instead of `.markdownlint.yml` will be used instead of `.markdownlintrc`.
 
 A custom configuration is often defined by a `.markdownlint.json` file in the root of the project:
 
@@ -186,9 +186,9 @@ File paths referenced by `extends` from user settings are resolved relative to t
 
 Configuration locations have the following precedence (in decreasing order):
 
-* `.markdownlint{.json,.yaml,.yml,rc}` file in the same directory
-* `.markdownlint{.json,.yaml,.yml,rc}` file in a parent directory
-* `.markdownlint{.json,.yaml,.yml,rc}` file in the root of the project
+* `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` file in the same directory
+* `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` file in a parent directory
+* `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` file in the root of the project
 * Visual Studio Code user/workspace settings
 * Default configuration (see above)
 
@@ -196,7 +196,7 @@ Once a configuration is found, lower-precedence locations are ignored. Changes s
 
 See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration.
 
-When a workspace is active, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint{.json,.yaml,.yml,rc}` configuration file in the root of the workspace. If none of those files exist, `.markdownlint.json` will be created in the "pending save" state and opened in the editor.
+When a workspace is active, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` configuration file in the root of the workspace. If none of those files exist, `.markdownlint.json` will be created in the "pending save" state and opened in the editor.
 
 ### markdownlint.ignore
 
