@@ -46,6 +46,9 @@ const configParsers = [
 ];
 const codeActionKindQuickFix = vscode.CodeActionKind.QuickFix;
 const codeActionKindSourceFixAll = vscode.CodeActionKind.SourceFixAll.append(extensionDisplayName);
+const defaultConfig = {
+	"MD013": false
+};
 
 const clickForInfo = "Click for more information about ";
 const clickToFix = "Click to fix this violation of ";
@@ -173,7 +176,10 @@ function getConfig (document) {
 		}
 	}
 	return (configMap[name] = {
-		"config": userWorkspaceConfig,
+		"config": {
+			...defaultConfig,
+			...userWorkspaceConfig
+		},
 		source
 	});
 }

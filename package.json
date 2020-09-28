@@ -86,7 +86,10 @@
 		},
 		"jsonValidation": [
 			{
-				"fileMatch": [ ".markdownlint.json", ".markdownlint.jsonc" ],
+				"fileMatch": [
+					".markdownlint.json",
+					".markdownlint.jsonc"
+				],
 				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
 			}
 		],
@@ -149,9 +152,7 @@
 					"description": "markdownlint config object",
 					"scope": "resource",
 					"type": "object",
-					"default": {
-						"MD013": false
-					},
+					"default": {},
 					"properties": {
 						"default": {
 							"description": "Default state for all rules",
