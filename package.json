@@ -31,9 +31,9 @@
 		"ignore": "5.1.8",
 		"js-yaml": "3.14.0",
 		"jsonc-parser": "2.3.1",
+		"markdown-it-texmath": "0.8.0",
 		"markdownlint": "0.21.0",
 		"markdownlint-rule-helpers": "0.12.0",
-		"@iktakahiro/markdown-it-katex": "4.0.0",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {

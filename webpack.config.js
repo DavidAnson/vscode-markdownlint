@@ -1,5 +1,7 @@
 "use strict";
 
+const webpack = require("webpack");
+
 const config = {
 	"target": "node",
 	"entry": "./extension.js",
@@ -10,6 +12,7 @@ const config = {
 	},
 	"externals": {
 		"vscode": "commonjs vscode"
-	}
+	},
+	"plugins": [ new webpack.IgnorePlugin(/katex/) ]
 };
 module.exports = config;
