@@ -93,6 +93,15 @@
 				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
 			}
 		],
+		"yamlValidation": [
+			{
+				"fileMatch": [
+					".markdownlint.yaml",
+					".markdownlint.yml"
+				],
+				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
+			}
+		],
 		"languages": [
 			{
 				"id": "jsonc",
