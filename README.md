@@ -99,7 +99,6 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD023 *heading-start-left*
 * MD026 *no-trailing-punctuation*
 * MD027 *no-multiple-space-blockquote*
-* MD028 *no-blanks-blockquote*
 * MD030 *list-marker-space*
 * MD031 *blanks-around-fences*
 * MD032 *blanks-around-lists*
@@ -289,6 +288,7 @@ The following snippets are available to help (press `Ctrl+Space` for IntelliSens
 
 * `markdownlint-disable`
 * `markdownlint-enable`
+* `markdownlint-disable-next-line`
 * `markdownlint-capture`
 * `markdownlint-restore`
 * `markdownlint-disable-file`
