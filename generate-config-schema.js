@@ -8,4 +8,5 @@ const configurationSchema = require("./node_modules/markdownlint/schema/markdown
 // Update package.json
 const configurationRoot = packageJson.contributes.configuration.properties["markdownlint.config"];
 configurationRoot.properties = configurationSchema.properties;
+configurationRoot.additionalProperties = configurationSchema.additionalProperties;
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, "\t") + "\n");
