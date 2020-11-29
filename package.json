@@ -17,8 +17,10 @@
 	},
 	"scripts": {
 		"compile": "webpack --mode production",
-		"lint": "eslint --ignore-pattern bundle.js *.js",
-		"schema": "node generate-config-schema.js"
+		"lint": "eslint --ignore-pattern bundle.js .",
+		"pretest": "npm run lint",
+		"schema": "node generate-config-schema.js",
+		"test": "node ./test/runTest.js"
 	},
 	"categories": [
 		"Linters"
@@ -40,7 +42,10 @@
 		"@types/node": "~14.11.2",
 		"@types/vscode": "~1.43.0",
 		"eslint": "~7.9.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.2.1",
 		"vsce": "~1.80.0",
+		"vscode-test": "^1.4.1",
 		"webpack": "~4.44.2",
 		"webpack-cli": "~3.3.12"
 	},

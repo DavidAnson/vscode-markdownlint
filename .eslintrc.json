@@ -38,5 +38,18 @@
         "prefer-template": "off",
         "require-unicode-regexp": "off",
         "sort-keys": "off"
-    }
+    },
+    "overrides": [
+        {
+            "files": [
+                "test/**/*.js"
+            ],
+            "env": {
+                "mocha": true
+            },
+            "rules": {
+                "no-console": "off"
+            }
+        }
+    ]
 }

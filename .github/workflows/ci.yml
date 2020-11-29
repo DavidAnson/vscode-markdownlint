@@ -28,3 +28,6 @@ jobs:
       run: |
         npm run schema
         git diff --exit-code
+
+    - name: Run tests
+      run: npm test
