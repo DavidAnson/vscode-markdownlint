@@ -1708,7 +1708,12 @@
 							"default": true
 						}
 					},
-					"additionalProperties": false
+					"additionalProperties": {
+						"type:": [
+							"boolean",
+							"object"
+						]
+					}
 				}
 			}
 		}
