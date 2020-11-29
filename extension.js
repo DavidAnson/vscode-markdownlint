@@ -736,10 +736,8 @@ function activate (context) {
 		"dispose": () => suppressLint(throttle.document)
 	});
 
-	// Request (deferred) lint of active document
-	if (vscode.window.activeTextEditor) {
-		requestLint(vscode.window.activeTextEditor.document);
-	}
+	// Lint all visible documents
+	setTimeout(cleanLintVisibleFiles, throttleDuration);
 }
 
 exports.activate = activate;
