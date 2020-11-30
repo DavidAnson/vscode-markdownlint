@@ -1,0 +1,91 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "markdownlint-cli2 configuration schema",
+	"type": "object",
+	"properties": {
+		"config": {
+			"$ref": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
+		},
+		"customRules": {
+			"description": "Module names or paths of custom rules to load and use when linting",
+			"type": "array",
+			"default": [],
+			"items": {
+				"description": "Module name or path of a custom rule",
+				"type": "string",
+				"minLength": 1
+			}
+		},
+		"fix": {
+			"description": "Whether to enable fixing of linting errors reported by rules that emit fix information",
+			"type": "boolean",
+			"default": false
+		},
+		"frontMatter": {
+			"description": "Regular expression used to match and ignore any front matter at the beginning of a document",
+			"type": "string",
+			"default": ""
+		},
+		"ignores": {
+			"description": "Glob expressions to ignore when linting",
+			"type": "array",
+			"default": [],
+			"items": {
+				"description": "Glob expression to ignore",
+				"type": "string",
+				"minLength": 1
+			}
+		},
+		"markdownItPlugins": {
+			"description": "markdown-it plugins to load and use when linting",
+			"type": "array",
+			"default": [],
+			"items": {
+				"description": "Name or path of a markdown-it plugin followed by parameters",
+				"type": "array",
+				"items": [
+					{
+						"description": "Name or path of a markdown-it plugin",
+						"type": "string",
+						"minLength": 1
+					},
+					{
+						"description": "Parameter to pass to the markdown-it plugin"
+					}
+				],
+				"minItems": 1
+			}
+		},
+		"noInlineConfig": {
+			"description": "Whether to disable support of HTML comments within Markdown content",
+			"type": "boolean",
+			"default": false
+		},
+		"noProgress": {
+			"description": "Whether to disable the display of progress on stdout",
+			"type": "boolean",
+			"default": false
+		},
+		"outputFormatters": {
+			"description": "Output formatters to load and use to customize markdownlint-cli2 output",
+			"type": "array",
+			"default": [],
+			"items": {
+				"description": "Name or path of an output formatter followed by parameters",
+				"type": "array",
+				"items": [
+					{
+						"description": "Name or path of an output formatter",
+						"type": "string",
+						"minLength": 1
+					},
+					{
+						"description": "Parameter to pass to the output formatter"
+					}
+				],
+				"minItems": 1
+			}
+		}
+	},
+	"additionalProperties": false
+}

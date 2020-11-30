@@ -91,6 +91,10 @@
 					".markdownlint.jsonc"
 				],
 				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
+			},
+			{
+				"fileMatch": ".markdownlint-cli2.jsonc",
+				"url": "./markdownlint-cli2-config-schema.json"
 			}
 		],
 		"yamlValidation": [
@@ -100,6 +104,10 @@
 					".markdownlint.yml"
 				],
 				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
+			},
+			{
+				"fileMatch": ".markdownlint-cli2.yaml",
+				"url": "./markdownlint-cli2-config-schema.json"
 			}
 		],
 		"languages": [
