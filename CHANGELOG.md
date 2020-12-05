@@ -1,5 +1,6 @@
 # Changes
 
+* 0.38.0 - Improved rules, schemas, new snippet
 * 0.37.0 - Improved rules, extends, schema
 * 0.36.0 - Add command, improve diagnostics
 * 0.35.0 - Improved rules, .markdownlintignore
