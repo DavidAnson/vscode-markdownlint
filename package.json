@@ -18,7 +18,8 @@
 	"scripts": {
 		"compile": "webpack --mode production",
 		"lint": "eslint --ignore-pattern bundle.js *.js",
-		"schema": "node generate-config-schema.js"
+		"schema": "node generate-config-schema.js",
+		"test": "npm run lint && npm run compile && npm run schema && git diff --exit-code"
 	},
 	"categories": [
 		"Linters"
