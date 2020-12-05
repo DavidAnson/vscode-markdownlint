@@ -13,6 +13,6 @@ const config = {
 	"externals": {
 		"vscode": "commonjs vscode"
 	},
-	"plugins": [ new webpack.IgnorePlugin({ resourceRegExp: /katex/ }) ]
+	"plugins": [ new webpack.IgnorePlugin({"resourceRegExp": /katex/}) ]
 };
 module.exports = config;
