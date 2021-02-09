@@ -30,7 +30,7 @@
 	"main": "./bundle",
 	"dependencies": {
 		"ignore": "5.1.8",
-		"js-yaml": "3.14.0",
+		"js-yaml": "4.0.0",
 		"jsonc-parser": "3.0.0",
 		"markdown-it-texmath": "0.8.0",
 		"markdownlint": "0.23.0",

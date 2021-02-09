@@ -42,7 +42,7 @@ const documentSelectors = [
 ];
 const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
-	(content) => require("js-yaml").safeLoad(content)
+	(content) => require("js-yaml").load(content)
 ];
 const codeActionKindQuickFix = vscode.CodeActionKind.QuickFix;
 const codeActionKindSourceFixAll = vscode.CodeActionKind.SourceFixAll.append(extensionDisplayName);
