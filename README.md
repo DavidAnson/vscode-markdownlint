@@ -83,6 +83,7 @@ See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/bl
 
 The following rules can be automatically fixed by moving the cursor to a rule violation (wavy underlined text) and typing `Ctrl+.` or clicking the light bulb icon.
 
+* MD004 *ul-style*
 * MD005 *list-indent*
 * MD006 *ul-start-left*
 * MD007 *ul-indent*
@@ -193,7 +194,7 @@ Configuration locations have the following precedence (in decreasing order):
 
 Once a configuration is found, lower-precedence locations are ignored. Changes saved to any location take effect immediately. Files referenced via `extends` are not monitored for changes. Only the last two locations apply to files outside a project.
 
-See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration.
+See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration. See [`.markdownlint.jsonc`](https://github.com/DavidAnson/markdownlint/blob/main/schema/.markdownlint.jsonc) and [`.markdownlint.yaml`](https://github.com/DavidAnson/markdownlint/blob/main/schema/.markdownlint.yaml) for example configurations with all properties set to the default value.
 
 When a workspace is active, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` configuration file in the root of the workspace. If none of those files exist, `.markdownlint.json` will be created in the "pending save" state and opened in the editor.
 

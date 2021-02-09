@@ -33,8 +33,8 @@
 		"js-yaml": "3.14.0",
 		"jsonc-parser": "3.0.0",
 		"markdown-it-texmath": "0.8.0",
-		"markdownlint": "0.22.0",
-		"markdownlint-rule-helpers": "0.13.0",
+		"markdownlint": "0.23.0",
+		"markdownlint-rule-helpers": "0.14.0",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
@@ -179,7 +179,10 @@
 						},
 						"extends": {
 							"description": "Path to configuration file to extend",
-							"type": "string",
+							"type": [
+								"string",
+								"null"
+							],
 							"default": null
 						},
 						"$schema": {
@@ -203,7 +206,7 @@
 							"default": true
 						},
 						"MD002": {
-							"description": "MD002/first-heading-h1/first-header-h1 - First heading should be a top level heading",
+							"description": "MD002/first-heading-h1/first-header-h1 - First heading should be a top-level heading",
 							"type": [
 								"boolean",
 								"object"
@@ -219,7 +222,7 @@
 							"additionalProperties": false
 						},
 						"first-heading-h1": {
-							"description": "MD002/first-heading-h1/first-header-h1 - First heading should be a top level heading",
+							"description": "MD002/first-heading-h1/first-header-h1 - First heading should be a top-level heading",
 							"type": [
 								"boolean",
 								"object"
@@ -235,7 +238,7 @@
 							"additionalProperties": false
 						},
 						"first-header-h1": {
-							"description": "MD002/first-heading-h1/first-header-h1 - First heading should be a top level heading",
+							"description": "MD002/first-heading-h1/first-header-h1 - First heading should be a top-level heading",
 							"type": [
 								"boolean",
 								"object"
@@ -860,7 +863,7 @@
 							"additionalProperties": false
 						},
 						"MD025": {
-							"description": "MD025/single-title/single-h1 - Multiple top level headings in the same document",
+							"description": "MD025/single-title/single-h1 - Multiple top-level headings in the same document",
 							"type": [
 								"boolean",
 								"object"
@@ -881,7 +884,7 @@
 							"additionalProperties": false
 						},
 						"single-title": {
-							"description": "MD025/single-title/single-h1 - Multiple top level headings in the same document",
+							"description": "MD025/single-title/single-h1 - Multiple top-level headings in the same document",
 							"type": [
 								"boolean",
 								"object"
@@ -902,7 +905,7 @@
 							"additionalProperties": false
 						},
 						"single-h1": {
-							"description": "MD025/single-title/single-h1 - Multiple top level headings in the same document",
+							"description": "MD025/single-title/single-h1 - Multiple top-level headings in the same document",
 							"type": [
 								"boolean",
 								"object"
@@ -1291,7 +1294,7 @@
 							"default": true
 						},
 						"MD041": {
-							"description": "MD041/first-line-heading/first-line-h1 - First line in file should be a top level heading",
+							"description": "MD041/first-line-heading/first-line-h1 - First line in a file should be a top-level heading",
 							"type": [
 								"boolean",
 								"object"
@@ -1312,7 +1315,7 @@
 							"additionalProperties": false
 						},
 						"first-line-heading": {
-							"description": "MD041/first-line-heading/first-line-h1 - First line in file should be a top level heading",
+							"description": "MD041/first-line-heading/first-line-h1 - First line in a file should be a top-level heading",
 							"type": [
 								"boolean",
 								"object"
@@ -1333,7 +1336,7 @@
 							"additionalProperties": false
 						},
 						"first-line-h1": {
-							"description": "MD041/first-line-heading/first-line-h1 - First line in file should be a top level heading",
+							"description": "MD041/first-line-heading/first-line-h1 - First line in a file should be a top-level heading",
 							"type": [
 								"boolean",
 								"object"
@@ -1377,7 +1380,7 @@
 									"items": {
 										"type": "string"
 									},
-									"default": null
+									"default": []
 								},
 								"headers": {
 									"description": "List of headings",
@@ -1385,7 +1388,7 @@
 									"items": {
 										"type": "string"
 									},
-									"default": null
+									"default": []
 								}
 							},
 							"additionalProperties": false
@@ -1404,7 +1407,7 @@
 									"items": {
 										"type": "string"
 									},
-									"default": null
+									"default": []
 								},
 								"headers": {
 									"description": "List of headings",
@@ -1412,7 +1415,7 @@
 									"items": {
 										"type": "string"
 									},
-									"default": null
+									"default": []
 								}
 							},
 							"additionalProperties": false
@@ -1431,7 +1434,7 @@
 									"items": {
 										"type": "string"
 									},
-									"default": null
+									"default": []
 								},
 								"headers": {
 									"description": "List of headings",
@@ -1439,7 +1442,7 @@
 									"items": {
 										"type": "string"
 									},
-									"default": null
+									"default": []
 								}
 							},
 							"additionalProperties": false
@@ -1458,7 +1461,7 @@
 									"items": {
 										"type": "string"
 									},
-									"default": null
+									"default": []
 								},
 								"code_blocks": {
 									"description": "Include code blocks",
@@ -1482,7 +1485,7 @@
 									"items": {
 										"type": "string"
 									},
-									"default": null
+									"default": []
 								},
 								"code_blocks": {
 									"description": "Include code blocks",
