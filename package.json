@@ -38,7 +38,6 @@
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"@types/node": "~14.14.10",
 		"@types/vscode": "~1.43.0",
 		"eslint": "~7.15.0",
 		"vsce": "~1.81.1",
