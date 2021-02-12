@@ -33,7 +33,7 @@
 		"js-yaml": "4.0.0",
 		"jsonc-parser": "3.0.0",
 		"markdown-it-texmath": "0.8.0",
-		"markdownlint": "0.23.0",
+		"markdownlint": "0.23.1",
 		"markdownlint-rule-helpers": "0.14.0",
 		"minimatch": "3.0.4"
 	},
