@@ -20,7 +20,7 @@
         "max-depth": ["error", 6],
         "max-len": ["error", 130],
         "max-lines": "off",
-        "max-lines-per-function": ["error", 90],
+        "max-lines-per-function": "off",
         "max-statements": "off",
         "no-extra-parens": "off",
         "no-magic-numbers": "off",

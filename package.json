@@ -61,7 +61,7 @@
 		"commands": [
 			{
 				"command": "markdownlint.fixAll",
-				"title": "Fix supported markdownlint violations in the document"
+				"title": "Fix all supported markdownlint violations in the document"
 			},
 			{
 				"command": "markdownlint.openConfigFile",

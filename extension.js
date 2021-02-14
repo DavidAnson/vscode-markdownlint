@@ -50,16 +50,16 @@ const defaultConfig = {
 	"MD013": false
 };
 
-const clickForInfo = "Click for more information about ";
-const clickToFix = "Click to fix this violation of ";
+const clickForInfo = "More information about ";
+const clickToFix = "Fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
-const fixAllCommandTitle = `Fix supported ${extensionDisplayName} violations in the document`;
+const fixAllCommandTitle = `Fix all supported ${extensionDisplayName} violations in this document`;
 const fixAllCommandName = "markdownlint.fixAll";
 const openConfigFileCommandName = "markdownlint.openConfigFile";
 const toggleLintingCommandName = "markdownlint.toggleLinting";
-const clickForConfigureInfo = `Click for details about configuring ${extensionDisplayName} rules`;
+const clickForConfigureInfo = `Details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
-const clickForConfigSource = `Click to open this document's ${extensionDisplayName} configuration`;
+const clickForConfigSource = `Open this document's ${extensionDisplayName} configuration`;
 const openGlobalSettingsCommand = "workbench.action.openGlobalSettings";
 const openWorkspaceSettingsCommand = "workbench.action.openWorkspaceSettings";
 const openFolderSettingsCommand = "workbench.action.openFolderSettings";
@@ -451,17 +451,22 @@ function provideCodeActions (document, range, codeActionContext) {
 			configSource = configSource || diagnostic.configSource;
 		});
 	if (fixInfoDiagnostics.length) {
-		// Register a "fix all" code action
-		const sourceFixAllAction = new vscode.CodeAction(
-			fixAllCommandTitle,
-			codeActionKindSourceFixAll
-		);
-		sourceFixAllAction.command = {
-			"title": fixAllCommandTitle,
-			"command": fixAllCommandName
+		// eslint-disable-next-line func-style
+		const registerFixAllCodeAction = (codeActionKind) => {
+			// Register a "fix all" code action
+			const sourceFixAllAction = new vscode.CodeAction(
+				fixAllCommandTitle,
+				codeActionKind
+			);
+			sourceFixAllAction.command = {
+				"title": fixAllCommandTitle,
+				"command": fixAllCommandName
+			};
+			sourceFixAllAction.diagnostics = fixInfoDiagnostics;
+			codeActions.push(sourceFixAllAction);
 		};
-		sourceFixAllAction.diagnostics = fixInfoDiagnostics;
-		codeActions.push(sourceFixAllAction);
+		registerFixAllCodeAction(codeActionKindSourceFixAll);
+		registerFixAllCodeAction(codeActionKindQuickFix);
 	}
 	// Open the source for the document's rule configuration
 	if (configSource) {
