@@ -12,11 +12,11 @@
 			"## Rules",
 			"## Configure",
 			"### markdownlint.config",
-			"### markdownlint.ignore",
 			"### markdownlint.run",
+			"### markdownlint.ignore",
 			"### markdownlint.customRules",
-			"### markdownlint.customRulesAlwaysAllow",
 			"## Suppress",
+			"## Snippets",
 			"## History"
 		]
 	},
@@ -26,6 +26,7 @@
 			"Ctrl",
 			"JavaScript",
 			"Markdown",
+			"markdown-it",
 			"markdownlint",
 			"Node.js",
 			"Shift",

@@ -11,13 +11,13 @@ The [Markdown](https://en.wikipedia.org/wiki/Markdown) markup language is design
 ## Install
 
 1. Open [Visual Studio Code](https://code.visualstudio.com/)
-2. Press `Ctrl+P` to open the Quick Open dialog
+2. Press `Ctrl+P`/`⌘P` to open the Quick Open dialog
 3. Type `ext install markdownlint` to find the extension
 4. Click the `Install` button, then the `Enable` button
 
 OR
 
-1. Press `Ctrl+Shift+X` to open the Extensions tab
+1. Press `Ctrl+Shift+X`/`⇧⌘X` to open the Extensions tab
 2. Type `markdownlint` to find the extension
 3. Click the `Install` button, then the `Enable` button
 
@@ -28,7 +28,7 @@ OR
 
 ## Use
 
-When editing a Markdown file in Code with markdownlint installed, any lines that violate one of markdownlint's rules (see below) will trigger a *Warning* in the editor. Warnings are indicated by a wavy green underline and can also be seen by pressing `Ctrl+Shift+M` to open the Errors and Warnings dialog. Hover the mouse pointer over a green line to see the warning or press `F8` and `Shift+F8` to cycle through all the warnings (markdownlint warnings all begin with `MD###`). For more information about a markdownlint warning, place the cursor on a line and click the light bulb icon or press `Ctrl+.` to open the code action dialog. Clicking one of the warnings in the dialog will display that rule's help entry in the default web browser.
+When editing a Markdown file in Code with `markdownlint` installed, any lines that violate one of `markdownlint`'s rules (see below) will trigger a *Warning* in the editor. Warnings are indicated by a wavy green underline and can also be seen by pressing `Ctrl+Shift+M`/`⇧⌘M` to open the Errors and Warnings dialog. Hover the mouse pointer over a green line to see the warning or press `F8` and `Shift+F8`/`⇧F8` to cycle through all the warnings (markdownlint warnings all begin with `MD###`). For more information about a `markdownlint` warning, place the cursor on a line and click the light bulb icon or press `Ctrl+.`/`⌘.` to open the quick fix dialog. Clicking one of the warnings in the dialog will display that rule's help entry in the default web browser.
 
 > For a tutorial, please see [Build an Amazing Markdown Editor Using Visual Studio Code and Pandoc](https://thisdavej.com/build-an-amazing-markdown-editor-using-visual-studio-code-and-pandoc/) by Dave Johnson.
 
@@ -81,7 +81,7 @@ When editing a Markdown file in Code with markdownlint installed, any lines that
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md) for more details.
 
-The following rules can be automatically fixed by moving the cursor to a rule violation (wavy underlined text) and typing `Ctrl+.` or clicking the light bulb icon.
+The following rules can be automatically fixed by moving the cursor to a rule violation (wavy underlined text) and typing `Ctrl+.`/`⌘.` or clicking the light bulb icon.
 
 * MD004 *ul-style*
 * MD005 *list-indent*
@@ -110,7 +110,7 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD044 *proper-names*
 * MD047 *single-trailing-newline*
 
-All violations of the above rules in the current document can be fixed at once by running the `markdownlint.fixAll` command, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P` then search for "markdownlint") or by [binding the command to a keyboard shortcut](https://code.visualstudio.com/docs/getstarted/keybindings).
+All violations of the above rules in the current document can be fixed at once by running the `markdownlint.fixAll` command, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P`/`⇧⌘P` then search for "markdownlint") or by [binding the command to a keyboard shortcut](https://code.visualstudio.com/docs/getstarted/keybindings).
 
 To automatically fix these violations when saving a Markdown document, [configure Visual Studio Code's `editor.codeActionsOnSave` setting](https://code.visualstudio.com/docs/getstarted/settings) like so:
 
@@ -120,7 +120,7 @@ To automatically fix these violations when saving a Markdown document, [configur
 }
 ```
 
-Automatically-applied fixes can be reverted by `Edit|Undo` or `Ctrl+Z`.
+Automatically-applied fixes can be reverted by `Edit|Undo` or `Ctrl+Z`/`⌘Z`.
 
 To temporarily disable linting of Markdown documents, run the `markdownlint.toggleLinting` command (from the Command Palette or by binding it to a keyboard shortcut). To re-enable linting, run the `markdownlint.toggleLinting` command again.
 
@@ -130,7 +130,7 @@ To temporarily disable linting of Markdown documents, run the `markdownlint.togg
 
 ### markdownlint.config
 
-The default rule configuration disables `MD013`/`line-length` because many files include lines longer than the conventional 80 character limit:
+The default rule configuration disables [`MD013`/`line-length`](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md013) because many files include lines longer than the conventional 80 character limit:
 
 ```json
 {
@@ -138,11 +138,12 @@ The default rule configuration disables `MD013`/`line-length` because many files
 }
 ```
 
-> **Note**: `MD002`/`first-heading-h1` is disabled by default because it has been deprecated in the `markdownlint` library.
+> **Note**: `MD002`/`first-heading-h1` and `MD006`/`ul-start-left` are also disabled because they have been deprecated in the `markdownlint` library.
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json`/`.markdownlintrc` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` in any directory of a project. The rules defined by `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` apply to Markdown files in the same directory and any sub-directories without their own `.markdownlint{.jsonc,.json,.yaml,.yml,rc}`.
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.js` in any directory of a project.
+Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.js` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
 
-> **Note**: `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` is used only if a project has been opened. When no folder is open or a file is not part of the current project, normal user and workspace settings apply (see below). If multiple of these files are present in the same directory, `.markdownlint.jsonc` will be used instead of `.markdownlint.json` will be used instead of `.markdownlint.yaml` will be used instead of `.markdownlint.yml` will be used instead of `.markdownlintrc`.
+> **Note**: When no folder is open, configuration and options are loaded from the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux).
 
 A custom configuration is often defined by a `.markdownlint.json` file in the root of the project:
 
@@ -155,7 +156,7 @@ A custom configuration is often defined by a `.markdownlint.json` file in the ro
 }
 ```
 
-To extend another configuration file, any configuration file can use the `extends` property to provide a relative path:
+To extend another configuration file, such a file can use the `extends` property to provide a relative path:
 
 ```json
 {
@@ -168,7 +169,7 @@ Files referenced via `extends` do not need to be part of the current project (bu
 
 Rules can also be configured using Code's support for [user and workspace settings](https://code.visualstudio.com/docs/customization/userandworkspace).
 
-The earlier configuration might look like the following in Code's user settings:
+The above configuration might look like the following in Code's user settings file:
 
 ```json
 {
@@ -182,21 +183,33 @@ The earlier configuration might look like the following in Code's user settings:
 }
 ```
 
-File paths referenced by `extends` from user settings are resolved relative to the user's home directory (ex: `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux). File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder.
+File paths referenced by `extends` from user settings are resolved relative to the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux). File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder. File paths referenced by `extends` from within the workspace are resolved relative to the file itself.
 
-Configuration locations have the following precedence (in decreasing order):
+Configuration sources have the following precedence (in decreasing order):
 
-* `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` file in the same directory
-* `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` file in a parent directory
-* `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` file in the root of the project
+* `.markdownlint-cli2.{jsonc,yaml,js}` file in the same or parent directory
+* `.markdownlint.{jsonc,json,yaml,yml,js}` file in the same or parent directory
 * Visual Studio Code user/workspace settings
 * Default configuration (see above)
 
-Once a configuration is found, lower-precedence locations are ignored. Changes saved to any location take effect immediately. Files referenced via `extends` are not monitored for changes. Only the last two locations apply to files outside a project.
+Configuration changes saved to any location take effect immediately. Files referenced via `extends` are not monitored for changes. Inherited configuration can be explicitly disabled (or re-enabled) in any configuration file.
 
-See [markdownlint's options.config section](https://github.com/DavidAnson/markdownlint#optionsconfig) for more information about rule configuration. See [`.markdownlint.jsonc`](https://github.com/DavidAnson/markdownlint/blob/main/schema/.markdownlint.jsonc) and [`.markdownlint.yaml`](https://github.com/DavidAnson/markdownlint/blob/main/schema/.markdownlint.yaml) for example configurations with all properties set to the default value.
+When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint.{jsonc,json,yaml,yml,js}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` will be opened in the editor in the "pending save" state.
 
-When a workspace is active, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint{.jsonc,.json,.yaml,.yml,rc}` configuration file in the root of the workspace. If none of those files exist, `.markdownlint.json` will be created in the "pending save" state and opened in the editor.
+### markdownlint.run
+
+By default, linting is performed as you type or edit a document. Linting is fast and efficient and should not interfere with typical workflows.
+
+If you find this distracting, linting can be configured to run only when the document is saved. This looks like the following in Code's user settings:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.run": "onSave"
+}
+```
+
+> **Note**: When configured to run `onSave`, the list of reported issues will become outdated while the document is edited and will update when the document is saved.
 
 ### markdownlint.ignore
 
@@ -226,28 +239,13 @@ An example of using Code's workspace configuration to ignore files might be:
 
 The globbing library used for matching `markdownlint.ignore` configuration values is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
 
-### markdownlint.run
-
-By default, linting is performed as you type or edit a document. Linting is fast and efficient and should not interfere with typical workflows.
-
-If you find this distracting, linting can be configured to run only when the document is saved. This looks like the following in Code's user settings:
-
-```json
-{
-    "editor.someSetting": true,
-    "markdownlint.run": "onSave"
-}
-```
-
-> **Note**: When configured to run `onSave`, the list of reported issues will become outdated while the document is edited and will update when the document is saved.
+> **Note**: Files can also be ignored (in a way other tools will recognize) via the `ignores` property in `.markdownlint-cli2.{jsonc,yaml,js}`.
 
 ### markdownlint.customRules
 
-Custom rules can be specified in Code's user/workspace configuration to apply additional linting beyond the default set of rules. Custom rules are specified by the path to a JavaScript file or the path to an [npm](https://www.npmjs.com/) package exporting one rule or an array of rules.
+Custom rules can be specified in Code's user/workspace configuration to apply additional linting beyond the default set of rules. Custom rules are specified by the path to a JavaScript file or the name of or path to an [npm](https://www.npmjs.com/) package exporting one rule or an array of rules ([examples of custom rules](https://www.npmjs.com/search?q=keywords:markdownlint-rule)).
 
-Paths are normally relative to the root of the current workspace (or the Code install directory when no folder is open). Paths can also be absolute. When adding custom rules to a workspace, consider committing those rules under the `.vscode` directory where they will be separate from other workspace content and available to everyone who clones the repository.
-
-Paths of the form `{extension}/path` are relative to the base directory of the Code extension named `extension` (which must already be installed). This syntax allows custom rules to be included within another extension's package and shared across multiple workspaces.
+Paths are normally relative to the root of the current workspace (or the user's home directory when no folder is open). Paths can also be absolute. If implementing custom rules in a workspace, consider committing the code under the `.vscode` directory where they will be separate from other workspace content and available to everyone who clones the repository.
 
 An example of Code's workspace settings for custom rules might look like the following:
 
@@ -259,25 +257,17 @@ An example of Code's workspace settings for custom rules might look like the fol
         ".vscode/my-custom-rule-array.js",
         ".vscode/npm-package-for-custom-rule",
         "c:\\absolute\\path\\to\\custom\\rule.js",
-        "{publisher.extension-name}/custom-rule.js",
-        "{publisher.extension-name}/npm/rule/package"
     ]
 }
 ```
 
-To troubleshoot issues loading or running custom rules, please refer to diagnostic messages from the extension in Code's Output window.
+For information about authoring custom rules, see [the `markdownlint` documentation for custom rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md).
 
-For information about authoring custom rules, see [markdownlint/CustomRules](https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md).
-
-### markdownlint.customRulesAlwaysAllow
-
-A list of workspace paths for which the user's response to the custom rule prompt was "Always allow". This setting is updated automatically by the extension, but can be modified to reset the prompt for a workspace.
-
-> **Note**: This setting is only valid as a user setting, not as a workspace setting (where it could be set by a malicious workspace).
+> **Note**: Custom rules can also be specified (in a way other tools will recognize) via the `customRules` property in `.markdownlint-cli2.{jsonc,yaml,js}`.
 
 ## Suppress
 
-Individual warnings can be suppressed with inline comments:
+Individual warnings can be suppressed with comments in the Markdown file itself:
 
 ```md
 <!-- markdownlint-disable MD037 -->
@@ -285,7 +275,11 @@ deliberate space * in * emphasis
 <!-- markdownlint-enable MD037 -->
 ```
 
-The following snippets are available to help (press `Ctrl+Space` for IntelliSense suggestions):
+More information about inline suppressions can be found in the [Configuration section of the `markdownlint` README.md](https://github.com/DavidAnson/markdownlint#configuration).
+
+## Snippets
+
+The following snippets are available when editing a Markdown document (press `Ctrl+Space`/`⌃Space` for IntelliSense suggestions):
 
 * `markdownlint-disable`
 * `markdownlint-enable`
@@ -295,8 +289,6 @@ The following snippets are available to help (press `Ctrl+Space` for IntelliSens
 * `markdownlint-disable-file`
 * `markdownlint-enable-file`
 * `markdownlint-configure-file`
-
-See [markdownlint's configuration section](https://github.com/DavidAnson/markdownlint#configuration) for more details.
 
 ## History
 

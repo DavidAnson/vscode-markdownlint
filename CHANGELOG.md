@@ -1,5 +1,6 @@
 # Changes
 
+* 0.40.0 - Switched to `markdownlint-cli2` (see below)
 * 0.39.0 - Improved rules, new fix
 * 0.38.0 - Improved rules, schemas, new snippet
 * 0.37.0 - Improved rules, extends, schema
@@ -39,3 +40,15 @@
 * 0.3.0 - Focused underlining
 * 0.2.0 - Custom configuration
 * 0.1.0 - Initial release
+
+## About release 0.40.0
+
+Originally, this extension called into the [`markdownlint`](https://github.com/DavidAnson/markdownlint) library and needed to reimplement support for shared concepts like configuration files, etc.. With this release, the extension calls into [`markdownlint-cli2`](https://github.com/DavidAnson/markdownlint-cli2) to perform linting. This brings complete support for everything that tool supports, including the powerful `.markdownlint-cli2.{jsonc,yaml,js}` format that allows configuration inheritance along with different rules, custom rules, and [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) for each directory. This change means a few things behave differently or are no longer supported:
+
+* The default configuration (to disable `MD013`/`line-length`) is allowed to propagate into an open project even if that project has its own configuration. (This was partially true before.) To change behavior within a project (e.g., for complete consistency with CLI behavior) do so explicitly with any of the configuration mechanisms (for example, via `"line-length": true`).
+* The `.markdownlintrc` configuration file is no longer used. This format was supported for consistency with [`markdownlint-cli`](https://github.com/igorshubovych/markdownlint-cli) and was only partially implemented. Any of the configuration file formats used by `markdownlint-cli2` can be used instead.
+* Custom rules in user/workspace settings with names like `{extension}/path` will no longer be loaded from other VS Code extension directories. This behavior was always unique to the VS Code extension and is now supported by `markdownlint-cli2` via standard file/package references in `.markdownlint-cli2.{jsonc,yaml,js}`.
+* The "Open this document's configuration" action is no longer present in VS Code. This feature attempted to determine the single configuration source for the current file, but now that configuration inheritance is supported, there may no longer be a single configuration file.
+* The `markdownlint.customRulesAlwaysAllow` setting is no longer used because custom rules (along with `markdown-it` plugins, `markdownlint.js`, and `markdownlint-cli2.js`) are automatically loaded by `markdownlint-cli2`.
+
+<!-- markdownlint-disable-file required-headings -->
