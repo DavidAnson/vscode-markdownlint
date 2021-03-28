@@ -57,8 +57,11 @@ const toggleLintingCommandName = "markdownlint.toggleLinting";
 const clickForConfigureInfo = `Details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
 const openCommand = "vscode.open";
+const sectionBlockJavaScript = "blockJavaScript";
 const sectionConfig = "config";
 const sectionCustomRules = "customRules";
+const sectionIgnore = "ignore";
+const sectionRun = "run";
 const throttleDuration = 500;
 
 // Variables
@@ -129,7 +132,7 @@ function getIgnores () {
 		}
 		// Handle "ignore" configuration
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
-		const ignorePaths = configuration.get("ignore");
+		const ignorePaths = configuration.get(sectionIgnore);
 		ignorePaths.forEach((ignorePath) => {
 			const ignoreRe = require("minimatch").makeRe(ignorePath, {
 				"dot": true,
@@ -178,6 +181,7 @@ function markdownlintWrapper (document) {
 		[contents]: {
 			[name]: text
 		},
+		"noRequire": configuration.get(sectionBlockJavaScript),
 		"optionsDefault": {
 			"config": getConfig(configuration),
 			"customRules": configuration.get(sectionCustomRules),
@@ -451,7 +455,7 @@ function getRun (document) {
 	}
 	// Read workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-	runMap[name] = configuration.get("run");
+	runMap[name] = configuration.get(sectionRun);
 	outputLine("INFO: Linting for \"" + document.fileName + "\" will be run \"" + runMap[name] + "\".");
 	return runMap[name];
 }

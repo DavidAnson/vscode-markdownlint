@@ -15,6 +15,7 @@
 			"### markdownlint.run",
 			"### markdownlint.ignore",
 			"### markdownlint.customRules",
+			"### markdownlint.blockJavaScript",
 			"## Suppress",
 			"## Snippets",
 			"## History"

@@ -265,6 +265,21 @@ For information about authoring custom rules, see [the `markdownlint` documentat
 
 > **Note**: Custom rules can also be specified (in a way other tools will recognize) via the `customRules` property in `.markdownlint-cli2.{jsonc,yaml,js}`.
 
+### markdownlint.blockJavaScript
+
+Prevents running JavaScript in custom rules, `markdown-it` plugins, and configuration files (such as `.markdownlint.js` and `.markdownlint-cli2.js`). Running code associated with an arbitrary project could be a security risk, so this can be prevented in user settings by blocking such code from being loaded or executed by the `markdownlint` extension within Visual Studio Code.
+
+An example of Code's user settings for blocking JavaScript might look like:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.blockJavaScript": true
+}
+```
+
+> **Note**: This setting may impact the usability of projects with custom rules, `markdown-it` plugins, or JavaScript configuration files.
+
 ## Suppress
 
 Individual warnings can be suppressed with comments in the Markdown file itself:

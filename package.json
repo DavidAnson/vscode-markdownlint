@@ -130,8 +130,15 @@
 			"title": "markdownlint",
 			"type": "object",
 			"properties": {
+				"markdownlint.blockJavaScript": {
+					"description": "Prevents running JavaScript in custom rules, markdown-it plugins, and configuration files",
+					"scope": "application",
+					"type": "boolean",
+					"default": false
+				},
 				"markdownlint.customRulesAlwaysAllow": {
 					"description": "Array of workspace paths that load custom rules without prompting",
+					"deprecationMessage": "Deprecated, see CHANGELOG.md and markdownlint.blockJavaScript",
 					"scope": "application",
 					"type": "array",
 					"items": {
