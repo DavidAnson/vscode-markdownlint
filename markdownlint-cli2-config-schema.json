@@ -24,14 +24,25 @@
 		"frontMatter": {
 			"description": "Regular expression used to match and ignore any front matter at the beginning of a document",
 			"type": "string",
+			"minLength": 1,
 			"default": ""
+		},
+		"globs": {
+			"description": "Glob expressions to include when linting (only valid at the root)",
+			"type": "array",
+			"default": [],
+			"items": {
+				"description": "Glob expression of files to lint",
+				"type": "string",
+				"minLength": 1
+			}
 		},
 		"ignores": {
 			"description": "Glob expressions to ignore when linting",
 			"type": "array",
 			"default": [],
 			"items": {
-				"description": "Glob expression to ignore",
+				"description": "Glob expression of files to ignore",
 				"type": "string",
 				"minLength": 1
 			}
@@ -50,7 +61,7 @@
 						"minLength": 1
 					},
 					{
-						"description": "Parameter to pass to the markdown-it plugin"
+						"description": "Parameter(s) to pass to the markdown-it plugin"
 					}
 				],
 				"minItems": 1
@@ -62,12 +73,12 @@
 			"default": false
 		},
 		"noProgress": {
-			"description": "Whether to disable the display of progress on stdout",
+			"description": "Whether to disable the display of progress on stdout (only valid at the root)",
 			"type": "boolean",
 			"default": false
 		},
 		"outputFormatters": {
-			"description": "Output formatters to load and use to customize markdownlint-cli2 output",
+			"description": "Output formatters to load and use to customize markdownlint-cli2 output (only valid at the root)",
 			"type": "array",
 			"default": [],
 			"items": {
@@ -80,7 +91,7 @@
 						"minLength": 1
 					},
 					{
-						"description": "Parameter to pass to the output formatter"
+						"description": "Parameter(s) to pass to the output formatter"
 					}
 				],
 				"minItems": 1
