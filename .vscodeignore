@@ -1,8 +1,11 @@
+.github
 .vscode
 node_modules
 .eslintrc.json
 .gitignore
 .markdownlint.json
+.npmrc
+.vscodeignore
 extension.js
 generate-config-schema.js
 jsconfig.json
