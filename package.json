@@ -25,7 +25,7 @@
 		"Linters"
 	],
 	"engines": {
-		"vscode": "^1.43.0"
+		"vscode": "^1.53.0"
 	},
 	"main": "./bundle",
 	"dependencies": {
@@ -34,12 +34,12 @@
 		"jsonc-parser": "3.0.0",
 		"markdown-it-texmath": "0.8.0",
 		"markdownlint": "0.23.1",
-		"markdownlint-cli2": "0.0.15",
+		"markdownlint-cli2": "0.1.2",
 		"markdownlint-rule-helpers": "0.14.0",
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"@types/vscode": "~1.43.0",
+		"@types/vscode": "~1.53.0",
 		"eslint": "~7.23.0",
 		"shebang-loader": "^0.0.1",
 		"vsce": "~1.87.0",
