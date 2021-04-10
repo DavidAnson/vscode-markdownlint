@@ -107,7 +107,7 @@ function getConfig (configuration) {
 				...extendConfig,
 				...userWorkspaceConfig
 			};
-		} catch (ex) {
+		} catch {
 			// Ignore error
 		}
 	}
@@ -175,7 +175,7 @@ function markdownlintWrapper (document) {
 	function captureResultsFormatter (options) {
 		results = options.results;
 	}
-	const params = {
+	const parameters = {
 		"directory": getWorkspacePath(),
 		argv,
 		[contents]: {
@@ -202,7 +202,7 @@ function markdownlintWrapper (document) {
 		}
 	};
 	// Invoke markdownlint-cli2
-	return markdownlintCli2(params)
+	return markdownlintCli2(parameters)
 		.catch((ex) => outputLine("ERROR: Exception while linting:\n" + ex.stack, true))
 		.then(() => results);
 }
@@ -309,7 +309,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			}
 			showConfigureInfo = true;
 		});
-	if (fixInfoDiagnostics.length) {
+	if (fixInfoDiagnostics.length > 0) {
 		// eslint-disable-next-line func-style
 		const registerFixAllCodeAction = (codeActionKind) => {
 			// Register a "fix all" code action
@@ -409,15 +409,15 @@ function openConfigFile () {
 		);
 	})).then((fileUris) => {
 		const validFilePaths = fileUris.filter((filePath) => filePath !== null);
-		if (validFilePaths.length) {
+		if (validFilePaths.length > 0) {
 			// File exists, open it
 			vscode.window.showTextDocument(validFilePaths[0]);
 		} else {
 			// File does not exist, create one
 			const filePath = path.join(workspacePath, markdownlintJson);
 			const fileUri = vscode.Uri.file(filePath);
-			const newFileUri = fileUri.with({"scheme": markdownSchemeUntitled});
-			vscode.window.showTextDocument(newFileUri).then(
+			const untitledFileUri = fileUri.with({"scheme": markdownSchemeUntitled});
+			vscode.window.showTextDocument(untitledFileUri).then(
 				(editor) => {
 					editor.edit((editBuilder) => {
 						editBuilder.insert(
@@ -598,4 +598,4 @@ function activate (context) {
 	setTimeout(cleanLintVisibleFiles, throttleDuration);
 }
 
-exports.activate = activate;
+module.exports.activate = activate;
