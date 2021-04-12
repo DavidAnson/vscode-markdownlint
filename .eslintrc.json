@@ -83,7 +83,7 @@
         "node/prefer-global/url": "error",
         "node/prefer-promises/dns": "error",
         "node/prefer-promises/fs": "error",
-    
+
         "unicorn/better-regex": "error",
         "unicorn/catch-error-name": "error",
         "unicorn/consistent-destructuring": "error",
