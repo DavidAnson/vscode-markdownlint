@@ -76,6 +76,13 @@ const throttle = {
 	"timeout": null
 };
 
+// Converts to a POSIX-style path
+// eslint-disable-next-line id-length
+function posixPath (p) {
+	return p.split(path.sep).join(path.posix.sep);
+}
+
+// Gets the workspace path (or HOMEDIR if none)
 function getWorkspacePath () {
 	return vscode.workspace.workspaceFolders ?
 		vscode.workspace.workspaceFolders[0].uri.fsPath :
@@ -160,7 +167,8 @@ function clearIgnores (eventUri) {
 
 // Wraps getting options and calling into markdownlint-cli2
 function markdownlintWrapper (document) {
-	const name = document.uri.path;
+	const directory = posixPath(getWorkspacePath());
+	const name = posixPath(document.uri.fsPath);
 	const text = document.getText();
 	const argv = document.isUntitled ?
 		[] :
@@ -176,7 +184,7 @@ function markdownlintWrapper (document) {
 		results = options.results;
 	}
 	const parameters = {
-		"directory": getWorkspacePath(),
+		directory,
 		argv,
 		[contents]: {
 			[name]: text
