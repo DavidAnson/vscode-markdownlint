@@ -63,6 +63,7 @@ const sectionCustomRules = "customRules";
 const sectionIgnore = "ignore";
 const sectionRun = "run";
 const throttleDuration = 500;
+const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 
 // Variables
 const ruleNameToInformationUri = {};
@@ -165,6 +166,30 @@ function clearIgnores (eventUri) {
 	}
 }
 
+// Returns custom rule configuration for user/workspace
+function getCustomRules (configuration) {
+	const customRulesPaths = configuration.get(sectionCustomRules);
+	const customRules = customRulesPaths.map((rulePath) => {
+		const match = customRuleExtensionPrefixRe.exec(rulePath);
+		if (match) {
+			const [
+				,
+				extensionName,
+				relativePath
+			] = match;
+			const extension = vscode.extensions.getExtension(extensionName);
+			if (extension) {
+				// eslint-disable-next-line no-param-reassign
+				rulePath = posixPath(
+					path.resolve(extension.extensionPath, relativePath)
+				);
+			}
+		}
+		return rulePath;
+	});
+	return customRules;
+}
+
 // Wraps getting options and calling into markdownlint-cli2
 function markdownlintWrapper (document) {
 	const directory = posixPath(getWorkspacePath());
@@ -192,7 +217,7 @@ function markdownlintWrapper (document) {
 		"noRequire": configuration.get(sectionBlockJavaScript),
 		"optionsDefault": {
 			"config": getConfig(configuration),
-			"customRules": configuration.get(sectionCustomRules),
+			"customRules": getCustomRules(configuration),
 			"markdownItPlugins": [
 				[
 					require("markdown-it-texmath"),
