@@ -245,7 +245,7 @@ The globbing library used for matching `markdownlint.ignore` configuration value
 
 Custom rules can be specified in Code's user/workspace configuration to apply additional linting beyond the default set of rules. Custom rules are specified by the path to a JavaScript file or the name of or path to an [npm](https://www.npmjs.com/) package exporting one rule or an array of rules ([examples of custom rules](https://www.npmjs.com/search?q=keywords:markdownlint-rule)).
 
-Paths are normally relative to the root of the current workspace (or the user's home directory when no folder is open). Paths can also be absolute. If implementing custom rules in a workspace, consider committing the code under the `.vscode` directory where they will be separate from other workspace content and available to everyone who clones the repository. Paths of the form `{extension}/path` are relative to the base directory of the Code extension named `extension` (which must already be installed). This syntax allows custom rules to be included within another extension's package and shared across multiple workspaces.
+Paths are typically relative to the root of the current workspace (or the user's home directory when no folder is open) and should begin with `./` to [differentiate the relative path from a module identifier](https://nodejs.org/dist/latest-v14.x/docs/api/modules.html#modules_file_modules). Paths can be absolute and begin with `/`, though this is discouraged because it does not work reliably across different machines. If implementing custom rules in a workspace, consider committing the rule code under the `.vscode` directory where it will be separate from other workspace content and available to everyone who clones the repository. Paths of the form `{extension}/path` are relative to the base directory of the Code extension named `extension` (which must already be installed). This syntax allows custom rules to be included within another extension's package, though this is discouraged because it introduces a subtle dependency on the other extension.
 
 An example of Code's workspace settings for custom rules might look like the following:
 
@@ -253,10 +253,10 @@ An example of Code's workspace settings for custom rules might look like the fol
 {
     "editor.someSetting": true,
     "markdownlint.customRules": [
-        ".vscode/my-custom-rule.js",
-        ".vscode/my-custom-rule-array.js",
-        ".vscode/npm-package-for-custom-rule",
-        "c:\\absolute\\path\\to\\custom\\rule.js",
+        "./.vscode/my-custom-rule.js",
+        "./.vscode/my-custom-rule-array.js",
+        "./.vscode/npm-package-for-custom-rule",
+        "/absolute/path/to/custom/rule.js",
         "{publisher.extension-name}/custom-rule.js",
         "{publisher.extension-name}/npm/rule/package"
     ]
