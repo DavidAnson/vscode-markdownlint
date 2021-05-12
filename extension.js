@@ -6,7 +6,6 @@ const markdownlint = require("markdownlint");
 const {"main": markdownlintCli2} = require("markdownlint-cli2");
 const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
 const ignore = require("ignore");
-const fs = require("fs");
 const path = require("path");
 
 // Optional requires are inlined to avoid startup cost
@@ -129,15 +128,6 @@ function getConfig (configuration) {
 function getIgnores () {
 	if (!Array.isArray(ignores)) {
 		ignores = [];
-		// Handle .markdownlintignore
-		const workspacePath = getWorkspacePath();
-		const ignoreFilePath = path.join(workspacePath, ignoreFileName);
-		if (fs.existsSync(ignoreFilePath)) {
-			const ignoreText = fs.readFileSync(ignoreFilePath, "utf8");
-			// @ts-ignore
-			const ignoreInstance = ignore().add(ignoreText);
-			ignores.push((file) => ignoreInstance.ignores(file));
-		}
 		// Handle "ignore" configuration
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 		const ignorePaths = configuration.get(sectionIgnore);
@@ -150,6 +140,24 @@ function getIgnores () {
 				ignores.push((file) => ignoreRe.test(file));
 			}
 		});
+		// Handle .markdownlintignore
+		if (vscode.workspace.workspaceFolders) {
+			const ignoreFileUri = vscode.Uri.joinPath(
+				vscode.workspace.workspaceFolders[0].uri,
+				ignoreFileName
+			);
+			vscode.workspace.fs.stat(ignoreFileUri).then(
+				() => vscode.workspace.fs.readFile(ignoreFileUri).then(
+					(ignoreBytes) => {
+						// @ts-ignore
+						const ignoreInstance = ignore().add(ignoreBytes.toString());
+						ignores.push((file) => ignoreInstance.ignores(file));
+						cleanLintVisibleFiles();
+					}
+				),
+				() => null
+			);
+		}
 	}
 	return ignores;
 }
