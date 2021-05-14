@@ -213,9 +213,9 @@ If you find this distracting, linting can be configured to run only when the doc
 
 ### markdownlint.ignore
 
-If a workspace contains generated content or other Markdown files that trigger warnings but cannot be fixed, it may be helpful to ignore (skip) those files when linting. This can be done by creating a file named `.markdownlintignore` in the root of the project or by updating the user/workspace configuration with a glob expression matching the relevant file names.
+If a workspace contains generated content or other Markdown files that trigger warnings but cannot be fixed, it may be helpful to ignore (skip) those files when linting. This can be done by creating a file named `.markdownlintignore` in the root of the project or by updating the user/workspace configuration's `markdownlint.ignore` setting with an array of glob expressions matching the relevant file names. Alternatively, the `markdownlint.ignore` setting can be a string identifying a file to use instead of `.markdownlintignore`.
 
-When using a `.markdownlintignore` file, the content of the file follows the rules for [gitignore](https://git-scm.com/docs/gitignore) and may look something like:
+When using a `.markdownlintignore` file (or overriding it), the content of the file follows the rules for [gitignore](https://git-scm.com/docs/gitignore) and may look something like:
 
 ```ini
 # Ignore Markdown files in the test directory
@@ -223,7 +223,7 @@ test/*.md
 !test/except/this/one.md
 ```
 
-An example of using Code's workspace configuration to ignore files might be:
+An example of using Code's workspace configuration to ignore files by glob might be:
 
 ```json
 {
@@ -237,7 +237,16 @@ An example of using Code's workspace configuration to ignore files might be:
 }
 ```
 
-The globbing library used for matching `markdownlint.ignore` configuration values is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
+Or to ignore files by referencing a different file:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.ignore": ".gitignore"
+}
+```
+
+The globbing library used for matching `markdownlint.ignore` array values is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
 
 > **Note**: Files can also be ignored (in a way other tools will recognize) via the `ignores` property in `.markdownlint-cli2.{jsonc,yaml,js}`.
 

@@ -128,23 +128,28 @@ function getConfig (configuration) {
 function getIgnores () {
 	if (!Array.isArray(ignores)) {
 		ignores = [];
+		let ignoreFile = ignoreFileName;
 		// Handle "ignore" configuration
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
-		const ignorePaths = configuration.get(sectionIgnore);
-		ignorePaths.forEach((ignorePath) => {
-			const ignoreRe = require("minimatch").makeRe(ignorePath, {
-				"dot": true,
-				"nocomment": true
+		const ignoreValue = configuration.get(sectionIgnore);
+		if (Array.isArray(ignoreValue)) {
+			ignoreValue.forEach((ignorePath) => {
+				const ignoreRe = require("minimatch").makeRe(ignorePath, {
+					"dot": true,
+					"nocomment": true
+				});
+				if (ignoreRe) {
+					ignores.push((file) => ignoreRe.test(file));
+				}
 			});
-			if (ignoreRe) {
-				ignores.push((file) => ignoreRe.test(file));
-			}
-		});
+		} else if (typeof ignoreValue === "string") {
+			ignoreFile = ignoreValue;
+		}
 		// Handle .markdownlintignore
 		if (vscode.workspace.workspaceFolders) {
 			const ignoreFileUri = vscode.Uri.joinPath(
 				vscode.workspace.workspaceFolders[0].uri,
-				ignoreFileName
+				ignoreFile
 			);
 			vscode.workspace.fs.stat(ignoreFileUri).then(
 				() => vscode.workspace.fs.readFile(ignoreFileUri).then(

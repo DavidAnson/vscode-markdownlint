@@ -159,13 +159,16 @@
 					"default": []
 				},
 				"markdownlint.ignore": {
-					"description": "Array of file names and glob expressions to ignore when linting",
+					"description": "Array or file of glob expressions to ignore when linting",
 					"scope": "window",
-					"type": "array",
+					"type": [
+						"array",
+						"string"
+					],
 					"items": {
 						"type": "string"
 					},
-					"default": []
+					"default": ".markdownlintignore"
 				},
 				"markdownlint.run": {
 					"description": "Run the linter on save (onSave) or on type (onType)",
