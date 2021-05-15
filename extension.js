@@ -25,17 +25,19 @@ const configFileNames = [
 const ignoreFileName = ".markdownlintignore";
 const markdownLanguageId = "markdown";
 const markdownSchemeFile = "file";
+const markdownSchemeVirtual = "vscode-vfs";
 const markdownSchemeUntitled = "untitled";
-const documentSelectors = [
-	{
-		"language": markdownLanguageId,
-		"scheme": markdownSchemeFile
-	},
-	{
-		"language": markdownLanguageId,
-		"scheme": markdownSchemeUntitled
-	}
+const markdownSchemes = [
+	markdownSchemeFile,
+	markdownSchemeVirtual,
+	markdownSchemeUntitled
 ];
+const documentSelectors = markdownSchemes.map((scheme) => (
+	{
+		"language": markdownLanguageId,
+		scheme
+	}
+));
 const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
 	(content) => require("js-yaml").load(content)
@@ -84,7 +86,10 @@ function posixPath (p) {
 
 // Gets the workspace file-system path (or HOMEDIR if none)
 function getWorkspaceFsPath () {
-	return vscode.workspace.workspaceFolders ?
+	const workspaceFolderSchemeFile =
+		vscode.workspace.workspaceFolders &&
+		(vscode.workspace.workspaceFolders[0].uri.scheme === markdownSchemeFile);
+	return workspaceFolderSchemeFile ?
 		vscode.workspace.workspaceFolders[0].uri.fsPath :
 		require("os").homedir();
 }
@@ -208,12 +213,13 @@ function markdownlintWrapper (document) {
 	const directory = posixPath(getWorkspaceFsPath());
 	const name = posixPath(document.uri.fsPath);
 	const text = document.getText();
-	const argv = document.isUntitled ?
-		[] :
-		[ name ];
-	const contents = document.isUntitled ?
-		"nonFileContents" :
-		"fileContents";
+	const isSchemeFile = document.uri.scheme === markdownSchemeFile;
+	const argv = isSchemeFile ?
+		[ name ] :
+		[];
+	const contents = isSchemeFile ?
+		"fileContents" :
+		"nonFileContents";
 	// Load user/workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 	// Prepare markdownlint-cli2 parameters
@@ -257,10 +263,7 @@ function markdownlintWrapper (document) {
 function isMarkdownDocument (document) {
 	return (
 		(document.languageId === markdownLanguageId) &&
-		(
-			(document.uri.scheme === markdownSchemeFile) ||
-			(document.uri.scheme === markdownSchemeUntitled)
-		)
+		markdownSchemes.includes(document.uri.scheme)
 	);
 }
 

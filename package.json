@@ -62,6 +62,9 @@
 		"onCommand:markdownlint.fixLine",
 		"onCommand:markdownlint.openConfigFile"
 	],
+	"capabilities": {
+		"virtualWorkspaces": true
+	},
 	"contributes": {
 		"commands": [
 			{
@@ -85,7 +88,7 @@
 				},
 				{
 					"command": "markdownlint.openConfigFile",
-					"when": "workbenchState != empty"
+					"when": "workbenchState != empty && resourceScheme == file"
 				}
 			]
 		},
