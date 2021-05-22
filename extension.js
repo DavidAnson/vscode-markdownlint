@@ -223,6 +223,10 @@ function markdownlintWrapper (document) {
 	// Load user/workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 	// Prepare markdownlint-cli2 parameters
+	const isTrusted =
+		// @ts-ignore
+		(vscode.workspace.isTrusted || (vscode.workspace.isTrusted === undefined)) &&
+		!configuration.get(sectionBlockJavaScript);
 	let results = [];
 	function captureResultsFormatter (options) {
 		results = options.results;
@@ -233,7 +237,7 @@ function markdownlintWrapper (document) {
 		[contents]: {
 			[name]: text
 		},
-		"noRequire": configuration.get(sectionBlockJavaScript),
+		"noRequire": !isTrusted,
 		"optionsDefault": {
 			"config": getConfig(configuration),
 			"customRules": getCustomRules(configuration),

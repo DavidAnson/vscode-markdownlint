@@ -290,6 +290,8 @@ An example of Code's user settings for blocking JavaScript might look like:
 ```
 
 > **Note**: This setting may impact the usability of projects with custom rules, `markdown-it` plugins, or JavaScript configuration files.
+>
+> **Note**: VS Code's upcoming [Workspace Trust feature](https://aka.ms/vscode-workspace-trust) will replace this setting once it is available. Until then, setting `blockJavaScript` OR choosing not to trust a workspace will block JavaScript.
 
 ## Suppress
 

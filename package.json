@@ -63,6 +63,9 @@
 		"onCommand:markdownlint.openConfigFile"
 	],
 	"capabilities": {
+		"untrustedWorkspaces": {
+			"supported": "limited"
+		},
 		"virtualWorkspaces": true
 	},
 	"contributes": {
