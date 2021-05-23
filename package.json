@@ -41,13 +41,13 @@
 	},
 	"devDependencies": {
 		"@types/vscode": "~1.53.0",
-		"eslint": "~7.24.0",
+		"eslint": "~7.27.0",
 		"eslint-plugin-node": "~11.1.0",
-		"eslint-plugin-unicorn": "~29.0.0",
+		"eslint-plugin-unicorn": "~32.0.1",
 		"shebang-loader": "^0.0.1",
-		"vsce": "~1.87.0",
-		"webpack": "~5.31.2",
-		"webpack-cli": "~4.6.0"
+		"vsce": "~1.88.0",
+		"webpack": "~5.37.1",
+		"webpack-cli": "~4.7.0"
 	},
 	"keywords": [
 		"markdown",

@@ -138,7 +138,7 @@ function getIgnores (document) {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 		const ignoreValue = configuration.get(sectionIgnore);
 		if (Array.isArray(ignoreValue)) {
-			ignoreValue.forEach((ignorePath) => {
+			for (const ignorePath of ignoreValue) {
 				const ignoreRe = require("minimatch").makeRe(ignorePath, {
 					"dot": true,
 					"nocomment": true
@@ -146,7 +146,7 @@ function getIgnores (document) {
 				if (ignoreRe) {
 					ignores.push((file) => ignoreRe.test(file));
 				}
-			});
+			}
 		} else if (typeof ignoreValue === "string") {
 			ignoreFile = ignoreValue;
 		}
@@ -259,7 +259,7 @@ function markdownlintWrapper (document) {
 	};
 	// Invoke markdownlint-cli2
 	return markdownlintCli2(parameters)
-		.catch((ex) => outputLine("ERROR: Exception while linting:\n" + ex.stack, true))
+		.catch((error) => outputLine("ERROR: Exception while linting:\n" + error.stack, true))
 		.then(() => results);
 }
 
@@ -285,7 +285,7 @@ function lint (document) {
 		// Lint
 		task = markdownlintWrapper(document)
 			.then((results) => {
-				results.forEach((result) => {
+				for (const result of results) {
 					// Create Diagnostics
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;
@@ -312,7 +312,7 @@ function lint (document) {
 					// @ts-ignore
 					diagnostic.fixInfo = result.fixInfo;
 					diagnostics.push(diagnostic);
-				});
+				}
 			});
 	}
 	// Publish
@@ -325,43 +325,42 @@ function provideCodeActions (document, range, codeActionContext) {
 	const diagnostics = codeActionContext.diagnostics || [];
 	const fixInfoDiagnostics = [];
 	let showConfigureInfo = false;
-	diagnostics
-		.filter((diagnostic) => diagnostic.source === extensionDisplayName)
-		.forEach((diagnostic) => {
-			const ruleName = diagnostic.code.value || diagnostic.code;
-			const ruleNameAlias = diagnostic.message.split(":")[0];
-			// Provide code action to fix the violation
-			if (diagnostic.fixInfo) {
-				const fixTitle = clickToFix + ruleNameAlias;
-				const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
-				fixAction.command = {
-					"title": fixTitle,
-					"command": fixLineCommandName,
-					"arguments": [
-						diagnostic.range.start.line,
-						diagnostic.fixInfo
-					]
-				};
-				fixAction.diagnostics = [ diagnostic ];
-				fixAction.isPreferred = true;
-				codeActions.push(fixAction);
-				fixInfoDiagnostics.push(diagnostic);
-			}
-			// Provide code action for information about the violation
-			const ruleInformationUri = ruleNameToInformationUri[ruleName];
-			if (ruleInformationUri) {
-				const infoTitle = clickForInfo + ruleNameAlias;
-				const infoAction = new vscode.CodeAction(infoTitle, codeActionKindQuickFix);
-				infoAction.command = {
-					"title": infoTitle,
-					"command": openCommand,
-					"arguments": [ ruleInformationUri ]
-				};
-				infoAction.diagnostics = [ diagnostic ];
-				codeActions.push(infoAction);
-			}
-			showConfigureInfo = true;
-		});
+	const filteredDiagnostics = diagnostics.filter((diagnostic) => diagnostic.source === extensionDisplayName);
+	for (const diagnostic of filteredDiagnostics) {
+		const ruleName = diagnostic.code.value || diagnostic.code;
+		const ruleNameAlias = diagnostic.message.split(":")[0];
+		// Provide code action to fix the violation
+		if (diagnostic.fixInfo) {
+			const fixTitle = clickToFix + ruleNameAlias;
+			const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
+			fixAction.command = {
+				"title": fixTitle,
+				"command": fixLineCommandName,
+				"arguments": [
+					diagnostic.range.start.line,
+					diagnostic.fixInfo
+				]
+			};
+			fixAction.diagnostics = [ diagnostic ];
+			fixAction.isPreferred = true;
+			codeActions.push(fixAction);
+			fixInfoDiagnostics.push(diagnostic);
+		}
+		// Provide code action for information about the violation
+		const ruleInformationUri = ruleNameToInformationUri[ruleName];
+		if (ruleInformationUri) {
+			const infoTitle = clickForInfo + ruleNameAlias;
+			const infoAction = new vscode.CodeAction(infoTitle, codeActionKindQuickFix);
+			infoAction.command = {
+				"title": infoTitle,
+				"command": openCommand,
+				"arguments": [ ruleInformationUri ]
+			};
+			infoAction.diagnostics = [ diagnostic ];
+			codeActions.push(infoAction);
+		}
+		showConfigureInfo = true;
+	}
 	if (fixInfoDiagnostics.length > 0) {
 		// eslint-disable-next-line func-style
 		const registerFixAllCodeAction = (codeActionKind) => {
@@ -540,7 +539,9 @@ function requestLint (document) {
 
 // Handles the onDidChangeVisibleTextEditors event
 function didChangeVisibleTextEditors (textEditors) {
-	textEditors.forEach((textEditor) => lint(textEditor.document));
+	for (const textEditor of textEditors) {
+		lint(textEditor.document);
+	}
 }
 
 // Handles the onDidChangeTextDocument event
