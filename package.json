@@ -157,7 +157,7 @@
 				},
 				"markdownlint.customRules": {
 					"description": "Array of paths for custom rules to include when linting",
-					"scope": "window",
+					"scope": "resource",
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -166,7 +166,7 @@
 				},
 				"markdownlint.ignore": {
 					"description": "Array or file of glob expressions to ignore when linting",
-					"scope": "window",
+					"scope": "resource",
 					"type": [
 						"array",
 						"string"

@@ -130,12 +130,12 @@ function getConfig (configuration) {
 }
 
 // Returns ignore configuration for user/workspace
-function getIgnores () {
+function getIgnores (document) {
 	if (!Array.isArray(ignores)) {
 		ignores = [];
 		let ignoreFile = ignoreFileName;
 		// Handle "ignore" configuration
-		const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
+		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 		const ignoreValue = configuration.get(sectionIgnore);
 		if (Array.isArray(ignoreValue)) {
 			ignoreValue.forEach((ignorePath) => {
@@ -221,7 +221,7 @@ function markdownlintWrapper (document) {
 		"fileContents" :
 		"nonFileContents";
 	// Load user/workspace configuration
-	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	// Prepare markdownlint-cli2 parameters
 	const isTrusted =
 		// @ts-ignore
@@ -281,7 +281,7 @@ function lint (document) {
 	let task = Promise.resolve();
 	const relativePath = vscode.workspace.asRelativePath(document.uri, false);
 	const normalizedPath = relativePath.split(path.sep).join("/");
-	if (getIgnores().every((ignoreTest) => !ignoreTest(normalizedPath))) {
+	if (getIgnores(document).every((ignoreTest) => !ignoreTest(normalizedPath))) {
 		// Lint
 		task = markdownlintWrapper(document)
 			.then((results) => {
