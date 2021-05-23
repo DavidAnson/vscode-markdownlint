@@ -1,5 +1,6 @@
 # Changes
 
+* 0.41.0 - Workspace trust, virtual workspaces
 * 0.40.0 - Switched to `markdownlint-cli2` (see below)
 * 0.39.0 - Improved rules, new fix
 * 0.38.0 - Improved rules, schemas, new snippet
