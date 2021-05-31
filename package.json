@@ -64,9 +64,13 @@
 	],
 	"capabilities": {
 		"untrustedWorkspaces": {
-			"supported": "limited"
+			"supported": "limited",
+			"description": "In untrusted workspaces, JavaScript is blocked for custom rules, markdown-it plugins, and configuration files."
 		},
-		"virtualWorkspaces": true
+		"virtualWorkspaces": {
+			"supported": "limited",
+			"description": "In virtual workspaces, access to configuration files is not supported. Default linting settings are used instead."
+		}
 	},
 	"contributes": {
 		"commands": [
