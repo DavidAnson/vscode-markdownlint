@@ -78,6 +78,11 @@ const throttle = {
 	"timeout": null
 };
 
+// Escapes glob pattern characters
+function escapeGlobPattern (glob) {
+	return glob.replace(/[!#()*?[\\\]{}]/g, "\\$&");
+}
+
 // Converts to a POSIX-style path
 // eslint-disable-next-line id-length
 function posixPath (p) {
@@ -215,7 +220,7 @@ function markdownlintWrapper (document) {
 	const text = document.getText();
 	const isSchemeFile = document.uri.scheme === markdownSchemeFile;
 	const argv = isSchemeFile ?
-		[ name ] :
+		[ escapeGlobPattern(name) ] :
 		[];
 	const contents = isSchemeFile ?
 		"fileContents" :
