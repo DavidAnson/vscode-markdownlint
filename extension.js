@@ -61,12 +61,18 @@ const openCommand = "vscode.open";
 const sectionBlockJavaScript = "blockJavaScript";
 const sectionConfig = "config";
 const sectionCustomRules = "customRules";
+const sectionFocusMode = "focusMode";
 const sectionIgnore = "ignore";
 const sectionRun = "run";
+const applicationConfigurationSections = [
+	sectionBlockJavaScript,
+	sectionFocusMode
+];
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 
 // Variables
+const applicationConfiguration = {};
 const ruleNameToInformationUri = {};
 let outputChannel = null;
 let diagnosticCollection = null;
@@ -231,7 +237,7 @@ function markdownlintWrapper (document) {
 	const isTrusted =
 		// @ts-ignore
 		(vscode.workspace.isTrusted || (vscode.workspace.isTrusted === undefined)) &&
-		!configuration.get(sectionBlockJavaScript);
+		!applicationConfiguration[sectionBlockJavaScript];
 	let results = [];
 	function captureResultsFormatter (options) {
 		results = options.results;
@@ -290,33 +296,42 @@ function lint (document) {
 		// Lint
 		task = markdownlintWrapper(document)
 			.then((results) => {
+				const {activeTextEditor} = vscode.window;
 				for (const result of results) {
 					// Create Diagnostics
-					const ruleName = result.ruleNames[0];
-					const ruleDescription = result.ruleDescription;
-					const ruleInformationUri = result.ruleInformation && vscode.Uri.parse(result.ruleInformation);
-					ruleNameToInformationUri[ruleName] = ruleInformationUri;
-					let message = result.ruleNames.join("/") + ": " + ruleDescription;
-					if (result.errorDetail) {
-						message += " [" + result.errorDetail + "]";
+					const lineNumber = result.lineNumber;
+					if (
+						!applicationConfiguration[sectionFocusMode] ||
+						!activeTextEditor ||
+						(activeTextEditor.document !== document) ||
+						(activeTextEditor.selection.active.line !== (lineNumber - 1))
+					) {
+						const ruleName = result.ruleNames[0];
+						const ruleDescription = result.ruleDescription;
+						const ruleInformationUri = result.ruleInformation && vscode.Uri.parse(result.ruleInformation);
+						ruleNameToInformationUri[ruleName] = ruleInformationUri;
+						let message = result.ruleNames.join("/") + ": " + ruleDescription;
+						if (result.errorDetail) {
+							message += " [" + result.errorDetail + "]";
+						}
+						let range = document.lineAt(lineNumber - 1).range;
+						if (result.errorRange) {
+							const start = result.errorRange[0] - 1;
+							const end = start + result.errorRange[1];
+							range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
+						}
+						const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+						diagnostic.code = ruleInformationUri ?
+							{
+								"value": ruleName,
+								"target": ruleInformationUri
+							} :
+							ruleName;
+						diagnostic.source = extensionDisplayName;
+						// @ts-ignore
+						diagnostic.fixInfo = result.fixInfo;
+						diagnostics.push(diagnostic);
 					}
-					let range = document.lineAt(result.lineNumber - 1).range;
-					if (result.errorRange) {
-						const start = result.errorRange[0] - 1;
-						const end = start + result.errorRange[1];
-						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
-					}
-					const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-					diagnostic.code = ruleInformationUri ?
-						{
-							"value": ruleName,
-							"target": ruleInformationUri
-						} :
-						ruleName;
-					diagnostic.source = extensionDisplayName;
-					// @ts-ignore
-					diagnostic.fixInfo = result.fixInfo;
-					diagnostics.push(diagnostic);
 				}
 			});
 	}
@@ -500,6 +515,11 @@ function clearDiagnosticsAndLintVisibleFiles (eventUri) {
 		outputLine(`INFO: Re-linting due to "${eventUri.fsPath}" change.`);
 	}
 	diagnosticCollection.clear();
+	lintVisibleFiles();
+}
+
+// Lints all visible files
+function lintVisibleFiles () {
 	didChangeVisibleTextEditors(vscode.window.visibleTextEditors);
 }
 
@@ -542,6 +562,29 @@ function requestLint (document) {
 	}, throttleDuration);
 }
 
+// Reads all application-scoped configuration settings
+function getApplicationConfiguration () {
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
+	for (const section of applicationConfigurationSections) {
+		applicationConfiguration[section] = configuration.get(section);
+	}
+}
+
+// Handles the onDidChangeActiveTextEditor event
+function didChangeActiveTextEditor () {
+	if (applicationConfiguration[sectionFocusMode]) {
+		lintVisibleFiles();
+	}
+}
+
+// Handles the onDidChangeTextEditorSelection event
+function didChangeTextEditorSelection (change) {
+	const document = change.textEditor.document;
+	if (isMarkdownDocument(document) && applicationConfiguration[sectionFocusMode]) {
+		requestLint(document);
+	}
+}
+
 // Handles the onDidChangeVisibleTextEditors event
 function didChangeVisibleTextEditors (textEditors) {
 	for (const textEditor of textEditors) {
@@ -552,14 +595,14 @@ function didChangeVisibleTextEditors (textEditors) {
 // Handles the onDidChangeTextDocument event
 function didChangeTextDocument (change) {
 	const document = change.document;
-	if ((document.languageId === markdownLanguageId) && (getRun(document) === "onType")) {
+	if (isMarkdownDocument(document) && (getRun(document) === "onType")) {
 		requestLint(document);
 	}
 }
 
 // Handles the onDidSaveTextDocument event
 function didSaveTextDocument (document) {
-	if ((document.languageId === markdownLanguageId) && (getRun(document) === "onSave")) {
+	if (isMarkdownDocument(document) && (getRun(document) === "onSave")) {
 		lint(document);
 		suppressLint(document);
 	}
@@ -575,6 +618,7 @@ function didCloseTextDocument (document) {
 function didChangeConfiguration (change) {
 	if (change.affectsConfiguration(extensionDisplayName)) {
 		outputLine("INFO: Resetting configuration cache due to setting change.");
+		getApplicationConfiguration();
 		clearRunMap();
 		clearIgnores();
 		clearDiagnosticsAndLintVisibleFiles();
@@ -586,8 +630,13 @@ function activate (context) {
 	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
 	context.subscriptions.push(outputChannel);
 
+	// Get application-level configuration
+	getApplicationConfiguration();
+
 	// Hook up to workspace events
 	context.subscriptions.push(
+		vscode.window.onDidChangeActiveTextEditor(didChangeActiveTextEditor),
+		vscode.window.onDidChangeTextEditorSelection(didChangeTextEditorSelection),
 		vscode.window.onDidChangeVisibleTextEditors(didChangeVisibleTextEditors),
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
 		vscode.workspace.onDidSaveTextDocument(didSaveTextDocument),

@@ -168,6 +168,12 @@
 					},
 					"default": []
 				},
+				"markdownlint.focusMode": {
+					"description": "Makes it easier to focus while typing by hiding violations on the current line",
+					"scope": "application",
+					"type": "boolean",
+					"default": false
+				},
 				"markdownlint.ignore": {
 					"description": "Array or file of glob expressions to ignore when linting",
 					"scope": "resource",

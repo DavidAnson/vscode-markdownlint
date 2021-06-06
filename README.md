@@ -196,6 +196,19 @@ Configuration changes saved to any location take effect immediately. Files refer
 
 When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint.{jsonc,json,yaml,yml,js}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` will be opened in the editor in the "pending save" state.
 
+### markdownlint.focusMode
+
+By default, all linting issues are logged and highlighted as you type or edit a document. This includes "transient" issues like `MD009`/`no-trailing-spaces` such as when typing at the end of a line.
+
+If you find this distracting, linting can be configured to ignore issues on the same line as the cursor. This looks like the following in Code's user settings:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.focusMode": true
+}
+```
+
 ### markdownlint.run
 
 By default, linting is performed as you type or edit a document. Linting is fast and efficient and should not interfere with typical workflows.
