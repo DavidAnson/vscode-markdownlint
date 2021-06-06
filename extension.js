@@ -25,19 +25,7 @@ const configFileNames = [
 const ignoreFileName = ".markdownlintignore";
 const markdownLanguageId = "markdown";
 const markdownSchemeFile = "file";
-const markdownSchemeVirtual = "vscode-vfs";
 const markdownSchemeUntitled = "untitled";
-const markdownSchemes = [
-	markdownSchemeFile,
-	markdownSchemeVirtual,
-	markdownSchemeUntitled
-];
-const documentSelectors = markdownSchemes.map((scheme) => (
-	{
-		"language": markdownLanguageId,
-		scheme
-	}
-));
 const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
 	(content) => require("js-yaml").load(content)
@@ -276,10 +264,7 @@ function markdownlintWrapper (document) {
 
 // Returns if the document is Markdown
 function isMarkdownDocument (document) {
-	return (
-		(document.languageId === markdownLanguageId) &&
-		markdownSchemes.includes(document.uri.scheme)
-	);
+	return (document.languageId === markdownLanguageId);
 }
 
 // Lints a Markdown document
@@ -655,7 +640,11 @@ function activate (context) {
 		]
 	};
 	context.subscriptions.push(
-		vscode.languages.registerCodeActionsProvider(documentSelectors, codeActionProvider, codeActionProviderMetadata)
+		vscode.languages.registerCodeActionsProvider(
+			{"language": markdownLanguageId},
+			codeActionProvider,
+			codeActionProviderMetadata
+		)
 	);
 
 	// Register Commands
