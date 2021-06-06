@@ -167,7 +167,7 @@ function getIgnores (document) {
 						// @ts-ignore
 						const ignoreInstance = ignore().add(ignoreBytes.toString());
 						ignores.push((file) => ignoreInstance.ignores(file));
-						cleanLintVisibleFiles();
+						clearDiagnosticsAndLintVisibleFiles();
 					}
 				),
 				() => null
@@ -185,7 +185,7 @@ function clearIgnores (eventUri) {
 	outputLine(`INFO: Resetting ignore cache due to ${source} change.`);
 	ignores = null;
 	if (eventUri) {
-		cleanLintVisibleFiles();
+		clearDiagnosticsAndLintVisibleFiles();
 	}
 }
 
@@ -491,11 +491,11 @@ function openConfigFile () {
 // Toggles linting on/off
 function toggleLinting () {
 	lintingEnabled = !lintingEnabled;
-	cleanLintVisibleFiles();
+	clearDiagnosticsAndLintVisibleFiles();
 }
 
-// Cleanly (i.e., from scratch) lint all visible files
-function cleanLintVisibleFiles (eventUri) {
+// Clears diagnostics and lints all visible files
+function clearDiagnosticsAndLintVisibleFiles (eventUri) {
 	if (eventUri) {
 		outputLine(`INFO: Re-linting due to "${eventUri.fsPath}" change.`);
 	}
@@ -577,7 +577,7 @@ function didChangeConfiguration (change) {
 		outputLine("INFO: Resetting configuration cache due to setting change.");
 		clearRunMap();
 		clearIgnores();
-		cleanLintVisibleFiles();
+		clearDiagnosticsAndLintVisibleFiles();
 	}
 }
 
@@ -628,17 +628,17 @@ function activate (context) {
 		const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
 		context.subscriptions.push(
 			configWatcher,
-			configWatcher.onDidCreate(cleanLintVisibleFiles),
-			configWatcher.onDidChange(cleanLintVisibleFiles),
-			configWatcher.onDidDelete(cleanLintVisibleFiles)
+			configWatcher.onDidCreate(clearDiagnosticsAndLintVisibleFiles),
+			configWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
+			configWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles)
 		);
 		const relativeOptionsFileGlob = new vscode.RelativePattern(workspacePath, "**/" + optionsFileGlob);
 		const optionsWatcher = vscode.workspace.createFileSystemWatcher(relativeOptionsFileGlob);
 		context.subscriptions.push(
 			optionsWatcher,
-			optionsWatcher.onDidCreate(cleanLintVisibleFiles),
-			optionsWatcher.onDidChange(cleanLintVisibleFiles),
-			optionsWatcher.onDidDelete(cleanLintVisibleFiles)
+			optionsWatcher.onDidCreate(clearDiagnosticsAndLintVisibleFiles),
+			optionsWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
+			optionsWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles)
 		);
 		const relativeIgnoreFilePath = new vscode.RelativePattern(workspacePath, ignoreFileName);
 		const ignoreWatcher = vscode.workspace.createFileSystemWatcher(relativeIgnoreFilePath);
@@ -656,7 +656,7 @@ function activate (context) {
 	});
 
 	// Lint all visible documents
-	setTimeout(cleanLintVisibleFiles, throttleDuration);
+	setTimeout(clearDiagnosticsAndLintVisibleFiles, throttleDuration);
 }
 
 module.exports.activate = activate;
