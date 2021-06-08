@@ -1,5 +1,6 @@
 # Changes
 
+* 0.42.0 - Add "focus mode" setting
 * 0.41.0 - Workspace trust, virtual workspaces
 * 0.40.0 - Switched to `markdownlint-cli2` (see below)
 * 0.39.0 - Improved rules, new fix
