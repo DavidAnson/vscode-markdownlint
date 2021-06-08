@@ -145,7 +145,9 @@
         "unicorn/prefer-negative-index": "error",
         "unicorn/prefer-node-protocol": "error",
         "unicorn/prefer-number-properties": "error",
+        "unicorn/prefer-object-has-own": "error",
         "unicorn/prefer-optional-catch-binding": "error",
+        "unicorn/prefer-prototype-methods": "error",
         "unicorn/prefer-query-selector": "error",
         "unicorn/prefer-reflect-apply": "error",
         "unicorn/prefer-regexp-test": "error",
@@ -159,6 +161,8 @@
         "unicorn/prefer-ternary": "error",
         "unicorn/prefer-type-error": "error",
         "unicorn/prevent-abbreviations": "error",
+        "unicorn/require-array-join-separator": "error",
+        "unicorn/require-number-to-fixed-digits-argument": "error",
         "unicorn/string-content": "error",
         "unicorn/throw-new-error": "error"
     }
