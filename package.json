@@ -19,7 +19,7 @@
 		"compile": "webpack --mode production",
 		"lint": "eslint --ignore-pattern bundle.js *.js && markdownlint-cli2 '*.md'",
 		"schema": "node generate-config-schema.js",
-		"test": "npm run lint && npm run compile && npm run schema && git diff --exit-code"
+		"test": "npm run lint && cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . && npm run compile && npm run schema && git diff --exit-code"
 	},
 	"categories": [
 		"Linters"
@@ -41,6 +41,7 @@
 	},
 	"devDependencies": {
 		"@types/vscode": "~1.53.0",
+		"cpy-cli": "~3.1.1",
 		"eslint": "~7.28.0",
 		"eslint-plugin-node": "~11.1.0",
 		"eslint-plugin-unicorn": "~33.0.1",
@@ -105,7 +106,7 @@
 					".markdownlint.json",
 					".markdownlint.jsonc"
 				],
-				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
+				"url": "./markdownlint-config-schema.json"
 			},
 			{
 				"fileMatch": ".markdownlint-cli2.jsonc",
@@ -118,7 +119,7 @@
 					".markdownlint.yaml",
 					".markdownlint.yml"
 				],
-				"url": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
+				"url": "./markdownlint-config-schema.json"
 			},
 			{
 				"fileMatch": ".markdownlint-cli2.yaml",

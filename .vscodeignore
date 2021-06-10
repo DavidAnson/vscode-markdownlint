@@ -9,5 +9,4 @@ node_modules
 extension.js
 generate-config-schema.js
 jsconfig.json
-!node_modules/markdownlint/schema/markdownlint-config-schema.json
 webpack.config.js

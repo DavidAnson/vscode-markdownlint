@@ -4,7 +4,7 @@
 	"type": "object",
 	"properties": {
 		"config": {
-			"$ref": "./node_modules/markdownlint/schema/markdownlint-config-schema.json"
+			"$ref": "./markdownlint-config-schema.json"
 		},
 		"customRules": {
 			"description": "Module names or paths of custom rules to load and use when linting",

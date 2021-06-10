@@ -3,7 +3,7 @@
 const fs = require("fs");
 const packageJsonPath = "./package.json";
 const packageJson = require(packageJsonPath);
-const configurationSchema = require("./node_modules/markdownlint/schema/markdownlint-config-schema.json");
+const configurationSchema = require("./markdownlint-config-schema.json");
 
 // Update package.json
 const configurationRoot = packageJson.contributes.configuration.properties["markdownlint.config"];
