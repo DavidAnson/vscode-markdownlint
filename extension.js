@@ -28,7 +28,8 @@ const configParsers = [
 	(content) => require("js-yaml").load(content)
 ];
 const codeActionKindQuickFix = vscode.CodeActionKind.QuickFix;
-const codeActionKindSourceFixAll = vscode.CodeActionKind.SourceFixAll.append(extensionDisplayName);
+const codeActionKindSourceFixAll = vscode.CodeActionKind.SourceFixAll;
+const codeActionKindSourceFixAllExtension = codeActionKindSourceFixAll.append(extensionDisplayName);
 const defaultConfig = {
 	"MD013": false
 };
@@ -397,7 +398,9 @@ function provideCodeActions (document, range, codeActionContext) {
 			sourceFixAllAction.diagnostics = fixInfoDiagnostics;
 			codeActions.push(sourceFixAllAction);
 		};
-		registerFixAllCodeAction(codeActionKindSourceFixAll);
+		if (codeActionContext.only && codeActionContext.only.contains(vscode.CodeActionKind.SourceFixAll)) {
+			registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
+		}
 		registerFixAllCodeAction(codeActionKindQuickFix);
 	}
 	// Add information about configuring rules
@@ -660,7 +663,7 @@ function activate (context) {
 	const codeActionProviderMetadata = {
 		"providedCodeActionKinds": [
 			codeActionKindQuickFix,
-			codeActionKindSourceFixAll
+			codeActionKindSourceFixAllExtension
 		]
 	};
 	context.subscriptions.push(
