@@ -442,7 +442,13 @@ function fixLine (lineIndex, fixInfo) {
 					}
 					editBuilder.delete(deleteRange);
 				}
-			}).then(resolve, reject);
+			})
+				.then(() => {
+					// Remove inappropriate selection that may have been added by editBuilder.replace
+					const cursorPosition = editor.selection.active;
+					editor.selection = new vscode.Selection(cursorPosition, cursorPosition);
+				})
+				.then(resolve, reject);
 		}
 		return resolve();
 	});
