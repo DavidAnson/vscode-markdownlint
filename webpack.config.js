@@ -3,7 +3,7 @@
 const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 
-const config = {
+const baseConfig = 	{
 	"target": "node",
 	"entry": "./extension.js",
 	"module": {
@@ -27,4 +27,30 @@ const config = {
 	},
 	"plugins": [ new webpack.IgnorePlugin({"resourceRegExp": /katex/}) ]
 };
+const config = [
+	baseConfig,
+	{
+		...baseConfig,
+		"target": "webworker",
+		"output": {
+			...baseConfig.output,
+			"filename": "bundle.web.js",
+			"libraryTarget": "commonjs"
+		},
+		"plugins": [
+			...baseConfig.plugins,
+			new webpack.IgnorePlugin({"resourceRegExp": /markdownlint-cli2/}),
+			new webpack.IgnorePlugin({"resourceRegExp": /jsonc-parser/}),
+			new webpack.IgnorePlugin({"resourceRegExp": /js-yaml/})
+		],
+		"resolve": {
+			"fallback": {
+				"fs": false,
+				"os": false,
+				"path": false,
+				"util": false
+			}
+		}
+	}
+];
 module.exports = config;

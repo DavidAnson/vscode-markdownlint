@@ -1,14 +1,11 @@
 "use strict";
 
-// Requires
+// Minimal requires (requires that may not be needed are inlined to avoid startup cost)
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
-const {"main": markdownlintCli2} = require("markdownlint-cli2");
-const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
-const ignore = require("ignore");
 const path = require("path");
-
-// Optional requires are inlined to avoid startup cost
+// Node modules (like path) are not available in web worker context
+const nodeModulesAvailable = path && (Object.keys(path).length > 0);
 
 // Constants
 const extensionDisplayName = "markdownlint";
@@ -106,7 +103,7 @@ function outputLine (message, show) {
 function getConfig (configuration) {
 	let userWorkspaceConfig = configuration.get(sectionConfig);
 	// Bootstrap extend behavior into readConfigSync
-	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
+	if (userWorkspaceConfig && userWorkspaceConfig.extends && nodeModulesAvailable) {
 		const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
 		const extendBase = userWorkspaceConfigMetadata.globalValue ?
 			require("os").homedir() :
@@ -158,8 +155,9 @@ function getIgnores (document) {
 			vscode.workspace.fs.stat(ignoreFileUri).then(
 				() => vscode.workspace.fs.readFile(ignoreFileUri).then(
 					(ignoreBytes) => {
-						// @ts-ignore
-						const ignoreInstance = ignore().add(ignoreBytes.toString());
+						const ignoreString = new TextDecoder().decode(ignoreBytes);
+						const ignore = require("ignore").default;
+						const ignoreInstance = ignore().add(ignoreString);
 						ignores.push((file) => ignoreInstance.ignores(file));
 						clearDiagnosticsAndLintVisibleFiles();
 					}
@@ -209,57 +207,83 @@ function getCustomRules (configuration) {
 
 // Wraps getting options and calling into markdownlint-cli2
 function markdownlintWrapper (document) {
-	const directory = posixPath(getWorkspaceFsPath());
-	const name = posixPath(document.uri.fsPath);
-	const text = document.getText();
-	const isSchemeFile = document.uri.scheme === markdownSchemeFile;
-	const argv = isSchemeFile ?
-		[ escapeGlobPattern(name) ] :
-		[];
-	const contents = isSchemeFile ?
-		"fileContents" :
-		"nonFileContents";
 	// Load user/workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-	// Prepare markdownlint-cli2 parameters
-	const isTrusted =
-		// @ts-ignore
-		(vscode.workspace.isTrusted || (vscode.workspace.isTrusted === undefined)) &&
-		!applicationConfiguration[sectionBlockJavaScript];
-	let results = [];
-	function captureResultsFormatter (options) {
-		results = options.results;
+	const config = getConfig(configuration);
+	const text = document.getText();
+	const markdownItPlugins = [
+		[
+			require("markdown-it-texmath"),
+			{
+				"engine": {
+					"renderToString": () => ""
+				}
+			}
+		]
+	];
+	if (nodeModulesAvailable) {
+		// Prepare markdownlint-cli2 parameters
+		const directory = posixPath(getWorkspaceFsPath());
+		const name = posixPath(document.uri.fsPath);
+		const isSchemeFile = document.uri.scheme === markdownSchemeFile;
+		const argv = isSchemeFile ?
+			[ escapeGlobPattern(name) ] :
+			[];
+		const contents = isSchemeFile ?
+			"fileContents" :
+			"nonFileContents";
+		const isTrusted =
+			// @ts-ignore
+			(vscode.workspace.isTrusted || (vscode.workspace.isTrusted === undefined)) &&
+			!applicationConfiguration[sectionBlockJavaScript];
+		let results = [];
+		// eslint-disable-next-line func-style
+		const captureResultsFormatter = (options) => {
+			results = options.results;
+		};
+		const parameters = {
+			directory,
+			argv,
+			[contents]: {
+				[name]: text
+			},
+			"noRequire": !isTrusted,
+			"optionsDefault": {
+				config,
+				"customRules": getCustomRules(configuration),
+				markdownItPlugins
+			},
+			"optionsOverride": {
+				"fix": false,
+				"outputFormatters": [ [ captureResultsFormatter ] ]
+			}
+		};
+		// Invoke markdownlint-cli2
+		const {"main": markdownlintCli2} = require("markdownlint-cli2");
+		return markdownlintCli2(parameters)
+			.catch((error) => outputLine("ERROR: Exception while linting with markdownlint-cli2:\n" + error.stack, true))
+			.then(() => results);
 	}
-	const parameters = {
-		directory,
-		argv,
-		[contents]: {
-			[name]: text
-		},
-		"noRequire": !isTrusted,
-		"optionsDefault": {
-			"config": getConfig(configuration),
-			"customRules": getCustomRules(configuration),
-			"markdownItPlugins": [
-				[
-					require("markdown-it-texmath"),
-					{
-						"engine": {
-							"renderToString": () => ""
-						}
-					}
-				]
-			]
-		},
-		"optionsOverride": {
-			"fix": false,
-			"outputFormatters": [ [ captureResultsFormatter ] ]
-		}
-	};
-	// Invoke markdownlint-cli2
-	return markdownlintCli2(parameters)
-		.catch((error) => outputLine("ERROR: Exception while linting:\n" + error.stack, true))
-		.then(() => results);
+	// Else invoke markdownlint (don't use markdownlint.promises.markdownlint which is invalid in web worker context)
+	return new Promise((resolve, reject) => {
+		const options = {
+			"strings": {
+				text
+			},
+			config,
+			markdownItPlugins,
+			"resultVersion": 3
+		};
+		markdownlint(options, (error, results) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	})
+		.catch((error) => outputLine("ERROR: Exception while linting with markdownlint:\n" + error.stack, true))
+		.then((results) => results.text);
 }
 
 // Returns if the document is Markdown
@@ -402,6 +426,7 @@ function fixLine (lineIndex, fixInfo) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor && fixInfo) {
+			const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
 			const document = editor.document;
 			const lineNumber = fixInfo.lineNumber || (lineIndex + 1);
 			const {text, range} = document.lineAt(lineNumber - 1);
@@ -433,6 +458,7 @@ function fixAll () {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
+			const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
 			const document = editor.document;
 			if (isMarkdownDocument(document)) {
 				const text = document.getText();

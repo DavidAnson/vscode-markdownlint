@@ -17,7 +17,8 @@
 	},
 	"scripts": {
 		"compile": "webpack --mode production",
-		"lint": "eslint --ignore-pattern bundle.js *.js && markdownlint-cli2 '*.md'",
+		"compile-debug": "webpack --mode none",
+		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js && markdownlint-cli2 '*.md'",
 		"schema": "node generate-config-schema.js",
 		"test": "npm run lint && cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . && npm run compile && npm run schema && git diff --exit-code"
 	},
@@ -29,6 +30,7 @@
 		"vscode": "^1.53.0"
 	},
 	"main": "./bundle",
+	"browser": "./bundle.web",
 	"dependencies": {
 		"ignore": "5.1.8",
 		"js-yaml": "4.1.0",
