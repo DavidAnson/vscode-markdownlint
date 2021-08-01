@@ -27,7 +27,7 @@
 	],
 	"engines": {
 		"node": ">=12",
-		"vscode": "^1.53.0"
+		"vscode": "^1.56.0"
 	},
 	"main": "./bundle",
 	"browser": "./bundle.web",
@@ -42,7 +42,7 @@
 		"minimatch": "3.0.4"
 	},
 	"devDependencies": {
-		"@types/vscode": "~1.53.0",
+		"@types/vscode": "~1.56.0",
 		"cpy-cli": "~3.1.1",
 		"eslint": "~7.28.0",
 		"eslint-plugin-node": "~11.1.0",
@@ -148,6 +148,7 @@
 			"properties": {
 				"markdownlint.blockJavaScript": {
 					"description": "Prevents running JavaScript in custom rules, markdown-it plugins, and configuration files",
+					"deprecationMessage": "Deprecated, honors VS Code's Workspace Trust setting",
 					"scope": "application",
 					"type": "boolean",
 					"default": false

@@ -43,16 +43,12 @@ const toggleLintingCommandName = "markdownlint.toggleLinting";
 const clickForConfigureInfo = `Details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
 const openCommand = "vscode.open";
-const sectionBlockJavaScript = "blockJavaScript";
 const sectionConfig = "config";
 const sectionCustomRules = "customRules";
 const sectionFocusMode = "focusMode";
 const sectionIgnore = "ignore";
 const sectionRun = "run";
-const applicationConfigurationSections = [
-	sectionBlockJavaScript,
-	sectionFocusMode
-];
+const applicationConfigurationSections = [ sectionFocusMode ];
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 
@@ -232,10 +228,6 @@ function markdownlintWrapper (document) {
 		const contents = isSchemeFile ?
 			"fileContents" :
 			"nonFileContents";
-		const isTrusted =
-			// @ts-ignore
-			(vscode.workspace.isTrusted || (vscode.workspace.isTrusted === undefined)) &&
-			!applicationConfiguration[sectionBlockJavaScript];
 		let results = [];
 		// eslint-disable-next-line func-style
 		const captureResultsFormatter = (options) => {
@@ -247,7 +239,7 @@ function markdownlintWrapper (document) {
 			[contents]: {
 				[name]: text
 			},
-			"noRequire": !isTrusted,
+			"noRequire": !vscode.workspace.isTrusted,
 			"optionsDefault": {
 				config,
 				"customRules": getCustomRules(configuration),
@@ -627,13 +619,18 @@ function didCloseTextDocument (document) {
 
 // Handles the onDidChangeConfiguration event
 function didChangeConfiguration (change) {
-	if (change.affectsConfiguration(extensionDisplayName)) {
+	if (!change || change.affectsConfiguration(extensionDisplayName)) {
 		outputLine("INFO: Resetting configuration cache due to setting change.");
 		getApplicationConfiguration();
 		clearRunMap();
 		clearIgnores();
 		clearDiagnosticsAndLintVisibleFiles();
 	}
+}
+
+// Handles the onDidGrantWorkspaceTrust event
+function didGrantWorkspaceTrust () {
+	didChangeConfiguration();
 }
 
 function activate (context) {
@@ -652,7 +649,8 @@ function activate (context) {
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
 		vscode.workspace.onDidSaveTextDocument(didSaveTextDocument),
 		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
-		vscode.workspace.onDidChangeConfiguration(didChangeConfiguration)
+		vscode.workspace.onDidChangeConfiguration(didChangeConfiguration),
+		vscode.workspace.onDidGrantWorkspaceTrust(didGrantWorkspaceTrust)
 	);
 
 	// Register CodeActionsProvider

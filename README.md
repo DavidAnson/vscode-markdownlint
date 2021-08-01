@@ -289,23 +289,6 @@ For information about authoring custom rules, see [the `markdownlint` documentat
 
 > **Note**: Custom rules can also be specified (in a way other tools will recognize) via the `customRules` property in `.markdownlint-cli2.{jsonc,yaml,js}`.
 
-### markdownlint.blockJavaScript
-
-Prevents running JavaScript in custom rules, `markdown-it` plugins, and configuration files (such as `.markdownlint.js` and `.markdownlint-cli2.js`). Running code associated with an arbitrary project could be a security risk, so this can be prevented in user settings by blocking such code from being loaded or executed by the `markdownlint` extension within Visual Studio Code.
-
-An example of Code's user settings for blocking JavaScript might look like:
-
-```json
-{
-    "editor.someSetting": true,
-    "markdownlint.blockJavaScript": true
-}
-```
-
-> **Note**: This setting may impact the usability of projects with custom rules, `markdown-it` plugins, or JavaScript configuration files.
->
-> **Note**: VS Code's upcoming [Workspace Trust feature](https://aka.ms/vscode-workspace-trust) will replace this setting once it is available. Until then, setting `blockJavaScript` OR choosing not to trust a workspace will block JavaScript.
-
 ## Suppress
 
 Individual warnings can be suppressed with comments in the Markdown file itself:
@@ -330,6 +313,10 @@ The following snippets are available when editing a Markdown document (press `Ct
 * `markdownlint-disable-file`
 * `markdownlint-enable-file`
 * `markdownlint-configure-file`
+
+## Security
+
+Running JavaScript from custom rules, `markdown-it` plugins, or configuration files (such as `.markdownlint.js` and `.markdownlint-cli2.js`) could be a security risk, so VS Code's [Workspace Trust setting](https://code.visualstudio.com/docs/editor/workspace-trust) is honored to block JavaScript for untrusted workspaces.
 
 ## History
 
