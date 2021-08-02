@@ -344,6 +344,12 @@ function lint (document) {
 // Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
 function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
+	// eslint-disable-next-line func-style
+	const addToCodeActions = (action) => {
+		if (!codeActionContext.only || codeActionContext.only.contains(action.kind)) {
+			codeActions.push(action);
+		}
+	};
 	const diagnostics = codeActionContext.diagnostics || [];
 	const fixInfoDiagnostics = [];
 	let showConfigureInfo = false;
@@ -365,7 +371,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			};
 			fixAction.diagnostics = [ diagnostic ];
 			fixAction.isPreferred = true;
-			codeActions.push(fixAction);
+			addToCodeActions(fixAction);
 			fixInfoDiagnostics.push(diagnostic);
 		}
 		// Provide code action for information about the violation
@@ -379,7 +385,7 @@ function provideCodeActions (document, range, codeActionContext) {
 				"arguments": [ ruleInformationUri ]
 			};
 			infoAction.diagnostics = [ diagnostic ];
-			codeActions.push(infoAction);
+			addToCodeActions(infoAction);
 		}
 		showConfigureInfo = true;
 	}
@@ -396,11 +402,9 @@ function provideCodeActions (document, range, codeActionContext) {
 				"command": fixAllCommandName
 			};
 			sourceFixAllAction.diagnostics = fixInfoDiagnostics;
-			codeActions.push(sourceFixAllAction);
+			addToCodeActions(sourceFixAllAction);
 		};
-		if (codeActionContext.only && codeActionContext.only.contains(codeActionKindSourceFixAllExtension)) {
-			registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
-		}
+		registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
 		registerFixAllCodeAction(codeActionKindQuickFix);
 	}
 	// Add information about configuring rules
@@ -411,7 +415,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			"command": openCommand,
 			"arguments": [ vscode.Uri.parse(clickForConfigureUrl) ]
 		};
-		codeActions.push(configureInfoAction);
+		addToCodeActions(configureInfoAction);
 	}
 	return codeActions;
 }
