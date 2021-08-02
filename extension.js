@@ -398,7 +398,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			sourceFixAllAction.diagnostics = fixInfoDiagnostics;
 			codeActions.push(sourceFixAllAction);
 		};
-		if (codeActionContext.only && codeActionContext.only.contains(vscode.CodeActionKind.SourceFixAll)) {
+		if (codeActionContext.only && codeActionContext.only.contains(codeActionKindSourceFixAllExtension)) {
 			registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
 		}
 		registerFixAllCodeAction(codeActionKindQuickFix);
