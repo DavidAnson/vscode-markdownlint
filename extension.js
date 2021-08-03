@@ -77,13 +77,20 @@ function posixPath (p) {
 	return p.split(path.sep).join(path.posix.sep);
 }
 
+// Gets the primary workspace folder (if any)
+function getWorkspaceFolder () {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	return (workspaceFolders && (workspaceFolders.length > 0)) ?
+		workspaceFolders[0] :
+		null;
+}
+
 // Gets the workspace file-system path (or HOMEDIR if none)
 function getWorkspaceFsPath () {
-	const workspaceFolderSchemeFile =
-		vscode.workspace.workspaceFolders &&
-		(vscode.workspace.workspaceFolders[0].uri.scheme === markdownSchemeFile);
+	const workspaceFolder = getWorkspaceFolder();
+	const workspaceFolderSchemeFile = workspaceFolder && (workspaceFolder.uri.scheme === markdownSchemeFile);
 	return workspaceFolderSchemeFile ?
-		vscode.workspace.workspaceFolders[0].uri.fsPath :
+		workspaceFolder.uri.fsPath :
 		require("os").homedir();
 }
 
@@ -144,9 +151,10 @@ function getIgnores (document) {
 			ignoreFile = ignoreValue;
 		}
 		// Handle .markdownlintignore
-		if (vscode.workspace.workspaceFolders) {
+		const workspaceFolder = getWorkspaceFolder();
+		if (workspaceFolder) {
 			const ignoreFileUri = vscode.Uri.joinPath(
-				vscode.workspace.workspaceFolders[0].uri,
+				workspaceFolder.uri,
 				ignoreFile
 			);
 			vscode.workspace.fs.stat(ignoreFileUri).then(
@@ -487,8 +495,9 @@ function fixAll () {
 
 // Creates or opens the markdownlint configuration file for the folder
 function openConfigFile () {
-	if (vscode.workspace.workspaceFolders) {
-		const workspacePath = vscode.workspace.workspaceFolders[0].uri;
+	const workspaceFolder = getWorkspaceFolder();
+	if (workspaceFolder) {
+		const workspacePath = workspaceFolder.uri;
 		Promise.all(configFileNames.map((configFileName) => {
 			const fileUri = vscode.Uri.joinPath(workspacePath, configFileName);
 			return vscode.workspace.fs.stat(fileUri).then(
@@ -697,8 +706,9 @@ function activate (context) {
 	context.subscriptions.push(diagnosticCollection);
 
 	// Hook up to file system changes for custom config file(s)
-	if (vscode.workspace.workspaceFolders) {
-		const workspacePath = vscode.workspace.workspaceFolders[0].uri;
+	const workspaceFolder = getWorkspaceFolder();
+	if (workspaceFolder) {
+		const workspacePath = workspaceFolder.uri;
 		const relativeConfigFileGlob = new vscode.RelativePattern(workspacePath, "**/" + configFileGlob);
 		const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
 		context.subscriptions.push(
