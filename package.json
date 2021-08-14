@@ -48,6 +48,7 @@
 		"eslint-plugin-node": "~11.1.0",
 		"eslint-plugin-unicorn": "~34.0.1",
 		"shebang-loader": "^0.0.1",
+		"terser-webpack-plugin": "~5.1.4",
 		"vsce": "~1.96.1",
 		"webpack": "~5.47.1",
 		"webpack-cli": "~4.7.2"
