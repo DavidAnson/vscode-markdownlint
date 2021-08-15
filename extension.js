@@ -99,7 +99,7 @@ function outputLine (message, show) {
 	const datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
 	outputChannel.appendLine(datePrefix + message);
 	if (show) {
-		outputChannel.show();
+		outputChannel.show(true);
 	}
 }
 
