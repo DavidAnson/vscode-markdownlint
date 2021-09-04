@@ -73,7 +73,7 @@
 		},
 		"virtualWorkspaces": {
 			"supported": "limited",
-			"description": "In virtual workspaces, access to configuration files is not supported. Default linting settings are used instead."
+			"description": "In web scenarios, access to configuration files is not supported. Default linting settings are used instead."
 		}
 	},
 	"contributes": {

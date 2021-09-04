@@ -4,6 +4,7 @@
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
 const path = require("path");
+const {promisify} = require("util");
 // Node modules (like path) are not available in web worker context
 const nodeModulesAvailable = path && (Object.keys(path).length > 0);
 
@@ -93,6 +94,95 @@ function getWorkspaceFsPath () {
 		workspaceFolder.uri.fsPath :
 		require("os").homedir();
 }
+
+// Returns true iff the path segment is in the workspace
+function isInWorkspace (pathSegment) {
+	const workspaceFolder = getWorkspaceFolder();
+	if (workspaceFolder) {
+		const pathSegmentUri = workspaceFolder.uri.with({"path": pathSegment});
+		return !vscode.workspace.asRelativePath(pathSegmentUri).startsWith("/");
+	}
+	return false;
+}
+
+// Returns true
+function trueFunction () {
+	return true;
+}
+
+// Returns false
+function falseFunction () {
+	return false;
+}
+
+// Joins a path to the current workspace folder URI
+function joinPathSegmentToWorkspaceUri (pathSegment) {
+	const workspaceFolder = getWorkspaceFolder();
+	return (workspaceFolder && isInWorkspace(pathSegment)) ?
+		workspaceFolder.uri.with({"path": pathSegment}) :
+		vscode.Uri.file(pathSegment);
+}
+
+// Implements fs.access via vscode.workspace.fs
+function fsAccess (pathSegment, mode, callback) {
+	// eslint-disable-next-line no-param-reassign
+	callback = callback || mode;
+	vscode.workspace.fs.stat(
+		joinPathSegmentToWorkspaceUri(pathSegment)
+	).then(
+		() => callback(null),
+		callback
+	);
+}
+
+// Implements fs.readFile via vscode.workspace.fs
+function fsReadFile (pathSegment, options, callback) {
+	// eslint-disable-next-line no-param-reassign
+	callback = callback || options;
+	vscode.workspace.fs.readFile(
+		joinPathSegmentToWorkspaceUri(pathSegment)
+	).then(
+		(bytes) => callback(null, new TextDecoder().decode(bytes)),
+		callback
+	);
+}
+
+// Implements fs.stat via vscode.workspace.fs
+function fsStat (pathSegment, options, callback) {
+	// eslint-disable-next-line no-param-reassign
+	callback = callback || options;
+	vscode.workspace.fs.stat(
+		joinPathSegmentToWorkspaceUri(pathSegment)
+	).then(
+		(fileStat) => {
+			// Stub required properties for fast-glob
+			/* eslint-disable dot-notation, multiline-ternary, no-bitwise */
+			fileStat["isBlockDevice"] = falseFunction;
+			fileStat["isCharacterDevice"] = falseFunction;
+			fileStat["isDirectory"] = (fileStat.type & vscode.FileType.Directory) ? trueFunction : falseFunction;
+			fileStat["isFIFO"] = falseFunction;
+			fileStat["isFile"] = (fileStat.type & vscode.FileType.File) ? trueFunction : falseFunction;
+			fileStat["isSocket"] = falseFunction;
+			fileStat["isSymbolicLink"] = (fileStat.type & vscode.FileType.SymbolicLink) ? trueFunction : falseFunction;
+			/* eslint-enable dot-notation, multiline-ternary, no-bitwise */
+			callback(null, fileStat);
+		},
+		callback
+	);
+}
+
+// Creates a Node-like fs object based on vscode.workspace.fs
+const workspaceFs = {
+	"promises": {
+		"access": promisify(fsAccess),
+		"readFile": promisify(fsReadFile),
+		"stat": promisify(fsStat)
+	},
+	"access": fsAccess,
+	"lstat": fsStat,
+	"stat": fsStat,
+	"readFile": fsReadFile
+};
 
 // Writes date and message to the output channel
 function outputLine (message, show) {
@@ -228,21 +318,28 @@ function markdownlintWrapper (document) {
 	];
 	if (nodeModulesAvailable) {
 		// Prepare markdownlint-cli2 parameters
-		const directory = posixPath(getWorkspaceFsPath());
+		const isSchemeUntitled = document.uri.scheme === markdownSchemeUntitled;
 		const name = posixPath(document.uri.fsPath);
-		const isSchemeFile = document.uri.scheme === markdownSchemeFile;
-		const argv = isSchemeFile ?
-			[ escapeGlobPattern(name) ] :
-			[];
-		const contents = isSchemeFile ?
-			"fileContents" :
-			"nonFileContents";
+		const workspaceFolder = getWorkspaceFolder();
+		// eslint-disable-next-line no-nested-ternary
+		const directory = isSchemeUntitled ?
+			null :
+			((workspaceFolder && isInWorkspace(name)) ?
+				posixPath(workspaceFolder.uri.fsPath) :
+				path.posix.dirname(name));
+		const argv = isSchemeUntitled ?
+			[] :
+			[ escapeGlobPattern(name) ];
+		const contents = isSchemeUntitled ?
+			"nonFileContents" :
+			"fileContents";
 		let results = [];
 		// eslint-disable-next-line func-style
 		const captureResultsFormatter = (options) => {
 			results = options.results;
 		};
 		const parameters = {
+			"fs": workspaceFs,
 			directory,
 			argv,
 			[contents]: {
