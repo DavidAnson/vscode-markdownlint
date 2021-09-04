@@ -4,7 +4,7 @@
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
 const path = require("path");
-const {promisify} = require("util");
+const pify = require("pify");
 // Node modules (like path) are not available in web worker context
 const nodeModulesAvailable = path && (Object.keys(path).length > 0);
 
@@ -174,9 +174,9 @@ function fsStat (pathSegment, options, callback) {
 // Creates a Node-like fs object based on vscode.workspace.fs
 const workspaceFs = {
 	"promises": {
-		"access": promisify(fsAccess),
-		"readFile": promisify(fsReadFile),
-		"stat": promisify(fsStat)
+		"access": pify(fsAccess),
+		"readFile": pify(fsReadFile),
+		"stat": pify(fsStat)
 	},
 	"access": fsAccess,
 	"lstat": fsStat,
@@ -363,23 +363,15 @@ function markdownlintWrapper (document) {
 			.then(() => results);
 	}
 	// Else invoke markdownlint (don't use markdownlint.promises.markdownlint which is invalid in web worker context)
-	return new Promise((resolve, reject) => {
-		const options = {
-			"strings": {
-				text
-			},
-			config,
-			markdownItPlugins,
-			"resultVersion": 3
-		};
-		markdownlint(options, (error, results) => {
-			if (error) {
-				reject(error);
-			} else {
-				resolve(results);
-			}
-		});
-	})
+	const options = {
+		"strings": {
+			text
+		},
+		config,
+		markdownItPlugins,
+		"resultVersion": 3
+	};
+	return pify(markdownlint)(options)
 		.catch((error) => outputLine("ERROR: Exception while linting with markdownlint:\n" + error.stack, true))
 		.then((results) => results.text);
 }

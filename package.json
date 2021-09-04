@@ -39,7 +39,8 @@
 		"markdownlint": "0.24.0",
 		"markdownlint-cli2": "0.3.0",
 		"markdownlint-rule-helpers": "0.15.0",
-		"minimatch": "3.0.4"
+		"minimatch": "3.0.4",
+		"pify": "5.0.0"
 	},
 	"devDependencies": {
 		"@types/vscode": "~1.56.0",
