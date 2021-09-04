@@ -86,15 +86,6 @@ function getWorkspaceFolder () {
 		null;
 }
 
-// Gets the workspace file-system path (or HOMEDIR if none)
-function getWorkspaceFsPath () {
-	const workspaceFolder = getWorkspaceFolder();
-	const workspaceFolderSchemeFile = workspaceFolder && (workspaceFolder.uri.scheme === markdownSchemeFile);
-	return workspaceFolderSchemeFile ?
-		workspaceFolder.uri.fsPath :
-		require("os").homedir();
-}
-
 // Returns true iff the path segment is in the workspace
 function isInWorkspace (pathSegment) {
 	const workspaceFolder = getWorkspaceFolder();
@@ -199,9 +190,14 @@ function getConfig (configuration) {
 	// Bootstrap extend behavior into readConfigSync
 	if (userWorkspaceConfig && userWorkspaceConfig.extends && nodeModulesAvailable) {
 		const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
-		const extendBase = userWorkspaceConfigMetadata.globalValue ?
+		const workspaceFolder = getWorkspaceFolder();
+		const useHomedir =
+			Boolean(userWorkspaceConfigMetadata.globalValue) ||
+			!workspaceFolder ||
+			(workspaceFolder.uri.scheme !== markdownSchemeFile);
+		const extendBase = useHomedir ?
 			require("os").homedir() :
-			getWorkspaceFsPath();
+			posixPath(workspaceFolder.uri.fsPath);
 		const extendPath = path.resolve(extendBase, userWorkspaceConfig.extends);
 		try {
 			const extendConfig = markdownlint.readConfigSync(extendPath, configParsers);
