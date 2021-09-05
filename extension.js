@@ -24,6 +24,10 @@ const ignoreFileName = ".markdownlintignore";
 const markdownLanguageId = "markdown";
 const markdownSchemeFile = "file";
 const markdownSchemeUntitled = "untitled";
+const markdownSchemesToIgnore = new Set([
+	// Used by GitHub.vscode-pull-request-github
+	"comment"
+]);
 const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
 	(content) => require("js-yaml").load(content)
@@ -374,7 +378,10 @@ function markdownlintWrapper (document) {
 
 // Returns if the document is Markdown
 function isMarkdownDocument (document) {
-	return (document.languageId === markdownLanguageId);
+	return (
+		(document.languageId === markdownLanguageId) &&
+		!markdownSchemesToIgnore.has(document.uri.scheme)
+	);
 }
 
 // Lints a Markdown document
