@@ -26,7 +26,9 @@ const markdownSchemeFile = "file";
 const markdownSchemeUntitled = "untitled";
 const markdownSchemesToIgnore = new Set([
 	// Used by GitHub.vscode-pull-request-github
-	"comment"
+	"comment",
+	// Used by ms-toolsai.jupyter
+	"vscode-notebook-cell"
 ]);
 const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
