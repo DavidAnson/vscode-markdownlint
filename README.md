@@ -194,7 +194,7 @@ Configuration sources have the following precedence (in decreasing order):
 
 Configuration changes saved to any location take effect immediately. Files referenced via `extends` are not monitored for changes. Inherited configuration can be explicitly disabled (or re-enabled) in any configuration file.
 
-When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint.{jsonc,json,yaml,yml,js}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` will be opened in the editor in the "pending save" state.
+When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint.{jsonc,json,yaml,yml,js}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` containing the default rule configuration will be opened in the editor in the "pending save" state.
 
 ### markdownlint.focusMode
 
