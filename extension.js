@@ -453,10 +453,9 @@ function provideCodeActions (document, range, codeActionContext) {
 		}
 	};
 	const diagnostics = codeActionContext.diagnostics || [];
-	const fixInfoDiagnostics = [];
 	let showConfigureInfo = false;
-	const filteredDiagnostics = diagnostics.filter((diagnostic) => diagnostic.source === extensionDisplayName);
-	for (const diagnostic of filteredDiagnostics) {
+	const extensionDiagnostics = diagnostics.filter((diagnostic) => diagnostic.source === extensionDisplayName);
+	for (const diagnostic of extensionDiagnostics) {
 		const ruleName = diagnostic.code.value || diagnostic.code;
 		const ruleNameAlias = diagnostic.message.split(":")[0];
 		// Provide code action to fix the violation
@@ -474,7 +473,6 @@ function provideCodeActions (document, range, codeActionContext) {
 			fixAction.diagnostics = [ diagnostic ];
 			fixAction.isPreferred = true;
 			addToCodeActions(fixAction);
-			fixInfoDiagnostics.push(diagnostic);
 		}
 		// Provide code action for information about the violation
 		const ruleInformationUri = ruleNameToInformationUri[ruleName];
@@ -491,24 +489,21 @@ function provideCodeActions (document, range, codeActionContext) {
 		}
 		showConfigureInfo = true;
 	}
-	if (fixInfoDiagnostics.length > 0) {
-		// eslint-disable-next-line func-style
-		const registerFixAllCodeAction = (codeActionKind) => {
-			// Register a "fix all" code action
-			const sourceFixAllAction = new vscode.CodeAction(
-				fixAllCommandTitle,
-				codeActionKind
-			);
-			sourceFixAllAction.command = {
-				"title": fixAllCommandTitle,
-				"command": fixAllCommandName
-			};
-			sourceFixAllAction.diagnostics = fixInfoDiagnostics;
-			addToCodeActions(sourceFixAllAction);
+	// eslint-disable-next-line func-style
+	const registerFixAllCodeAction = (codeActionKind) => {
+		// Register a "fix all" code action
+		const sourceFixAllAction = new vscode.CodeAction(
+			fixAllCommandTitle,
+			codeActionKind
+		);
+		sourceFixAllAction.command = {
+			"title": fixAllCommandTitle,
+			"command": fixAllCommandName
 		};
-		registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
-		registerFixAllCodeAction(codeActionKindQuickFix);
-	}
+		addToCodeActions(sourceFixAllAction);
+	};
+	registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
+	registerFixAllCodeAction(codeActionKindQuickFix);
 	// Add information about configuring rules
 	if (showConfigureInfo) {
 		const configureInfoAction = new vscode.CodeAction(clickForConfigureInfo, codeActionKindQuickFix);
