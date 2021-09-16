@@ -320,6 +320,7 @@ function markdownlintWrapper (document) {
 	];
 	if (nodeModulesAvailable) {
 		// Prepare markdownlint-cli2 parameters
+		const isSchemeFile = document.uri.scheme === markdownSchemeFile;
 		const isSchemeUntitled = document.uri.scheme === markdownSchemeUntitled;
 		const name = posixPath(document.uri.fsPath);
 		const workspaceFolder = getWorkspaceFolder();
@@ -347,7 +348,8 @@ function markdownlintWrapper (document) {
 			[contents]: {
 				[name]: text
 			},
-			"noRequire": !vscode.workspace.isTrusted,
+			"noGlobs": true,
+			"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
 			"optionsDefault": {
 				config,
 				"customRules": getCustomRules(configuration),
