@@ -1,5 +1,6 @@
 # Changes
 
+* 0.44.0 - Support virtual file systems
 * 0.43.0 - Web worker support
 * 0.42.0 - Add "focus mode" setting
 * 0.41.0 - Workspace trust, virtual workspaces
