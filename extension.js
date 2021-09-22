@@ -73,9 +73,10 @@ const throttle = {
 	"timeout": null
 };
 
-// Escapes glob pattern characters
+// Escapes all RegExp special characters recognized by fast-glob
 function escapeGlobPattern (glob) {
-	return glob.replace(/[!#()*?[\\\]{}]/g, "\\$&");
+	// https://github.com/mrmlnc/fast-glob#advanced-syntax
+	return glob.replace(/[$()*+?[\]^]/g, "\\$&");
 }
 
 // Converts to a POSIX-style path
