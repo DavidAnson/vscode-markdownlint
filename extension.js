@@ -85,102 +85,102 @@ function posixPath (p) {
 	return p.split(path.sep).join(path.posix.sep);
 }
 
-// Gets the primary workspace folder (if any)
-function getWorkspaceFolder () {
+// Gets the workspace folder Uri (if any) for the document Uri (if specified)
+function getWorkspaceFolderUri (documentUri) {
+	if (documentUri) {
+		const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
+		return workspaceFolder ?
+			workspaceFolder.uri :
+			vscode.Uri.joinPath(documentUri, "..");
+	}
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	return (workspaceFolders && (workspaceFolders.length > 0)) ?
-		workspaceFolders[0] :
+		workspaceFolders[0].uri :
 		null;
 }
 
-// Returns true iff the path segment is in the workspace
-function isInWorkspace (pathSegment) {
-	const workspaceFolder = getWorkspaceFolder();
-	if (workspaceFolder) {
-		const pathSegmentUri = workspaceFolder.uri.with({"path": pathSegment});
-		return !vscode.workspace.asRelativePath(pathSegmentUri).startsWith("/");
+// A Node-like fs object implemented using vscode.workspace.fs
+class FsWrapper {
+	// Returns true
+	static fwTrue () {
+		return true;
 	}
-	return false;
-}
 
-// Returns true
-function trueFunction () {
-	return true;
-}
+	// Returns false
+	static fwFalse () {
+		return false;
+	}
 
-// Returns false
-function falseFunction () {
-	return false;
-}
+	// Joins a path segment to the current folder Uri
+	fwJoinPathSegmentToFolderUri (pathSegment) {
+		return this.fwFolderUri.with({"path": pathSegment});
+	}
 
-// Joins a path to the current workspace folder URI
-function joinPathSegmentToWorkspaceUri (pathSegment) {
-	const workspaceFolder = getWorkspaceFolder();
-	return (workspaceFolder && isInWorkspace(pathSegment)) ?
-		workspaceFolder.uri.with({"path": pathSegment}) :
-		vscode.Uri.file(pathSegment);
-}
+	// Implements fs.access via vscode.workspace.fs
+	fwAccess (pathSegment, mode, callback) {
+		// eslint-disable-next-line no-param-reassign
+		callback = callback || mode;
+		vscode.workspace.fs.stat(
+			this.fwJoinPathSegmentToFolderUri(pathSegment)
+		).then(
+			() => callback(null),
+			callback
+		);
+	}
 
-// Implements fs.access via vscode.workspace.fs
-function fsAccess (pathSegment, mode, callback) {
-	// eslint-disable-next-line no-param-reassign
-	callback = callback || mode;
-	vscode.workspace.fs.stat(
-		joinPathSegmentToWorkspaceUri(pathSegment)
-	).then(
-		() => callback(null),
-		callback
-	);
-}
+	// Implements fs.readFile via vscode.workspace.fs
+	fwReadFile (pathSegment, options, callback) {
+		// eslint-disable-next-line no-param-reassign
+		callback = callback || options;
+		vscode.workspace.fs.readFile(
+			this.fwJoinPathSegmentToFolderUri(pathSegment)
+		).then(
+			(bytes) => callback(null, new TextDecoder().decode(bytes)),
+			callback
+		);
+	}
 
-// Implements fs.readFile via vscode.workspace.fs
-function fsReadFile (pathSegment, options, callback) {
-	// eslint-disable-next-line no-param-reassign
-	callback = callback || options;
-	vscode.workspace.fs.readFile(
-		joinPathSegmentToWorkspaceUri(pathSegment)
-	).then(
-		(bytes) => callback(null, new TextDecoder().decode(bytes)),
-		callback
-	);
-}
+	// Implements fs.stat via vscode.workspace.fs
+	fwStat (pathSegment, options, callback) {
+		// eslint-disable-next-line no-param-reassign
+		callback = callback || options;
+		vscode.workspace.fs.stat(
+			this.fwJoinPathSegmentToFolderUri(pathSegment)
+		).then(
+			(fileStat) => {
+				// Stub required properties for fast-glob
+				/* eslint-disable dot-notation, multiline-ternary, no-bitwise */
+				fileStat["isBlockDevice"] = FsWrapper.fwFalse;
+				fileStat["isCharacterDevice"] = FsWrapper.fwFalse;
+				fileStat["isDirectory"] = (fileStat.type & vscode.FileType.Directory) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
+				fileStat["isFIFO"] = FsWrapper.fwFalse;
+				fileStat["isFile"] = (fileStat.type & vscode.FileType.File) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
+				fileStat["isSocket"] = FsWrapper.fwFalse;
+				fileStat["isSymbolicLink"] =
+					(fileStat.type & vscode.FileType.SymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
+				/* eslint-enable dot-notation, multiline-ternary, no-bitwise */
+				callback(null, fileStat);
+			},
+			callback
+		);
+	}
 
-// Implements fs.stat via vscode.workspace.fs
-function fsStat (pathSegment, options, callback) {
-	// eslint-disable-next-line no-param-reassign
-	callback = callback || options;
-	vscode.workspace.fs.stat(
-		joinPathSegmentToWorkspaceUri(pathSegment)
-	).then(
-		(fileStat) => {
-			// Stub required properties for fast-glob
-			/* eslint-disable dot-notation, multiline-ternary, no-bitwise */
-			fileStat["isBlockDevice"] = falseFunction;
-			fileStat["isCharacterDevice"] = falseFunction;
-			fileStat["isDirectory"] = (fileStat.type & vscode.FileType.Directory) ? trueFunction : falseFunction;
-			fileStat["isFIFO"] = falseFunction;
-			fileStat["isFile"] = (fileStat.type & vscode.FileType.File) ? trueFunction : falseFunction;
-			fileStat["isSocket"] = falseFunction;
-			fileStat["isSymbolicLink"] = (fileStat.type & vscode.FileType.SymbolicLink) ? trueFunction : falseFunction;
-			/* eslint-enable dot-notation, multiline-ternary, no-bitwise */
-			callback(null, fileStat);
-		},
-		callback
-	);
+	// Constructs a new instance
+	constructor (folderUri) {
+		this.fwFolderUri = folderUri;
+		const access = this.fwAccess.bind(this);
+		const readFile = this.fwReadFile.bind(this);
+		const stat = this.fwStat.bind(this);
+		this.access = access;
+		this.readFile = readFile;
+		this.stat = stat;
+		this.lstat = stat;
+		this.promises = {};
+		this.promises.access = pify(access);
+		this.promises.readFile = pify(readFile);
+		this.promises.stat = pify(stat);
+	}
 }
-
-// Creates a Node-like fs object based on vscode.workspace.fs
-const workspaceFs = {
-	"promises": {
-		"access": pify(fsAccess),
-		"readFile": pify(fsReadFile),
-		"stat": pify(fsStat)
-	},
-	"access": fsAccess,
-	"lstat": fsStat,
-	"stat": fsStat,
-	"readFile": fsReadFile
-};
 
 // Writes date and message to the output channel
 function outputLine (message, show) {
@@ -192,19 +192,19 @@ function outputLine (message, show) {
 }
 
 // Returns rule configuration from user/workspace configuration
-function getConfig (configuration) {
+function getConfig (configuration, uri) {
 	let userWorkspaceConfig = configuration.get(sectionConfig);
 	// Bootstrap extend behavior into readConfigSync
 	if (userWorkspaceConfig && userWorkspaceConfig.extends && nodeModulesAvailable) {
 		const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
-		const workspaceFolder = getWorkspaceFolder();
+		const workspaceFolderUri = getWorkspaceFolderUri(uri);
 		const useHomedir =
 			Boolean(userWorkspaceConfigMetadata.globalValue) ||
-			!workspaceFolder ||
-			(workspaceFolder.uri.scheme !== markdownSchemeFile);
+			!workspaceFolderUri ||
+			(workspaceFolderUri.scheme !== markdownSchemeFile);
 		const extendBase = useHomedir ?
 			require("os").homedir() :
-			posixPath(workspaceFolder.uri.fsPath);
+			posixPath(workspaceFolderUri.fsPath);
 		const extendPath = path.resolve(extendBase, userWorkspaceConfig.extends);
 		try {
 			const extendConfig = markdownlint.readConfigSync(extendPath, configParsers);
@@ -244,10 +244,10 @@ function getIgnores (document) {
 			ignoreFile = ignoreValue;
 		}
 		// Handle .markdownlintignore
-		const workspaceFolder = getWorkspaceFolder();
-		if (workspaceFolder) {
+		const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
+		if (workspaceFolderUri) {
 			const ignoreFileUri = vscode.Uri.joinPath(
-				workspaceFolder.uri,
+				workspaceFolderUri,
 				ignoreFile
 			);
 			vscode.workspace.fs.stat(ignoreFileUri).then(
@@ -307,7 +307,7 @@ function getCustomRules (configuration) {
 function markdownlintWrapper (document) {
 	// Load user/workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-	const config = getConfig(configuration);
+	const config = getConfig(configuration, document.uri);
 	const text = document.getText();
 	const markdownItPlugins = [
 		[
@@ -324,12 +324,15 @@ function markdownlintWrapper (document) {
 		const isSchemeFile = document.uri.scheme === markdownSchemeFile;
 		const isSchemeUntitled = document.uri.scheme === markdownSchemeUntitled;
 		const name = posixPath(document.uri.fsPath);
-		const workspaceFolder = getWorkspaceFolder();
+		const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
+		const fs = isSchemeUntitled ?
+			null :
+			new FsWrapper(workspaceFolderUri);
 		// eslint-disable-next-line no-nested-ternary
 		const directory = isSchemeUntitled ?
 			null :
-			((workspaceFolder && isInWorkspace(name)) ?
-				posixPath(workspaceFolder.uri.fsPath) :
+			(workspaceFolderUri ?
+				posixPath(workspaceFolderUri.fsPath) :
 				path.posix.dirname(name));
 		const argv = isSchemeUntitled ?
 			[] :
@@ -343,7 +346,7 @@ function markdownlintWrapper (document) {
 			results = options.results;
 		};
 		const parameters = {
-			"fs": workspaceFs,
+			fs,
 			directory,
 			argv,
 			[contents]: {
@@ -585,13 +588,12 @@ function fixAll () {
 	});
 }
 
-// Creates or opens the markdownlint configuration file for the folder
+// Creates or opens the markdownlint configuration file for the workspace
 function openConfigFile () {
-	const workspaceFolder = getWorkspaceFolder();
-	if (workspaceFolder) {
-		const workspacePath = workspaceFolder.uri;
+	const workspaceFolderUri = getWorkspaceFolderUri();
+	if (workspaceFolderUri) {
 		Promise.all(configFileNames.map((configFileName) => {
-			const fileUri = vscode.Uri.joinPath(workspacePath, configFileName);
+			const fileUri = vscode.Uri.joinPath(workspaceFolderUri, configFileName);
 			return vscode.workspace.fs.stat(fileUri).then(
 				() => fileUri,
 				() => null
@@ -603,7 +605,7 @@ function openConfigFile () {
 				vscode.window.showTextDocument(validFilePaths[0]);
 			} else {
 				// File does not exist, create one
-				const fileUri = vscode.Uri.joinPath(workspacePath, markdownlintJson);
+				const fileUri = vscode.Uri.joinPath(workspaceFolderUri, markdownlintJson);
 				const untitledFileUri = fileUri.with({"scheme": markdownSchemeUntitled});
 				vscode.window.showTextDocument(untitledFileUri).then(
 					(editor) => {
@@ -642,7 +644,7 @@ function lintVisibleFiles () {
 
 // Returns the run setting for the document
 function getRun (document) {
-	const name = document.fileName;
+	const name = document.uri.toString();
 	// Use cached configuration if present for file
 	if (runMap[name]) {
 		return runMap[name];
@@ -650,7 +652,7 @@ function getRun (document) {
 	// Read workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	runMap[name] = configuration.get(sectionRun);
-	outputLine("INFO: Linting for \"" + document.fileName + "\" will be run \"" + runMap[name] + "\".");
+	outputLine("INFO: Linting for \"" + name + "\" will be run \"" + runMap[name] + "\".");
 	return runMap[name];
 }
 
@@ -798,10 +800,9 @@ function activate (context) {
 	context.subscriptions.push(diagnosticCollection);
 
 	// Hook up to file system changes for custom config file(s)
-	const workspaceFolder = getWorkspaceFolder();
-	if (workspaceFolder) {
-		const workspacePath = workspaceFolder.uri;
-		const relativeConfigFileGlob = new vscode.RelativePattern(workspacePath, "**/" + configFileGlob);
+	const workspaceFolderUri = getWorkspaceFolderUri();
+	if (workspaceFolderUri) {
+		const relativeConfigFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + configFileGlob);
 		const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
 		context.subscriptions.push(
 			configWatcher,
@@ -809,7 +810,7 @@ function activate (context) {
 			configWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
 			configWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles)
 		);
-		const relativeOptionsFileGlob = new vscode.RelativePattern(workspacePath, "**/" + optionsFileGlob);
+		const relativeOptionsFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + optionsFileGlob);
 		const optionsWatcher = vscode.workspace.createFileSystemWatcher(relativeOptionsFileGlob);
 		context.subscriptions.push(
 			optionsWatcher,
@@ -817,7 +818,7 @@ function activate (context) {
 			optionsWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
 			optionsWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles)
 		);
-		const relativeIgnoreFilePath = new vscode.RelativePattern(workspacePath, ignoreFileName);
+		const relativeIgnoreFilePath = new vscode.RelativePattern(workspaceFolderUri, ignoreFileName);
 		const ignoreWatcher = vscode.workspace.createFileSystemWatcher(relativeIgnoreFilePath);
 		context.subscriptions.push(
 			ignoreWatcher,
