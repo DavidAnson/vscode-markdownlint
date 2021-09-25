@@ -59,6 +59,7 @@ const sectionRun = "run";
 const applicationConfigurationSections = [ sectionFocusMode ];
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
+const driveLetterRe = /^[A-Za-z]:[/\\]/;
 
 // Variables
 const applicationConfiguration = {};
@@ -111,9 +112,25 @@ class FsWrapper {
 		return false;
 	}
 
-	// Joins a path segment to the current folder Uri
-	fwJoinPathSegmentToFolderUri (pathSegment) {
-		return this.fwFolderUri.with({"path": pathSegment});
+	// Returns a Uri of fwFolderUri with the specified path segment
+	fwFolderUriWithPathSegment (pathSegment) {
+		// Fix path issues on Windows
+		let posixPathSegment = posixPath(pathSegment);
+		if (driveLetterRe.test(posixPathSegment)) {
+			// eslint-disable-next-line unicorn/prefer-ternary
+			if (
+				this.fwFolderUri.path.startsWith("/") &&
+				driveLetterRe.test(this.fwFolderUri.path.slice(1))
+			) {
+				// Both paths begin with Windows drive letter, make it consistent
+				posixPathSegment = `/${posixPathSegment}`;
+			} else {
+				// Folder path does not start with Windows drive letter, remove it
+				posixPathSegment = posixPathSegment.replace(driveLetterRe, "/");
+			}
+		}
+		// Return consistently-formatted Uri with specified path
+		return this.fwFolderUri.with({"path": posixPathSegment});
 	}
 
 	// Implements fs.access via vscode.workspace.fs
@@ -121,7 +138,7 @@ class FsWrapper {
 		// eslint-disable-next-line no-param-reassign
 		callback = callback || mode;
 		vscode.workspace.fs.stat(
-			this.fwJoinPathSegmentToFolderUri(pathSegment)
+			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			() => callback(null),
 			callback
@@ -133,7 +150,7 @@ class FsWrapper {
 		// eslint-disable-next-line no-param-reassign
 		callback = callback || options;
 		vscode.workspace.fs.readFile(
-			this.fwJoinPathSegmentToFolderUri(pathSegment)
+			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			(bytes) => callback(null, new TextDecoder().decode(bytes)),
 			callback
@@ -145,7 +162,7 @@ class FsWrapper {
 		// eslint-disable-next-line no-param-reassign
 		callback = callback || options;
 		vscode.workspace.fs.stat(
-			this.fwJoinPathSegmentToFolderUri(pathSegment)
+			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			(fileStat) => {
 				// Stub required properties for fast-glob

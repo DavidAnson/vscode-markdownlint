@@ -11,6 +11,7 @@
         "unicorn"
     ],
     "extends": "eslint:all",
+    "reportUnusedDisableDirectives": true,
     "rules": {
         "array-bracket-spacing": ["error", "always"],
         "dot-location": ["error", "property"],
