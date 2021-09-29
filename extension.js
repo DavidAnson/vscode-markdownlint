@@ -50,7 +50,7 @@ const fixAllCommandTitle = `Fix all supported ${extensionDisplayName} violations
 const fixAllCommandName = "markdownlint.fixAll";
 const openConfigFileCommandName = "markdownlint.openConfigFile";
 const toggleLintingCommandName = "markdownlint.toggleLinting";
-const clickForConfigureInfo = `Details about configuring ${extensionDisplayName} rules`;
+const clickForConfigureInfo = `Information about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
 const openCommand = "vscode.open";
 const sectionConfig = "config";
@@ -478,7 +478,6 @@ function provideCodeActions (document, range, codeActionContext) {
 		}
 	};
 	const diagnostics = codeActionContext.diagnostics || [];
-	let showConfigureInfo = false;
 	const extensionDiagnostics = diagnostics.filter((diagnostic) => diagnostic.source === extensionDisplayName);
 	for (const diagnostic of extensionDiagnostics) {
 		const ruleName = diagnostic.code.value || diagnostic.code;
@@ -512,25 +511,24 @@ function provideCodeActions (document, range, codeActionContext) {
 			infoAction.diagnostics = [ diagnostic ];
 			addToCodeActions(infoAction);
 		}
-		showConfigureInfo = true;
 	}
-	// eslint-disable-next-line func-style
-	const registerFixAllCodeAction = (codeActionKind) => {
-		// Register a "fix all" code action
-		const sourceFixAllAction = new vscode.CodeAction(
-			fixAllCommandTitle,
-			codeActionKind
-		);
-		sourceFixAllAction.command = {
-			"title": fixAllCommandTitle,
-			"command": fixAllCommandName
+	if (extensionDiagnostics.length > 0) {
+		// eslint-disable-next-line func-style
+		const registerFixAllCodeAction = (codeActionKind) => {
+			// Register a "fix all" code action
+			const sourceFixAllAction = new vscode.CodeAction(
+				fixAllCommandTitle,
+				codeActionKind
+			);
+			sourceFixAllAction.command = {
+				"title": fixAllCommandTitle,
+				"command": fixAllCommandName
+			};
+			addToCodeActions(sourceFixAllAction);
 		};
-		addToCodeActions(sourceFixAllAction);
-	};
-	registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
-	registerFixAllCodeAction(codeActionKindQuickFix);
-	// Add information about configuring rules
-	if (showConfigureInfo) {
+		registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
+		registerFixAllCodeAction(codeActionKindQuickFix);
+		// Add information about configuring rules
 		const configureInfoAction = new vscode.CodeAction(clickForConfigureInfo, codeActionKindQuickFix);
 		configureInfoAction.command = {
 			"title": clickForConfigureInfo,
