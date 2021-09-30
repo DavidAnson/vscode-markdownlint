@@ -62,6 +62,8 @@ const applicationConfigurationSections = [ sectionFocusMode ];
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 const driveLetterRe = /^[A-Za-z]:[/\\]/;
+const networkShareRe = /^\\\\[^\\]+\\/;
+const firstSegmentRe = /^\/{1,2}[^/]+\//;
 
 // Variables
 const applicationConfiguration = {};
@@ -116,7 +118,7 @@ class FsWrapper {
 
 	// Returns a Uri of fwFolderUri with the specified path segment
 	fwFolderUriWithPathSegment (pathSegment) {
-		// Fix path issues on Windows
+		// Fix drive letter issues on Windows
 		let posixPathSegment = posixPath(pathSegment);
 		if (driveLetterRe.test(posixPathSegment)) {
 			// eslint-disable-next-line unicorn/prefer-ternary
@@ -130,6 +132,11 @@ class FsWrapper {
 				// Folder path does not start with Windows drive letter, remove it
 				posixPathSegment = posixPathSegment.replace(driveLetterRe, "/");
 			}
+		}
+		// Fix network share issues on Windows (possibly in addition to drive letter issues)
+		if (networkShareRe.test(this.fwFolderUri.fsPath)) {
+			// Path segment has the computer name prefixed, remove it
+			posixPathSegment = posixPathSegment.replace(firstSegmentRe, "/");
 		}
 		// Return consistently-formatted Uri with specified path
 		return this.fwFolderUri.with({"path": posixPathSegment});
