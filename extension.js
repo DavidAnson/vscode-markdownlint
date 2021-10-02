@@ -27,6 +27,7 @@ const markdownSchemeUntitled = "untitled";
 const markdownSchemesToIgnore = new Set([
 	// Used by GitHub.vscode-pull-request-github
 	"comment",
+	"newIssue",
 	// Used by Code's "Source Control" view (stores path in Uri.query)
 	"git",
 	// Used by ms-toolsai.jupyter
