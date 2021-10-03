@@ -379,6 +379,7 @@ function markdownlintWrapper (document) {
 			[contents]: {
 				[name]: text
 			},
+			"noErrors": true,
 			"noGlobs": true,
 			"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
 			"optionsDefault": {
