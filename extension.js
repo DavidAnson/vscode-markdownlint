@@ -160,6 +160,43 @@ class FsWrapper {
 		);
 	}
 
+	// Implements fs.readdir via vscode.workspace.fs
+	fwReaddir (pathSegment, options, callback) {
+		// eslint-disable-next-line no-param-reassign
+		callback = callback || options;
+		vscode.workspace.fs.readDirectory(
+			this.fwFolderUriWithPathSegment(pathSegment)
+		).then(
+			(namesAndTypes) => {
+				const namesOrDirents = namesAndTypes.map(
+					(nameAndType) => {
+						const [
+							name,
+							fileType
+						] = nameAndType;
+						return options.withFileTypes ?
+							{
+								/* eslint-disable multiline-ternary, no-bitwise */
+								"isBlockDevice": FsWrapper.fwFalse,
+								"isCharacterDevice": FsWrapper.fwFalse,
+								"isDirectory": (fileType & vscode.FileType.Directory) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
+								"isFIFO": FsWrapper.fwFalse,
+								"isFile": (fileType & vscode.FileType.File) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
+								"isSocket": FsWrapper.fwFalse,
+								"isSymbolicLink":
+									(fileType & vscode.FileType.SymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
+								/* eslint-enable multiline-ternary, no-bitwise */
+								name
+							} :
+							name;
+					}
+				);
+				callback(null, namesOrDirents);
+			},
+			callback
+		);
+	}
+
 	// Implements fs.readFile via vscode.workspace.fs
 	fwReadFile (pathSegment, options, callback) {
 		// eslint-disable-next-line no-param-reassign
@@ -201,9 +238,11 @@ class FsWrapper {
 	constructor (folderUri) {
 		this.fwFolderUri = folderUri;
 		const access = this.fwAccess.bind(this);
+		const readdir = this.fwReaddir.bind(this);
 		const readFile = this.fwReadFile.bind(this);
 		const stat = this.fwStat.bind(this);
 		this.access = access;
+		this.readdir = readdir;
 		this.readFile = readFile;
 		this.stat = stat;
 		this.lstat = stat;
