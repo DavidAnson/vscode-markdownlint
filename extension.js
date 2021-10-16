@@ -30,6 +30,8 @@ const markdownSchemesToIgnore = new Set([
 	"newIssue",
 	// Used by Code's "Source Control" view (stores path in Uri.query)
 	"git",
+	// Used by johnstoncode.svn-scm (stores path in Uri.query)
+	"svn",
 	// Used by ms-toolsai.jupyter
 	"vscode-notebook-cell"
 ]);
