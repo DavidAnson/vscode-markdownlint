@@ -26,6 +26,7 @@
         "max-lines": "off",
         "max-lines-per-function": "off",
         "max-statements": "off",
+        "multiline-comment-style": ["error", "separate-lines"],
         "no-extra-parens": "off",
         "no-magic-numbers": "off",
         "no-promise-executor-return": "off",

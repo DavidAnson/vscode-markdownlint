@@ -83,8 +83,11 @@ const throttle = {
 
 // Escapes all RegExp special characters recognized by fast-glob
 function escapeGlobPattern (glob) {
+	// Only escape characters in basename because fast-glob assumes dirname is exact
 	// https://github.com/mrmlnc/fast-glob#advanced-syntax
-	return glob.replace(/[$()*+?[\]^]/g, "\\$&");
+	const dirname = path.posix.dirname(glob);
+	const basename = path.posix.basename(glob);
+	return path.posix.join(dirname, basename.replace(/[$()*+?[\]^]/g, "\\$&"));
 }
 
 // Converts to a POSIX-style path
@@ -399,6 +402,8 @@ function markdownlintWrapper (document) {
 		return markdownlintCli2(parameters)
 			.catch((error) => outputLine("ERROR: Exception while linting with markdownlint-cli2:\n" + error.stack, true))
 			.then(() => results);
+		// If necessary some day to filter results by matching file name...
+		// .then(() => results.filter((result) => isSchemeUntitled || (result.fileName === path.posix.relative(directory, name))))
 	}
 	// Else invoke markdownlint (don't use markdownlint.promises.markdownlint which is invalid in web worker context)
 	const options = {
