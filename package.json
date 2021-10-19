@@ -100,7 +100,7 @@
 				},
 				{
 					"command": "markdownlint.openConfigFile",
-					"when": "workbenchState != empty && resourceScheme == file"
+					"when": "workbenchState != empty"
 				}
 			]
 		},
