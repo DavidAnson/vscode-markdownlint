@@ -138,6 +138,21 @@
 				]
 			}
 		],
+		"problemMatchers": [
+			{
+				"name": "markdownlint",
+				"owner": "markdownlint",
+				"fileLocation": "relative",
+				"pattern": {
+					"regexp": "^([^:]+):(\\d+)(?::(\\d+))?\\s(\\S+)\\s(.+)$",
+					"file": 1,
+					"line": 2,
+					"column": 3,
+					"message": 5,
+					"code": 4
+				}
+			}
+		],
 		"snippets": [
 			{
 				"language": "markdown",
