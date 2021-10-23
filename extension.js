@@ -53,8 +53,11 @@ const fixAllCommandTitle = `Fix all supported ${extensionDisplayName} violations
 const fixAllCommandName = "markdownlint.fixAll";
 const openConfigFileCommandName = "markdownlint.openConfigFile";
 const toggleLintingCommandName = "markdownlint.toggleLinting";
-const clickForConfigureInfo = `Information about configuring ${extensionDisplayName} rules`;
+const lintAllTaskName = "Lint all Markdown files in this workspace";
+const problemMatcherName = `$${extensionDisplayName}`;
+const clickForConfigureInfo = `Details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
+const errorExceptionPrefix = "ERROR: Exception while linting with markdownlint-cli2:\n";
 const openCommand = "vscode.open";
 const sectionConfig = "config";
 const sectionCustomRules = "customRules";
@@ -253,6 +256,37 @@ class FsWrapper {
 	}
 }
 
+// A VS Code Pseudoterminal for linting a workspace and emitting the results
+class LintWorkspacePseudoterminal {
+	constructor () {
+		this.writeEmitter = new vscode.EventEmitter();
+		this.closeEmitter = new vscode.EventEmitter();
+	}
+
+	get onDidWrite () {
+		return this.writeEmitter.event;
+	}
+
+	get onDidClose () {
+		return this.closeEmitter.event;
+	}
+
+	open () {
+		const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
+		const logString = (message) => this.writeEmitter.fire(
+			`${message.split(markdownlintRuleHelpers.newLineRe).join("\r\n")}\r\n`
+		);
+		lintWorkspace(logString)
+			.finally(() => this.close());
+	}
+
+	close () {
+		this.writeEmitter.dispose();
+		this.closeEmitter.fire();
+		this.closeEmitter.dispose();
+	}
+}
+
 // Writes date and message to the output channel
 function outputLine (message, show) {
 	const datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
@@ -374,13 +408,9 @@ function getCustomRules (configuration) {
 	return customRules;
 }
 
-// Wraps getting options and calling into markdownlint-cli2
-function markdownlintWrapper (document) {
-	// Load user/workspace configuration
-	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-	const config = getConfig(configuration, document.uri);
-	const text = document.getText();
-	const markdownItPlugins = [
+// Gets the default markdown-it plugins for markdownlint-cli2
+function getDefaultMarkdownItPlugins () {
+	return [
 		[
 			require("markdown-it-texmath"),
 			{
@@ -390,6 +420,29 @@ function markdownlintWrapper (document) {
 			}
 		]
 	];
+}
+// Gets the value of the optionsDefault parameter to markdownlint-cli2
+function getOptionsDefault (workspaceConfiguration, config) {
+	return {
+		"config": config || getConfig(workspaceConfiguration),
+		"customRules": getCustomRules(workspaceConfiguration),
+		"markdownItPlugins": getDefaultMarkdownItPlugins()
+	};
+}
+
+// Gets the value of the optionsOverride parameter to markdownlint-cli2
+function getOptionsOverride () {
+	return {
+		"fix": false
+	};
+}
+
+// Wraps getting options and calling into markdownlint-cli2
+function markdownlintWrapper (document) {
+	// Load user/workspace configuration
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
+	const config = getConfig(configuration, document.uri);
+	const text = document.getText();
 	if (nodeModulesAvailable) {
 		// Prepare markdownlint-cli2 parameters
 		const isSchemeFile = document.uri.scheme === markdownSchemeFile;
@@ -426,20 +479,16 @@ function markdownlintWrapper (document) {
 			"noErrors": true,
 			"noGlobs": true,
 			"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
-			"optionsDefault": {
-				config,
-				"customRules": getCustomRules(configuration),
-				markdownItPlugins
-			},
+			"optionsDefault": getOptionsDefault(configuration, config),
 			"optionsOverride": {
-				"fix": false,
+				...getOptionsOverride(),
 				"outputFormatters": [ [ captureResultsFormatter ] ]
 			}
 		};
 		// Invoke markdownlint-cli2
 		const {"main": markdownlintCli2} = require("markdownlint-cli2");
 		return markdownlintCli2(parameters)
-			.catch((error) => outputLine("ERROR: Exception while linting with markdownlint-cli2:\n" + error.stack, true))
+			.catch((error) => outputLine(errorExceptionPrefix + error.stack, true))
 			.then(() => results);
 		// If necessary some day to filter results by matching file name...
 		// .then(() => results.filter((result) => isSchemeUntitled || (result.fileName === path.posix.relative(directory, name))))
@@ -450,7 +499,7 @@ function markdownlintWrapper (document) {
 			text
 		},
 		config,
-		markdownItPlugins,
+		"markdownItPlugins": getDefaultMarkdownItPlugins(),
 		"resultVersion": 3
 	};
 	return pify(markdownlint)(options)
@@ -464,6 +513,37 @@ function isMarkdownDocument (document) {
 		(document.languageId === markdownLanguageId) &&
 		!markdownSchemesToIgnore.has(document.uri.scheme)
 	);
+}
+
+// Lints Markdown files in the workspace folder tree
+function lintWorkspace (logString) {
+	const workspaceFolderUri = getWorkspaceFolderUri();
+	if (workspaceFolderUri && nodeModulesAvailable) {
+		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
+		const isSchemeFile = workspaceFolderUri.scheme === markdownSchemeFile;
+		const parameters = {
+			"fs": new FsWrapper(workspaceFolderUri),
+			"argv": [
+				// https://github.com/microsoft/vscode/blob/main/extensions/markdown-basics/package.json
+				"**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
+				// https://github.com/microsoft/vscode/blob/main/src/vs/workbench/contrib/search/browser/search.contribution.ts
+				"!**/node_modules",
+				"!**/bower_components",
+				// Additional globs
+				"!**/.git"
+			],
+			"directory": posixPath(workspaceFolderUri.fsPath),
+			"logMessage": logString,
+			"logError": logString,
+			"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
+			"optionsDefault": getOptionsDefault(configuration),
+			"optionsOverride": getOptionsOverride()
+		};
+		const {"main": markdownlintCli2} = require("markdownlint-cli2");
+		return markdownlintCli2(parameters)
+			.catch((error) => logString(errorExceptionPrefix + error.stack));
+	}
+	return Promise.reject(new Error("No workspace folder or Node modules unavailable."));
 }
 
 // Lints a Markdown document
@@ -856,6 +936,29 @@ function activate (context) {
 			{"language": markdownLanguageId},
 			codeActionProvider,
 			codeActionProviderMetadata
+		)
+	);
+
+	// Register Tasks
+	const lintWorkspaceExecution = new vscode.CustomExecution(
+		() => Promise.resolve(new LintWorkspacePseudoterminal())
+	);
+	const lintWorkspaceTask = new vscode.Task(
+		{"type": extensionDisplayName},
+		vscode.TaskScope.Workspace,
+		lintAllTaskName,
+		extensionDisplayName,
+		lintWorkspaceExecution,
+		problemMatcherName
+	);
+	context.subscriptions.push(
+		vscode.tasks.registerTaskProvider(
+			extensionDisplayName,
+			{
+				"provideTasks": () => [ lintWorkspaceTask ],
+				// eslint-disable-next-line unicorn/no-useless-undefined
+				"resolveTask": () => undefined
+			}
 		)
 	);
 

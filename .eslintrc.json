@@ -21,6 +21,7 @@
         "global-require": "off",
         "indent": ["error", "tab"],
         "linebreak-style": "off",
+        "max-classes-per-file": "off",
         "max-depth": ["error", 6],
         "max-len": ["error", 130],
         "max-lines": "off",
