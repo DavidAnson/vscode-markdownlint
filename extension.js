@@ -49,11 +49,12 @@ const defaultConfig = {
 const clickForInfo = "More information about ";
 const clickToFix = "Fix this violation of ";
 const fixLineCommandName = "markdownlint.fixLine";
-const fixAllCommandTitle = `Fix all supported ${extensionDisplayName} violations in this document`;
+const fixAllCommandTitle = `Fix all supported ${extensionDisplayName} violations in the document`;
 const fixAllCommandName = "markdownlint.fixAll";
+const lintWorkspaceCommandName = "markdownlint.lintWorkspace";
 const openConfigFileCommandName = "markdownlint.openConfigFile";
 const toggleLintingCommandName = "markdownlint.toggleLinting";
-const lintAllTaskName = "Lint all Markdown files in this workspace";
+const lintAllTaskName = `Lint all Markdown files in the workspace with ${extensionDisplayName}`;
 const problemMatcherName = `$${extensionDisplayName}`;
 const clickForConfigureInfo = `Details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
@@ -546,6 +547,17 @@ function lintWorkspace (logString) {
 	return Promise.reject(new Error("No workspace folder or Node modules unavailable."));
 }
 
+// Runs the lintWorkspace task to lint all Markdown files in the workspace
+function lintWorkspaceViaTask () {
+	return vscode.tasks.fetchTasks({"type": extensionDisplayName})
+		.then((tasks) => {
+			const lintWorkspaceTask = tasks.find((task) => task.name === lintAllTaskName);
+			return lintWorkspaceTask ?
+				vscode.tasks.executeTask(lintWorkspaceTask) :
+				Promise.reject(new Error("Unable to fetch task."));
+		});
+}
+
 // Lints a Markdown document
 function lint (document) {
 	if (!lintingEnabled || !isMarkdownDocument(document)) {
@@ -966,6 +978,7 @@ function activate (context) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand(fixAllCommandName, fixAll),
 		vscode.commands.registerCommand(fixLineCommandName, fixLine),
+		vscode.commands.registerCommand(lintWorkspaceCommandName, lintWorkspaceViaTask),
 		vscode.commands.registerCommand(openConfigFileCommandName, openConfigFile),
 		vscode.commands.registerCommand(toggleLintingCommandName, toggleLinting)
 	);

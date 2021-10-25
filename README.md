@@ -122,6 +122,11 @@ To automatically fix these violations when saving a Markdown document, [configur
 
 Automatically-applied fixes can be reverted by `Edit|Undo` or `Ctrl+Z`/`⌘Z`.
 
+To lint all Markdown files in the current workspace, run the `markdownlint.lintWorkspace` command (from the Command Palette or by binding it to a keyboard shortcut).
+This will use [`markdownlint-cli2`](https://github.com/DavidAnson/markdownlint-cli2), the same engine that powers the extension, to lint all files and output the results to a new terminal in the "Terminal" panel.
+Results will also appear in the "Problems" panel (`Ctrl+Shift+M`/`⇧⌘M`) because of the [problem matcher](https://code.visualstudio.com/docs/editor/tasks#_defining-a-problem-matcher) included with the extension.
+Entries in the "Problems" panel can be clicked to open the corresponding file in the editor.
+
 To temporarily disable linting of Markdown documents, run the `markdownlint.toggleLinting` command (from the Command Palette or by binding it to a keyboard shortcut). To re-enable linting, run the `markdownlint.toggleLinting` command again.
 
 > **Note**: The effects of the `markdownlint.toggleLinting` command are reset when a new workspace is opened; linting defaults to enabled.

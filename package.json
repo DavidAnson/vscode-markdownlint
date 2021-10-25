@@ -64,8 +64,9 @@
 	"activationEvents": [
 		"onLanguage:markdown",
 		"onCommand:markdownlint.fixAll",
-		"onCommand:markdownlint.fixLine",
-		"onCommand:markdownlint.openConfigFile"
+		"onCommand:markdownlint.lintWorkspace",
+		"onCommand:markdownlint.openConfigFile",
+		"onCommand:markdownlint.toggleLinting"
 	],
 	"capabilities": {
 		"untrustedWorkspaces": {
@@ -84,8 +85,12 @@
 				"title": "Fix all supported markdownlint violations in the document"
 			},
 			{
+				"command": "markdownlint.lintWorkspace",
+				"title": "Lint all Markdown files in the workspace with markdownlint"
+			},
+			{
 				"command": "markdownlint.openConfigFile",
-				"title": "Create or open the markdownlint configuration file for the folder"
+				"title": "Create or open the markdownlint configuration file for the workspace"
 			},
 			{
 				"command": "markdownlint.toggleLinting",
@@ -97,6 +102,10 @@
 				{
 					"command": "markdownlint.fixAll",
 					"when": "editorLangId == markdown"
+				},
+				{
+					"command": "markdownlint.lintWorkspace",
+					"when": "workbenchState != empty"
 				},
 				{
 					"command": "markdownlint.openConfigFile",
