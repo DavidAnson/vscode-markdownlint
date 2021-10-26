@@ -16,6 +16,7 @@
 			"### markdownlint.run",
 			"### markdownlint.ignore",
 			"### markdownlint.customRules",
+			"### markdownlint.lintWorkspaceGlobs",
 			"## Suppress",
 			"## Snippets",
 			"## Security",
@@ -33,6 +34,7 @@
 			"Node.js",
 			"Shift",
 			"Visual Studio Code"
-		]
+		],
+		"code_blocks": false
 	}
 }

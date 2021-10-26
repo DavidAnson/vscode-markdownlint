@@ -126,6 +126,7 @@ To lint all Markdown files in the current workspace, run the `markdownlint.lintW
 This will use [`markdownlint-cli2`](https://github.com/DavidAnson/markdownlint-cli2), the same engine that powers the extension, to lint all files and output the results to a new terminal in the "Terminal" panel.
 Results will also appear in the "Problems" panel (`Ctrl+Shift+M`/`⇧⌘M`) because of the [problem matcher](https://code.visualstudio.com/docs/editor/tasks#_defining-a-problem-matcher) included with the extension.
 Entries in the "Problems" panel can be clicked to open the corresponding file in the editor.
+To customize the files that are included/excluded when linting a workspace, configure the `markdownlint.lintWorkspaceGlobs` setting (see below) at workspace or user scope.
 
 To temporarily disable linting of Markdown documents, run the `markdownlint.toggleLinting` command (from the Command Palette or by binding it to a keyboard shortcut). To re-enable linting, run the `markdownlint.toggleLinting` command again.
 
@@ -293,6 +294,25 @@ An example of Code's workspace settings for custom rules might look like the fol
 For information about authoring custom rules, see [the `markdownlint` documentation for custom rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md).
 
 > **Note**: Custom rules can also be specified (in a way other tools will recognize) via the `customRules` property in `.markdownlint-cli2.{jsonc,yaml,js}`.
+
+### markdownlint.lintWorkspaceGlobs
+
+The standard globs used when linting a workspace should match VS Code's default concept of "Markdown files that matter":
+
+```json
+[
+    // Source: https://github.com/microsoft/vscode/blob/main/extensions/markdown-basics/package.json
+    "**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
+    // Source: https://github.com/microsoft/vscode/blob/main/src/vs/workbench/contrib/search/browser/search.contribution.ts
+    "!**/node_modules",
+    "!**/bower_components",
+    // Additional exclusions
+    "!**/.git"
+]
+```
+
+This list can be customized at workspace or user scope to include and exclude additional files and directories.
+For more information about syntax, see the ["Command Line" section of the markdownlint-cli2 documentation](https://github.com/DavidAnson/markdownlint-cli2#command-line).
 
 ## Suppress
 

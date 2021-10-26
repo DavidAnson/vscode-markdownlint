@@ -64,6 +64,7 @@ const sectionConfig = "config";
 const sectionCustomRules = "customRules";
 const sectionFocusMode = "focusMode";
 const sectionIgnore = "ignore";
+const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
 const sectionRun = "run";
 const applicationConfigurationSections = [ sectionFocusMode ];
 const throttleDuration = 500;
@@ -524,15 +525,7 @@ function lintWorkspace (logString) {
 		const isSchemeFile = workspaceFolderUri.scheme === markdownSchemeFile;
 		const parameters = {
 			"fs": new FsWrapper(workspaceFolderUri),
-			"argv": [
-				// https://github.com/microsoft/vscode/blob/main/extensions/markdown-basics/package.json
-				"**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
-				// https://github.com/microsoft/vscode/blob/main/src/vs/workbench/contrib/search/browser/search.contribution.ts
-				"!**/node_modules",
-				"!**/bower_components",
-				// Additional globs
-				"!**/.git"
-			],
+			"argv": configuration.get(sectionLintWorkspaceGlobs),
 			"directory": posixPath(workspaceFolderUri.fsPath),
 			"logMessage": logString,
 			"logError": logString,
@@ -963,6 +956,9 @@ function activate (context) {
 		lintWorkspaceExecution,
 		problemMatcherName
 	);
+	lintWorkspaceTask.presentationOptions = {
+		"showReuseMessage": false
+	};
 	context.subscriptions.push(
 		vscode.tasks.registerTaskProvider(
 			extensionDisplayName,

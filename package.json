@@ -216,6 +216,20 @@
 					},
 					"default": ".markdownlintignore"
 				},
+				"markdownlint.lintWorkspaceGlobs": {
+					"description": "Array of glob expressions to include or ignore when linting the workspace",
+					"scope": "resource",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						"**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
+						"!**/node_modules",
+						"!**/bower_components",
+						"!**/.git"
+					]
+				},
 				"markdownlint.run": {
 					"description": "Run the linter on save (onSave) or on type (onType)",
 					"scope": "resource",
