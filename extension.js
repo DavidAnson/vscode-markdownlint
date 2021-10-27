@@ -569,11 +569,16 @@ function lint (document) {
 				for (const result of results) {
 					// Create Diagnostics
 					const lineNumber = result.lineNumber;
+					const focusMode = applicationConfiguration[sectionFocusMode];
+					const focusModeRange = (!Number.isInteger(focusMode) || (focusMode < 0)) ?
+						0 :
+						focusMode;
 					if (
-						!applicationConfiguration[sectionFocusMode] ||
+						(applicationConfiguration[sectionFocusMode] === false) ||
 						!activeTextEditor ||
 						(activeTextEditor.document !== document) ||
-						(activeTextEditor.selection.active.line !== (lineNumber - 1))
+						(activeTextEditor.selection.active.line < (lineNumber - focusModeRange - 1)) ||
+						(activeTextEditor.selection.active.line > (lineNumber + focusModeRange - 1))
 					) {
 						const ruleName = result.ruleNames[0];
 						const ruleDescription = result.ruleDescription;
@@ -848,7 +853,7 @@ function getApplicationConfiguration () {
 
 // Handles the onDidChangeActiveTextEditor event
 function didChangeActiveTextEditor () {
-	if (applicationConfiguration[sectionFocusMode]) {
+	if (applicationConfiguration[sectionFocusMode] !== false) {
 		lintVisibleFiles();
 	}
 }
@@ -856,7 +861,10 @@ function didChangeActiveTextEditor () {
 // Handles the onDidChangeTextEditorSelection event
 function didChangeTextEditorSelection (change) {
 	const document = change.textEditor.document;
-	if (isMarkdownDocument(document) && applicationConfiguration[sectionFocusMode]) {
+	if (
+		isMarkdownDocument(document) &&
+		(applicationConfiguration[sectionFocusMode] !== false)
+	) {
 		requestLint(document);
 	}
 }

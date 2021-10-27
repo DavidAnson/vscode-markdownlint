@@ -215,6 +215,17 @@ If you find this distracting, linting can be configured to ignore issues on the 
 }
 ```
 
+To ignore issues on the *N* lines above and below the cursor, set `focusMode` to a positive integer representing the number of lines to ignore in each direction:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.focusMode": 2
+}
+```
+
+The value of `2` in the example above will ignore issues on the line with the cursor, the 2 lines above it, and the 2 lines below it.
+
 ### markdownlint.run
 
 By default, linting is performed as you type or edit a document. Linting is fast and efficient and should not interfere with typical workflows.

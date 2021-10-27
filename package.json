@@ -199,9 +199,12 @@
 					"default": []
 				},
 				"markdownlint.focusMode": {
-					"description": "Makes it easier to focus while typing by hiding violations on the current line",
+					"description": "Makes it easier to focus while typing by hiding issues on or near the current line",
 					"scope": "application",
-					"type": "boolean",
+					"type": [
+						"boolean",
+						"integer"
+					],
 					"default": false
 				},
 				"markdownlint.ignore": {
