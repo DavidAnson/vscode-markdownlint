@@ -176,6 +176,7 @@
         "unicorn/require-number-to-fixed-digits-argument": "error",
         "unicorn/require-post-message-target-origin": "error",
         "unicorn/string-content": "error",
+        "unicorn/template-indent": "error",
         "unicorn/throw-new-error": "error"
     }
 }
