@@ -6,6 +6,7 @@ node_modules
 .markdownlint.json
 .npmrc
 .vscodeignore
+CONTRIBUTING.md
 extension.js
 generate-config-schema.js
 jsconfig.json
