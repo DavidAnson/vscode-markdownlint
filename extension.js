@@ -86,15 +86,6 @@ const throttle = {
 	"timeout": null
 };
 
-// Escapes all RegExp special characters recognized by fast-glob
-function escapeGlobPattern (glob) {
-	// Only escape characters in basename because fast-glob assumes dirname is exact
-	// https://github.com/mrmlnc/fast-glob#advanced-syntax
-	const dirname = path.posix.dirname(glob);
-	const basename = path.posix.basename(glob);
-	return path.posix.join(dirname, basename.replace(/[$()*+?[\]^]/g, "\\$&"));
-}
-
 // Converts to a POSIX-style path
 // eslint-disable-next-line id-length
 function posixPath (p) {
@@ -462,7 +453,7 @@ function markdownlintWrapper (document) {
 				path.posix.dirname(name));
 		const argv = isSchemeUntitled ?
 			[] :
-			[ escapeGlobPattern(name) ];
+			[ `:${name}` ];
 		const contents = isSchemeUntitled ?
 			"nonFileContents" :
 			"fileContents";
