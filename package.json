@@ -231,8 +231,9 @@
 					},
 					"default": [
 						"**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
-						"!**/node_modules",
 						"!**/bower_components",
+						"!**/node_modules",
+						"!**/vendor",
 						"!**/.git"
 					]
 				},
