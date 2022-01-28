@@ -110,9 +110,23 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD044 *proper-names*
 * MD047 *single-trailing-newline*
 
-All violations of the above rules in the current document can be fixed at once by running the `markdownlint.fixAll` command, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P`/`⇧⌘P` then search for "markdownlint") or by [binding the command to a keyboard shortcut](https://code.visualstudio.com/docs/getstarted/keybindings).
+## Commands
 
-To automatically fix these violations when saving a Markdown document, [configure Visual Studio Code's `editor.codeActionsOnSave` setting](https://code.visualstudio.com/docs/getstarted/settings) like so:
+### Fix
+
+All of a document's violations of the above rules can be fixed automatically.
+
+`markdownlint` registers itself as a source code formatter for Markdown files and can be invoked by the `Format Document`/`editor.action.formatDocument` command, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P`/`⇧⌘P`) or via the default key binding `Shift+Alt+F`/`⇧⌥F`.
+To automatically format a Markdown document when saving it, [configure Visual Studio Code's `editor.formatOnSave` setting](https://code.visualstudio.com/docs/getstarted/settings) like so:
+
+```json
+"[markdown]": {
+    "editor.formatOnSave": true,
+},
+```
+
+`markdownlint` also contributes the `markdownlint.fixAll` command which fixes a document's violations in one step and can be run from the Command Palette or by [binding the command to a keyboard shortcut](https://code.visualstudio.com/docs/getstarted/keybindings).
+To automatically fix violations when saving a Markdown document, configure Visual Studio Code's `editor.codeActionsOnSave` setting like so:
 
 ```json
 "editor.codeActionsOnSave": {
@@ -120,13 +134,17 @@ To automatically fix these violations when saving a Markdown document, [configur
 }
 ```
 
-Automatically-applied fixes can be reverted by `Edit|Undo` or `Ctrl+Z`/`⌘Z`.
+Automatically-applied fixes from either method can be reverted by `Edit|Undo` or `Ctrl+Z`/`⌘Z`.
+
+### Workspace
 
 To lint all Markdown files in the current workspace, run the `markdownlint.lintWorkspace` command (from the Command Palette or by binding it to a keyboard shortcut).
 This will use [`markdownlint-cli2`](https://github.com/DavidAnson/markdownlint-cli2), the same engine that powers the extension, to lint all files and output the results to a new terminal in the "Terminal" panel.
 Results will also appear in the "Problems" panel (`Ctrl+Shift+M`/`⇧⌘M`) because of the [problem matcher](https://code.visualstudio.com/docs/editor/tasks#_defining-a-problem-matcher) included with the extension.
 Entries in the "Problems" panel can be clicked to open the corresponding file in the editor.
 To customize the files that are included/excluded when linting a workspace, configure the `markdownlint.lintWorkspaceGlobs` setting (see below) at workspace or user scope.
+
+### Disable
 
 To temporarily disable linting of Markdown documents, run the `markdownlint.toggleLinting` command (from the Command Palette or by binding it to a keyboard shortcut). To re-enable linting, run the `markdownlint.toggleLinting` command again.
 

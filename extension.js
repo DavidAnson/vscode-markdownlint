@@ -721,12 +721,12 @@ function fixAll () {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
-			const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
 			const document = editor.document;
 			if (isMarkdownDocument(document)) {
-				const text = document.getText();
 				return markdownlintWrapper(document)
 					.then((errors) => {
+						const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
+						const text = document.getText();
 						const fixedText = markdownlintRuleHelpers.applyFixes(text, errors);
 						return (text === fixedText) ?
 							null :
@@ -738,6 +738,27 @@ function fixAll () {
 					})
 					.then(resolve, reject);
 			}
+		}
+		return resolve();
+	});
+}
+
+// Formats the document (applies fixes)
+function formatDocument (document) {
+	return new Promise((resolve, reject) => {
+		if (isMarkdownDocument(document)) {
+			return markdownlintWrapper(document)
+				.then((errors) => {
+					const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
+					const text = document.getText();
+					const fixedText = markdownlintRuleHelpers.applyFixes(text, errors);
+					const start = document.lineAt(0).range.start;
+					const end = document.lineAt(document.lineCount - 1).range.end;
+					return (text === fixedText) ?
+						[] :
+						[ vscode.TextEdit.replace(new vscode.Range(start, end), fixedText) ];
+				})
+				.then(resolve, reject);
 		}
 		return resolve();
 	});
@@ -928,6 +949,7 @@ function activate (context) {
 	);
 
 	// Register CodeActionsProvider
+	const documentSelector = {"language": markdownLanguageId};
 	const codeActionProvider = {
 		provideCodeActions
 	};
@@ -939,13 +961,24 @@ function activate (context) {
 	};
 	context.subscriptions.push(
 		vscode.languages.registerCodeActionsProvider(
-			{"language": markdownLanguageId},
+			documentSelector,
 			codeActionProvider,
 			codeActionProviderMetadata
 		)
 	);
 
-	// Register Tasks
+	// Register DocumentFormattingEditProvider
+	const documentFormattingEditProvider = {
+		"provideDocumentFormattingEdits": formatDocument
+	};
+	context.subscriptions.push(
+		vscode.languages.registerDocumentFormattingEditProvider(
+			documentSelector,
+			documentFormattingEditProvider
+		)
+	);
+
+	// Register TaskProvider
 	const lintWorkspaceExecution = new vscode.CustomExecution(
 		() => Promise.resolve(new LintWorkspacePseudoterminal())
 	);
