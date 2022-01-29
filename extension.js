@@ -743,15 +743,24 @@ function fixAll () {
 	});
 }
 
-// Formats the document (applies fixes)
-function formatDocument (document) {
+// Formats a range of the document (applying fixes)
+function formatDocument (document, range) {
 	return new Promise((resolve, reject) => {
 		if (isMarkdownDocument(document)) {
 			return markdownlintWrapper(document)
 				.then((errors) => {
+					const rangeErrors = errors.filter((error) => {
+						const {fixInfo} = error;
+						if (fixInfo) {
+							// eslint-disable-next-line unicorn/consistent-destructuring
+							const line = error.lineNumber - 1;
+							return ((range.start.line <= line) && (line <= range.end.line));
+						}
+						return false;
+					});
 					const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
 					const text = document.getText();
-					const fixedText = markdownlintRuleHelpers.applyFixes(text, errors);
+					const fixedText = markdownlintRuleHelpers.applyFixes(text, rangeErrors);
 					const start = document.lineAt(0).range.start;
 					const end = document.lineAt(document.lineCount - 1).range.end;
 					return (text === fixedText) ?
@@ -967,14 +976,14 @@ function activate (context) {
 		)
 	);
 
-	// Register DocumentFormattingEditProvider
-	const documentFormattingEditProvider = {
-		"provideDocumentFormattingEdits": formatDocument
+	// Register DocumentRangeFormattingEditProvider
+	const documentRangeFormattingEditProvider = {
+		"provideDocumentRangeFormattingEdits": formatDocument
 	};
 	context.subscriptions.push(
-		vscode.languages.registerDocumentFormattingEditProvider(
+		vscode.languages.registerDocumentRangeFormattingEditProvider(
 			documentSelector,
-			documentFormattingEditProvider
+			documentRangeFormattingEditProvider
 		)
 	);
 
