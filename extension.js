@@ -447,7 +447,6 @@ function markdownlintWrapper (document) {
 		const fs = isSchemeUntitled ?
 			null :
 			new FsWrapper(workspaceFolderUri);
-		// eslint-disable-next-line no-nested-ternary
 		const directory = isSchemeUntitled ?
 			null :
 			(workspaceFolderUri ?
