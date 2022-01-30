@@ -249,6 +249,8 @@ To ignore issues on the *N* lines above and below the cursor, set `focusMode` to
 
 The value of `2` in the example above will ignore issues on the line with the cursor, the 2 lines above it, and the 2 lines below it.
 
+> **Note**: This is an application-level setting and is only valid in user (not workspace) settings.
+
 ### markdownlint.run
 
 By default, linting is performed as you type or edit a document. Linting is fast and efficient and should not interfere with typical workflows.
