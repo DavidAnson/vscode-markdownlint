@@ -78,6 +78,8 @@ When editing a Markdown file in Code with `markdownlint` installed, any lines th
 * **[MD046](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md046)** *code-block-style* - Code block style
 * **[MD047](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md047)** *single-trailing-newline* - Files should end with a single newline character
 * **[MD048](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md048)** *code-fence-style* - Code fence style
+* **[MD049](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md049)** *emphasis-style* - Emphasis style should be consistent
+* **[MD050](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md050)** *strong-style* - Strong style should be consistent
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md) for more details.
 
@@ -109,6 +111,8 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD039 *no-space-in-links*
 * MD044 *proper-names*
 * MD047 *single-trailing-newline*
+* MD049 *emphasis-style*
+* MD050 *strong-style*
 
 ## Commands
 
