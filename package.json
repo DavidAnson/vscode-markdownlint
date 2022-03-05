@@ -142,14 +142,6 @@
 				"url": "./markdownlint-cli2-config-schema.json"
 			}
 		],
-		"languages": [
-			{
-				"id": "jsonc",
-				"filenames": [
-					".markdownlintrc"
-				]
-			}
-		],
 		"problemMatchers": [
 			{
 				"name": "markdownlint",
