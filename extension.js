@@ -299,7 +299,8 @@ function getConfig (configuration, uri) {
 		const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
 		const workspaceFolderUri = getWorkspaceFolderUri(uri);
 		const useHomedir =
-			Boolean(userWorkspaceConfigMetadata.globalValue) ||
+			(userWorkspaceConfigMetadata.globalValue &&
+				(userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
 			!workspaceFolderUri ||
 			(workspaceFolderUri.scheme !== markdownSchemeFile);
 		const extendBase = useHomedir ?
