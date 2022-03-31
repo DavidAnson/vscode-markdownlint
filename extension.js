@@ -22,20 +22,15 @@ const configFileNames = [
 ];
 const ignoreFileName = ".markdownlintignore";
 const markdownLanguageId = "markdown";
-const markdownSchemeFile = "file";
-const markdownSchemeUntitled = "untitled";
-const markdownSchemesToIgnore = new Set([
-	// Used by GitHub.vscode-pull-request-github
-	"comment",
-	"newIssue",
-	// Used by Code's "Source Control" view (stores path in Uri.query)
-	"git",
-	// Used by eamodio.gitlens
-	"gitlens",
-	// Used by johnstoncode.svn-scm (stores path in Uri.query)
-	"svn",
-	// Used by ms-toolsai.jupyter
-	"vscode-notebook-cell"
+const schemeFile = "file";
+const schemeUntitled = "untitled";
+const schemeFileSystemLike = new Set([
+	// Standard file system workspace
+	schemeFile,
+	// Used by extensions:
+	//   GitHub Repositories (github.remotehub)
+	//   Remote Repositories (ms-vscode.remote-repositories)
+	"vscode-vfs"
 ]);
 const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
@@ -302,7 +297,7 @@ function getConfig (configuration, uri) {
 			(userWorkspaceConfigMetadata.globalValue &&
 				(userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
 			!workspaceFolderUri ||
-			(workspaceFolderUri.scheme !== markdownSchemeFile);
+			(workspaceFolderUri.scheme !== schemeFile);
 		const extendBase = useHomedir ?
 			require("os").homedir() :
 			posixPath(workspaceFolderUri.fsPath);
@@ -441,8 +436,8 @@ function markdownlintWrapper (document) {
 	const text = document.getText();
 	if (nodeModulesAvailable) {
 		// Prepare markdownlint-cli2 parameters
-		const isSchemeFile = document.uri.scheme === markdownSchemeFile;
-		const isSchemeUntitled = document.uri.scheme === markdownSchemeUntitled;
+		const isSchemeFile = document.uri.scheme === schemeFile;
+		const isSchemeUntitled = document.uri.scheme === schemeUntitled;
 		const name = posixPath(document.uri.fsPath);
 		const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
 		const fs = isSchemeUntitled ?
@@ -506,7 +501,10 @@ function markdownlintWrapper (document) {
 function isMarkdownDocument (document) {
 	return (
 		(document.languageId === markdownLanguageId) &&
-		!markdownSchemesToIgnore.has(document.uri.scheme)
+		(
+			(document.uri.scheme === schemeUntitled) ||
+			schemeFileSystemLike.has(document.uri.scheme)
+		)
 	);
 }
 
@@ -515,7 +513,7 @@ function lintWorkspace (logString) {
 	const workspaceFolderUri = getWorkspaceFolderUri();
 	if (workspaceFolderUri && nodeModulesAvailable) {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
-		const isSchemeFile = workspaceFolderUri.scheme === markdownSchemeFile;
+		const isSchemeFile = workspaceFolderUri.scheme === schemeFile;
 		const parameters = {
 			"fs": new FsWrapper(workspaceFolderUri),
 			"argv": configuration.get(sectionLintWorkspaceGlobs),
@@ -791,7 +789,7 @@ function openConfigFile () {
 			} else {
 				// File does not exist, create one
 				const fileUri = vscode.Uri.joinPath(workspaceFolderUri, markdownlintJson);
-				const untitledFileUri = fileUri.with({"scheme": markdownSchemeUntitled});
+				const untitledFileUri = fileUri.with({"scheme": schemeUntitled});
 				vscode.window.showTextDocument(untitledFileUri).then(
 					(editor) => {
 						editor.edit((editBuilder) => {
