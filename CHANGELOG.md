@@ -1,5 +1,6 @@
 # Changes
 
+* 0.47.0 - Miscellaneous improvements
 * 0.46.0 - New rules, document formatting, better path handling
 * 0.45.0 - Add linting for workspace
 * 0.44.0 - Support virtual file systems
