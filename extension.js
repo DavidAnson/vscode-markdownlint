@@ -22,15 +22,27 @@ const configFileNames = [
 ];
 const ignoreFileName = ".markdownlintignore";
 const markdownLanguageId = "markdown";
-const schemeFile = "file";
+// Untitled/unsaved document
 const schemeUntitled = "untitled";
-const schemeFileSystemLike = new Set([
-	// Standard file system workspace
+// Standard file system workspace
+const schemeFile = "file";
+// Used by extensions:
+//   GitHub Repositories (github.remotehub)
+//   Remote Repositories (ms-vscode.remote-repositories)
+const schemeVscodeVfs = "vscode-vfs";
+// Used by GistPad (vsls-contrib.gistfs)
+const schemeGist = "gist";
+// Schemes that are okay to lint (as part of a workspace or independently)
+const schemeSupported = new Set([
+	schemeUntitled,
 	schemeFile,
-	// Used by extensions:
-	//   GitHub Repositories (github.remotehub)
-	//   Remote Repositories (ms-vscode.remote-repositories)
-	"vscode-vfs"
+	schemeVscodeVfs,
+	schemeGist
+]);
+// Schemes that are file system-like (support probing for configuration files)
+const schemeFileSystemLike = new Set([
+	schemeFile,
+	schemeVscodeVfs
 ]);
 const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
@@ -436,22 +448,23 @@ function markdownlintWrapper (document) {
 	const text = document.getText();
 	if (nodeModulesAvailable) {
 		// Prepare markdownlint-cli2 parameters
-		const isSchemeFile = document.uri.scheme === schemeFile;
-		const isSchemeUntitled = document.uri.scheme === schemeUntitled;
+		const scheme = document.uri.scheme;
+		const isSchemeFile = scheme === schemeFile;
+		const independentDocument = !schemeFileSystemLike.has(scheme);
 		const name = posixPath(document.uri.fsPath);
 		const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
-		const fs = isSchemeUntitled ?
+		const fs = independentDocument ?
 			null :
 			new FsWrapper(workspaceFolderUri);
-		const directory = isSchemeUntitled ?
+		const directory = independentDocument ?
 			null :
 			(workspaceFolderUri ?
 				posixPath(workspaceFolderUri.fsPath) :
 				path.posix.dirname(name));
-		const argv = isSchemeUntitled ?
+		const argv = independentDocument ?
 			[] :
 			[ `:${name}` ];
-		const contents = isSchemeUntitled ?
+		const contents = independentDocument ?
 			"nonFileContents" :
 			"fileContents";
 		let results = [];
@@ -501,10 +514,7 @@ function markdownlintWrapper (document) {
 function isMarkdownDocument (document) {
 	return (
 		(document.languageId === markdownLanguageId) &&
-		(
-			(document.uri.scheme === schemeUntitled) ||
-			schemeFileSystemLike.has(document.uri.scheme)
-		)
+		schemeSupported.has(document.uri.scheme)
 	);
 }
 
