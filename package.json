@@ -26,7 +26,8 @@
 		"upgrade": "npx --yes npm-check-updates --upgrade"
 	},
 	"categories": [
-		"Linters"
+		"Linters",
+		"Formatters"
 	],
 	"engines": {
 		"node": ">=12",
