@@ -168,23 +168,6 @@
 			"title": "markdownlint",
 			"type": "object",
 			"properties": {
-				"markdownlint.blockJavaScript": {
-					"description": "Prevents running JavaScript in custom rules, markdown-it plugins, and configuration files",
-					"deprecationMessage": "Deprecated, honors VS Code's Workspace Trust setting",
-					"scope": "application",
-					"type": "boolean",
-					"default": false
-				},
-				"markdownlint.customRulesAlwaysAllow": {
-					"description": "Array of workspace paths that load custom rules without prompting",
-					"deprecationMessage": "Deprecated, see CHANGELOG.md and markdownlint.blockJavaScript",
-					"scope": "application",
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"default": []
-				},
 				"markdownlint.customRules": {
 					"description": "Array of paths for custom rules to include when linting",
 					"scope": "resource",
