@@ -336,7 +336,7 @@ For information about authoring custom rules, see [the `markdownlint` documentat
 
 The standard globs used when linting a workspace should match VS Code's default concept of "Markdown files that matter":
 
-```json
+```jsonc
 [
     // Source: https://github.com/microsoft/vscode/blob/main/extensions/markdown-basics/package.json
     "**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
