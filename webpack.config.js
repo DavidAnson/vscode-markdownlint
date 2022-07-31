@@ -3,6 +3,7 @@
 const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 
+const nodeModulePrefixRe = /^node:/u;
 const baseConfig = 	{
 	"target": "node",
 	"entry": "./extension.js",
@@ -31,7 +32,16 @@ const baseConfig = 	{
 		"node:util": "commonjs util",
 		"vscode": "commonjs vscode"
 	},
-	"plugins": [ new webpack.IgnorePlugin({"resourceRegExp": /katex/}) ]
+	"plugins": [
+		new webpack.IgnorePlugin({"resourceRegExp": /katex/}),
+		new webpack.NormalModuleReplacementPlugin(
+			nodeModulePrefixRe,
+			(resource) => {
+				const module = resource.request.replace(nodeModulePrefixRe, "");
+				resource.request = module;
+			}
+		)
+	]
 };
 const config = [
 	baseConfig,

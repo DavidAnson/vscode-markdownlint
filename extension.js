@@ -3,7 +3,7 @@
 // Minimal requires (requires that may not be needed are inlined to avoid startup cost)
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
-const path = require("path");
+const path = require("node:path");
 const pify = require("pify");
 // Node modules (like path) are not available in web worker context
 const nodeModulesAvailable = path && (Object.keys(path).length > 0);
@@ -311,7 +311,7 @@ function getConfig (configuration, uri) {
 			!workspaceFolderUri ||
 			(workspaceFolderUri.scheme !== schemeFile);
 		const extendBase = useHomedir ?
-			require("os").homedir() :
+			require("node:os").homedir() :
 			posixPath(workspaceFolderUri.fsPath);
 		const extendPath = path.resolve(extendBase, userWorkspaceConfig.extends);
 		try {
