@@ -4,7 +4,6 @@
 const vscode = require("vscode");
 const markdownlint = require("markdownlint");
 const path = require("node:path");
-const pify = require("pify");
 // Node modules (like path) are not available in web worker context
 const nodeModulesAvailable = path && (Object.keys(path).length > 0);
 
@@ -239,6 +238,45 @@ class FsWrapper {
 		);
 	}
 
+	// Implements fs.promises.access via fwAccess
+	fwAccessPromise (pathSegment, mode) {
+		return new Promise((resolve, reject) => {
+			this.fwAccess(pathSegment, mode, (error) => {
+				if (error) {
+					reject(error);
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	// Implements fs.promises.readFile via fwReadFile
+	fwReadFilePromise (pathSegment, options) {
+		return new Promise((resolve, reject) => {
+			this.fwReadFile(pathSegment, options, (error, data) => {
+				if (error) {
+					reject(error);
+				} else {
+					resolve(data);
+				}
+			});
+		});
+	}
+
+	// Implements fs.promises.stat via fwStat
+	fwStatPromise (pathSegment, options) {
+		return new Promise((resolve, reject) => {
+			this.fwStat(pathSegment, options, (error, stats) => {
+				if (error) {
+					reject(error);
+				} else {
+					resolve(stats);
+				}
+			});
+		});
+	}
+
 	// Constructs a new instance
 	constructor (folderUri) {
 		this.fwFolderUri = folderUri;
@@ -252,9 +290,9 @@ class FsWrapper {
 		this.stat = stat;
 		this.lstat = stat;
 		this.promises = {};
-		this.promises.access = pify(access);
-		this.promises.readFile = pify(readFile);
-		this.promises.stat = pify(stat);
+		this.promises.access = this.fwAccessPromise.bind(this);
+		this.promises.readFile = this.fwReadFilePromise.bind(this);
+		this.promises.stat = this.fwStatPromise.bind(this);
 	}
 }
 
@@ -505,7 +543,15 @@ function markdownlintWrapper (document) {
 		"markdownItPlugins": getDefaultMarkdownItPlugins(),
 		"resultVersion": 3
 	};
-	return pify(markdownlint)(options)
+	return new Promise((resolve, reject) => {
+		markdownlint(options, (error, results) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(results);
+			}
+		});
+	})
 		.catch((error) => outputLine("ERROR: Exception while linting with markdownlint:\n" + error.stack, true))
 		.then((results) => results.text);
 }
