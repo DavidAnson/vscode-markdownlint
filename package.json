@@ -50,7 +50,6 @@
 		"eslint": "8.20.0",
 		"eslint-plugin-node": "11.1.0",
 		"eslint-plugin-unicorn": "43.0.2",
-		"shebang-loader": "0.0.1",
 		"terser-webpack-plugin": "5.3.3",
 		"vsce": "2.10.0",
 		"webpack": "5.74.0",

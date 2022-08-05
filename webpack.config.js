@@ -10,8 +10,7 @@ const baseConfig = 	{
 	"module": {
 		"rules": [
 			{
-				"test": /markdownlint-cli2.js$/,
-				"loader": "shebang-loader"
+				"test": /markdownlint-cli2.js$/
 			}
 		]
 	},
