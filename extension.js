@@ -312,7 +312,7 @@ class LintWorkspacePseudoterminal {
 	}
 
 	open () {
-		const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
+		const markdownlintRuleHelpers = require("markdownlint/helpers");
 		const logString = (message) => this.writeEmitter.fire(
 			`${message.split(markdownlintRuleHelpers.newLineRe).join("\r\n")}\r\n`
 		);
@@ -737,7 +737,7 @@ function fixLine (lineIndex, fixInfo) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor && fixInfo) {
-			const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
+			const markdownlintRuleHelpers = require("markdownlint/helpers");
 			const document = editor.document;
 			const lineNumber = fixInfo.lineNumber || (lineIndex + 1);
 			const {text, range} = document.lineAt(lineNumber - 1);
@@ -779,7 +779,7 @@ function fixAll () {
 			if (isMarkdownDocument(document)) {
 				return markdownlintWrapper(document)
 					.then((errors) => {
-						const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
+						const markdownlintRuleHelpers = require("markdownlint/helpers");
 						const text = document.getText();
 						const fixedText = markdownlintRuleHelpers.applyFixes(text, errors);
 						return (text === fixedText) ?
@@ -812,7 +812,7 @@ function formatDocument (document, range) {
 						}
 						return false;
 					});
-					const markdownlintRuleHelpers = require("markdownlint-rule-helpers");
+					const markdownlintRuleHelpers = require("markdownlint/helpers");
 					const text = document.getText();
 					const fixedText = markdownlintRuleHelpers.applyFixes(text, rangeErrors);
 					const start = document.lineAt(0).range.start;

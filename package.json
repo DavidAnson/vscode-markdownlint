@@ -42,7 +42,6 @@
 		"markdown-it-texmath": "1.0.0",
 		"markdownlint": "0.25.1",
 		"markdownlint-cli2": "0.4.0",
-		"markdownlint-rule-helpers": "0.16.0",
 		"minimatch": "5.1.0"
 	},
 	"devDependencies": {
