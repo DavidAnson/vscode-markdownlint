@@ -6,6 +6,9 @@
 	"version": "0.47.0",
 	"author": "David Anson (https://dlaa.me/)",
 	"publisher": "DavidAnson",
+	"sponsor": {
+		"url": "https://github.com/sponsors/DavidAnson"
+	},
 	"license": "MIT",
 	"homepage": "https://github.com/DavidAnson/vscode-markdownlint",
 	"repository": {
