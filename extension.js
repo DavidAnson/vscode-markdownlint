@@ -313,9 +313,10 @@ class LintWorkspacePseudoterminal {
 	}
 
 	open () {
-		const markdownlintRuleHelpers = require("markdownlint/helpers");
+		// eslint-disable-next-line unicorn/no-keyword-prefix
+		const {newLineRe} = require("markdownlint/helpers");
 		const logString = (message) => this.writeEmitter.fire(
-			`${message.split(markdownlintRuleHelpers.newLineRe).join("\r\n")}\r\n`
+			`${message.split(newLineRe).join("\r\n")}\r\n`
 		);
 		lintWorkspace(logString)
 			.finally(() => this.close());
@@ -349,10 +350,13 @@ function getConfig (configuration, uri) {
 				(userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
 			!workspaceFolderUri ||
 			(workspaceFolderUri.scheme !== schemeFile);
+		const os = require("node:os");
 		const extendBase = useHomedir ?
-			require("node:os").homedir() :
+			os.homedir() :
 			posixPath(workspaceFolderUri.fsPath);
-		const extendPath = path.resolve(extendBase, userWorkspaceConfig.extends);
+		const {expandTildePath} = require("markdownlint/helpers");
+		const expanded = expandTildePath(userWorkspaceConfig.extends, os);
+		const extendPath = path.resolve(extendBase, expanded);
 		try {
 			const extendConfig = markdownlint.readConfigSync(extendPath, configParsers);
 			userWorkspaceConfig = {
@@ -738,11 +742,11 @@ function fixLine (lineIndex, fixInfo) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor && fixInfo) {
-			const markdownlintRuleHelpers = require("markdownlint/helpers");
+			const {applyFix} = require("markdownlint/helpers");
 			const document = editor.document;
 			const lineNumber = fixInfo.lineNumber || (lineIndex + 1);
 			const {text, range} = document.lineAt(lineNumber - 1);
-			const fixedText = markdownlintRuleHelpers.applyFix(text, fixInfo, "\n");
+			const fixedText = applyFix(text, fixInfo, "\n");
 			return editor.edit((editBuilder) => {
 				if (typeof fixedText === "string") {
 					editBuilder.replace(range, fixedText);
@@ -780,9 +784,9 @@ function fixAll () {
 			if (isMarkdownDocument(document)) {
 				return markdownlintWrapper(document)
 					.then((errors) => {
-						const markdownlintRuleHelpers = require("markdownlint/helpers");
+						const {applyFixes} = require("markdownlint/helpers");
 						const text = document.getText();
-						const fixedText = markdownlintRuleHelpers.applyFixes(text, errors);
+						const fixedText = applyFixes(text, errors);
 						return (text === fixedText) ?
 							null :
 							editor.edit((editBuilder) => {
@@ -813,9 +817,9 @@ function formatDocument (document, range) {
 						}
 						return false;
 					});
-					const markdownlintRuleHelpers = require("markdownlint/helpers");
+					const {applyFixes} = require("markdownlint/helpers");
 					const text = document.getText();
-					const fixedText = markdownlintRuleHelpers.applyFixes(text, rangeErrors);
+					const fixedText = applyFixes(text, rangeErrors);
 					const start = document.lineAt(0).range.start;
 					const end = document.lineAt(document.lineCount - 1).range.end;
 					return (text === fixedText) ?
