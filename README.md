@@ -80,6 +80,9 @@ When editing a Markdown file in Code with `markdownlint` installed, any lines th
 * **[MD048](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md048)** *code-fence-style* - Code fence style
 * **[MD049](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md049)** *emphasis-style* - Emphasis style should be consistent
 * **[MD050](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md050)** *strong-style* - Strong style should be consistent
+* **[MD051](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md051)** *link-fragments* - Link fragments should be valid
+* **[MD052](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md052)** *reference-links-images* - Reference links and images should use a label that is defined
+* **[MD053](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md053)** *link-image-reference-definitions* - Link and image reference definitions should be needed
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md) for more details.
 
@@ -113,6 +116,7 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD047 *single-trailing-newline*
 * MD049 *emphasis-style*
 * MD050 *strong-style*
+* MD053 *link-image-reference-definitions*
 
 ## Commands
 
@@ -169,11 +173,11 @@ The default rule configuration disables [`MD013`/`line-length`](https://github.c
 
 > **Note**: `MD002`/`first-heading-h1` and `MD006`/`ul-start-left` are also disabled because they have been deprecated in the `markdownlint` library.
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.cjs` in any directory of a project.
-Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.cjs`/`.markdownlint.mjs` in any directory of a project.
+Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs`/`.markdownlint-cli2.mjs` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
 
 > **Note**: When no folder is open, configuration and options are loaded from the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux).
-> Because JavaScript code is cached after being loaded, edits to `.markdownlint.cjs` and `.markdownlint-cli2.cjs` require a restart of VS Code.
+> Because JavaScript code is cached after being loaded, edits to `.markdownlint.cjs`, `.markdownlint.mjs`, `.markdownlint-cli2.cjs`, and `.markdownlint-cli2.mjs` require a restart of VS Code.
 
 A custom configuration is often defined by a `.markdownlint.json` file in the root of the project:
 
@@ -369,6 +373,7 @@ The following snippets are available when editing a Markdown document (press `Ct
 
 * `markdownlint-disable`
 * `markdownlint-enable`
+* `markdownlint-disable-line`
 * `markdownlint-disable-next-line`
 * `markdownlint-capture`
 * `markdownlint-restore`
@@ -378,7 +383,7 @@ The following snippets are available when editing a Markdown document (press `Ct
 
 ## Security
 
-Running JavaScript from custom rules, `markdown-it` plugins, or configuration files (such as `.markdownlint.cjs` and `.markdownlint-cli2.cjs`) could be a security risk, so VS Code's [Workspace Trust setting](https://code.visualstudio.com/docs/editor/workspace-trust) is honored to block JavaScript for untrusted workspaces.
+Running JavaScript from custom rules, `markdown-it` plugins, or configuration files (such as `.markdownlint.cjs`, `.markdownlint.mjs`, `.markdownlint-cli2.cjs`, and `.markdownlint-cli2.mjs`) could be a security risk, so VS Code's [Workspace Trust setting](https://code.visualstudio.com/docs/editor/workspace-trust) is honored to block JavaScript for untrusted workspaces.
 
 ## History
 

@@ -21,7 +21,7 @@
 		"docker-npm-install": "docker run --rm --tty --name npm-install --volume $PWD:/home/workdir --workdir /home/workdir --user node node:16 npm install",
 		"docker-npm-run-upgrade": "docker run --rm --tty --name npm-run-upgrade --volume $PWD:/home/workdir --workdir /home/workdir --user node node:16 npm run upgrade",
 		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js && markdownlint-cli2 *.md",
-		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && node generate-config-schema.js",
+		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && node expand-config-schema.js && node generate-config-schema.js",
 		"test": "npm run lint && npm run compile && npm run schema && git diff --exit-code",
 		"upgrade": "npx --yes npm-check-updates --upgrade"
 	},
@@ -40,8 +40,8 @@
 		"js-yaml": "4.1.0",
 		"jsonc-parser": "3.1.0",
 		"markdown-it-texmath": "1.0.0",
-		"markdownlint": "0.25.1",
-		"markdownlint-cli2": "0.4.0",
+		"markdownlint": "0.26.1",
+		"markdownlint-cli2": "0.5.0",
 		"minimatch": "5.1.0"
 	},
 	"devDependencies": {
@@ -270,6 +270,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								}
 							},
@@ -286,6 +288,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								}
 							},
@@ -302,6 +306,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								}
 							},
@@ -456,6 +462,7 @@
 								"indent": {
 									"description": "Spaces for indent",
 									"type": "integer",
+									"minimum": 1,
 									"default": 2
 								},
 								"start_indented": {
@@ -466,6 +473,7 @@
 								"start_indent": {
 									"description": "Spaces for first level indent (when start_indented is set)",
 									"type": "integer",
+									"minimum": 1,
 									"default": 2
 								}
 							},
@@ -482,6 +490,7 @@
 								"indent": {
 									"description": "Spaces for indent",
 									"type": "integer",
+									"minimum": 1,
 									"default": 2
 								},
 								"start_indented": {
@@ -492,6 +501,7 @@
 								"start_indent": {
 									"description": "Spaces for first level indent (when start_indented is set)",
 									"type": "integer",
+									"minimum": 1,
 									"default": 2
 								}
 							},
@@ -508,6 +518,7 @@
 								"br_spaces": {
 									"description": "Spaces for line break",
 									"type": "integer",
+									"minimum": 0,
 									"default": 2
 								},
 								"list_item_empty_lines": {
@@ -534,6 +545,7 @@
 								"br_spaces": {
 									"description": "Spaces for line break",
 									"type": "integer",
+									"minimum": 0,
 									"default": 2
 								},
 								"list_item_empty_lines": {
@@ -562,9 +574,18 @@
 									"type": "boolean",
 									"default": true
 								},
+								"ignore_code_languages": {
+									"description": "Fenced code languages to ignore",
+									"type": "array",
+									"items": {
+										"type": "string"
+									},
+									"default": []
+								},
 								"spaces_per_tab": {
 									"description": "Number of spaces for each hard tab",
-									"type": "number",
+									"type": "integer",
+									"minimum": 0,
 									"default": 1
 								}
 							},
@@ -583,9 +604,18 @@
 									"type": "boolean",
 									"default": true
 								},
+								"ignore_code_languages": {
+									"description": "Fenced code languages to ignore",
+									"type": "array",
+									"items": {
+										"type": "string"
+									},
+									"default": []
+								},
 								"spaces_per_tab": {
 									"description": "Number of spaces for each hard tab",
-									"type": "number",
+									"type": "integer",
+									"minimum": 0,
 									"default": 1
 								}
 							},
@@ -612,6 +642,7 @@
 								"maximum": {
 									"description": "Consecutive blank lines",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								}
 							},
@@ -628,6 +659,7 @@
 								"maximum": {
 									"description": "Consecutive blank lines",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								}
 							},
@@ -644,16 +676,19 @@
 								"line_length": {
 									"description": "Number of characters",
 									"type": "integer",
+									"minimum": 1,
 									"default": 80
 								},
 								"heading_line_length": {
 									"description": "Number of characters for headings",
 									"type": "integer",
+									"minimum": 1,
 									"default": 80
 								},
 								"code_block_line_length": {
 									"description": "Number of characters for code blocks",
 									"type": "integer",
+									"minimum": 1,
 									"default": 80
 								},
 								"code_blocks": {
@@ -700,16 +735,19 @@
 								"line_length": {
 									"description": "Number of characters",
 									"type": "integer",
+									"minimum": 1,
 									"default": 80
 								},
 								"heading_line_length": {
 									"description": "Number of characters for headings",
 									"type": "integer",
+									"minimum": 1,
 									"default": 80
 								},
 								"code_block_line_length": {
 									"description": "Number of characters for code blocks",
 									"type": "integer",
+									"minimum": 1,
 									"default": 80
 								},
 								"code_blocks": {
@@ -806,11 +844,13 @@
 								"lines_above": {
 									"description": "Blank lines above heading",
 									"type": "integer",
+									"minimum": 0,
 									"default": 1
 								},
 								"lines_below": {
 									"description": "Blank lines below heading",
 									"type": "integer",
+									"minimum": 0,
 									"default": 1
 								}
 							},
@@ -827,11 +867,13 @@
 								"lines_above": {
 									"description": "Blank lines above heading",
 									"type": "integer",
+									"minimum": 0,
 									"default": 1
 								},
 								"lines_below": {
 									"description": "Blank lines below heading",
 									"type": "integer",
+									"minimum": 0,
 									"default": 1
 								}
 							},
@@ -848,11 +890,13 @@
 								"lines_above": {
 									"description": "Blank lines above heading",
 									"type": "integer",
+									"minimum": 0,
 									"default": 1
 								},
 								"lines_below": {
 									"description": "Blank lines below heading",
 									"type": "integer",
+									"minimum": 0,
 									"default": 1
 								}
 							},
@@ -947,6 +991,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								},
 								"front_matter_title": {
@@ -968,6 +1014,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								},
 								"front_matter_title": {
@@ -989,6 +1037,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								},
 								"front_matter_title": {
@@ -1106,21 +1156,25 @@
 								"ul_single": {
 									"description": "Spaces for single-line unordered list items",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								},
 								"ol_single": {
 									"description": "Spaces for single-line ordered list items",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								},
 								"ul_multi": {
 									"description": "Spaces for multi-line unordered list items",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								},
 								"ol_multi": {
 									"description": "Spaces for multi-line ordered list items",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								}
 							},
@@ -1137,21 +1191,25 @@
 								"ul_single": {
 									"description": "Spaces for single-line unordered list items",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								},
 								"ol_single": {
 									"description": "Spaces for single-line ordered list items",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								},
 								"ul_multi": {
 									"description": "Spaces for multi-line unordered list items",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								},
 								"ol_multi": {
 									"description": "Spaces for multi-line ordered list items",
 									"type": "integer",
+									"minimum": 1,
 									"default": 1
 								}
 							},
@@ -1378,6 +1436,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								},
 								"front_matter_title": {
@@ -1399,6 +1459,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								},
 								"front_matter_title": {
@@ -1420,6 +1482,8 @@
 								"level": {
 									"description": "Heading level",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
 									"default": 1
 								},
 								"front_matter_title": {
@@ -1452,7 +1516,8 @@
 									"description": "List of headings",
 									"type": "array",
 									"items": {
-										"type": "string"
+										"type": "string",
+										"pattern": "^(\\*|\\+|#{1,6} .*)$"
 									},
 									"default": []
 								},
@@ -1460,7 +1525,8 @@
 									"description": "List of headings",
 									"type": "array",
 									"items": {
-										"type": "string"
+										"type": "string",
+										"pattern": "^(\\*|\\+|#{1,6} .*)$"
 									},
 									"default": []
 								}
@@ -1479,7 +1545,8 @@
 									"description": "List of headings",
 									"type": "array",
 									"items": {
-										"type": "string"
+										"type": "string",
+										"pattern": "^(\\*|\\+|#{1,6} .*)$"
 									},
 									"default": []
 								},
@@ -1487,7 +1554,8 @@
 									"description": "List of headings",
 									"type": "array",
 									"items": {
-										"type": "string"
+										"type": "string",
+										"pattern": "^(\\*|\\+|#{1,6} .*)$"
 									},
 									"default": []
 								}
@@ -1506,7 +1574,8 @@
 									"description": "List of headings",
 									"type": "array",
 									"items": {
-										"type": "string"
+										"type": "string",
+										"pattern": "^(\\*|\\+|#{1,6} .*)$"
 									},
 									"default": []
 								},
@@ -1514,7 +1583,8 @@
 									"description": "List of headings",
 									"type": "array",
 									"items": {
-										"type": "string"
+										"type": "string",
+										"pattern": "^(\\*|\\+|#{1,6} .*)$"
 									},
 									"default": []
 								}
@@ -1541,6 +1611,11 @@
 									"description": "Include code blocks",
 									"type": "boolean",
 									"default": true
+								},
+								"html_elements": {
+									"description": "Include HTML elements",
+									"type": "boolean",
+									"default": true
 								}
 							},
 							"additionalProperties": false
@@ -1563,6 +1638,11 @@
 								},
 								"code_blocks": {
 									"description": "Include code blocks",
+									"type": "boolean",
+									"default": true
+								},
+								"html_elements": {
+									"description": "Include HTML elements",
 									"type": "boolean",
 									"default": true
 								}
@@ -1757,6 +1837,36 @@
 							},
 							"additionalProperties": false
 						},
+						"MD051": {
+							"description": "MD051/link-fragments - Link fragments should be valid",
+							"type": "boolean",
+							"default": true
+						},
+						"link-fragments": {
+							"description": "MD051/link-fragments - Link fragments should be valid",
+							"type": "boolean",
+							"default": true
+						},
+						"MD052": {
+							"description": "MD052/reference-links-images - Reference links and images should use a label that is defined",
+							"type": "boolean",
+							"default": true
+						},
+						"reference-links-images": {
+							"description": "MD052/reference-links-images - Reference links and images should use a label that is defined",
+							"type": "boolean",
+							"default": true
+						},
+						"MD053": {
+							"description": "MD053/link-image-reference-definitions - Link and image reference definitions should be needed",
+							"type": "boolean",
+							"default": true
+						},
+						"link-image-reference-definitions": {
+							"description": "MD053/link-image-reference-definitions - Link and image reference definitions should be needed",
+							"type": "boolean",
+							"default": true
+						},
 						"headings": {
 							"description": "headings - MD001, MD002, MD003, MD018, MD019, MD020, MD021, MD022, MD023, MD024, MD025, MD026, MD036, MD041, MD043",
 							"type": "boolean",
@@ -1793,7 +1903,7 @@
 							"default": true
 						},
 						"links": {
-							"description": "links - MD011, MD034, MD039, MD042",
+							"description": "links - MD011, MD034, MD039, MD042, MD051, MD052, MD053",
 							"type": "boolean",
 							"default": true
 						},
@@ -1873,7 +1983,7 @@
 							"default": true
 						},
 						"images": {
-							"description": "images - MD045",
+							"description": "images - MD045, MD052, MD053",
 							"type": "boolean",
 							"default": true
 						}

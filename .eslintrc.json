@@ -55,7 +55,7 @@
         "node/no-extraneous-import": "error",
         "node/no-extraneous-require": ["error", { "allowModules": ["terser-webpack-plugin"] }],
         "node/no-missing-import": "error",
-        "node/no-missing-require": ["error", { "allowModules": ["vscode"] }],
+        "node/no-missing-require": ["error", { "allowModules": ["vscode", "markdownlint-cli2"] }],
         "node/no-new-require": "error",
         "node/no-path-concat": "error",
         "node/no-process-exit": "error",
