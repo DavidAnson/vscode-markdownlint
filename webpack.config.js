@@ -27,19 +27,22 @@ const baseConfig = 	{
 	"externals": {
 		"vscode": "commonjs vscode"
 	},
-	"plugins": [
-		new webpack.IgnorePlugin({"resourceRegExp": /katex/}),
-		new webpack.NormalModuleReplacementPlugin(
-			nodeModulePrefixRe,
-			(resource) => {
-				const module = resource.request.replace(nodeModulePrefixRe, "");
-				resource.request = module;
-			}
-		)
-	]
+	"plugins": [ new webpack.IgnorePlugin({"resourceRegExp": /katex/}) ]
 };
 const config = [
-	baseConfig,
+	{
+		...baseConfig,
+		"plugins": [
+			...baseConfig.plugins,
+			new webpack.NormalModuleReplacementPlugin(
+				nodeModulePrefixRe,
+				(resource) => {
+					const module = resource.request.replace(nodeModulePrefixRe, "");
+					resource.request = module;
+				}
+			)
+		]
+	},
 	{
 		...baseConfig,
 		"target": "webworker",
@@ -50,16 +53,30 @@ const config = [
 		},
 		"plugins": [
 			...baseConfig.plugins,
-			new webpack.IgnorePlugin({"resourceRegExp": /markdownlint-cli2/}),
-			new webpack.IgnorePlugin({"resourceRegExp": /jsonc-parser/}),
-			new webpack.IgnorePlugin({"resourceRegExp": /js-yaml/})
+			new webpack.NormalModuleReplacementPlugin(
+				nodeModulePrefixRe,
+				(resource) => {
+					let module = resource.request.replace(nodeModulePrefixRe, "");
+					if (module === "url") {
+						module = "url-stub";
+					}
+					resource.request = module;
+				}
+			),
+			new webpack.ProvidePlugin({
+				"process": "process-wrapper"
+			})
 		],
 		"resolve": {
 			"fallback": {
 				"fs": false,
-				"os": false,
-				"path": false,
-				"util": false
+				"os": require.resolve("./webworker/os-stub.js"),
+				"path": require.resolve("path-browserify"),
+				"process": require.resolve("./webworker/process-wrapper.js"),
+				"process-wrapper": require.resolve("./webworker/process-wrapper.js"),
+				"stream": require.resolve("stream-browserify"),
+				"url-stub": require.resolve("./webworker/url-stub.js"),
+				"util": require.resolve("util")
 			}
 		}
 	}

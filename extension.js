@@ -2,10 +2,8 @@
 
 // Minimal requires (requires that may not be needed are inlined to avoid startup cost)
 const vscode = require("vscode");
-const markdownlint = require("markdownlint");
 const path = require("node:path");
-// Node modules (like path) are not available in web worker context
-const nodeModulesAvailable = path && (Object.keys(path).length > 0);
+const {promisify} = require("node:util");
 
 // Constants
 const extensionDisplayName = "markdownlint";
@@ -239,45 +237,6 @@ class FsWrapper {
 		);
 	}
 
-	// Implements fs.promises.access via fwAccess
-	fwAccessPromise (pathSegment, mode) {
-		return new Promise((resolve, reject) => {
-			this.fwAccess(pathSegment, mode, (error) => {
-				if (error) {
-					reject(error);
-				} else {
-					resolve();
-				}
-			});
-		});
-	}
-
-	// Implements fs.promises.readFile via fwReadFile
-	fwReadFilePromise (pathSegment, options) {
-		return new Promise((resolve, reject) => {
-			this.fwReadFile(pathSegment, options, (error, data) => {
-				if (error) {
-					reject(error);
-				} else {
-					resolve(data);
-				}
-			});
-		});
-	}
-
-	// Implements fs.promises.stat via fwStat
-	fwStatPromise (pathSegment, options) {
-		return new Promise((resolve, reject) => {
-			this.fwStat(pathSegment, options, (error, stats) => {
-				if (error) {
-					reject(error);
-				} else {
-					resolve(stats);
-				}
-			});
-		});
-	}
-
 	// Constructs a new instance
 	constructor (folderUri) {
 		this.fwFolderUri = folderUri;
@@ -291,9 +250,9 @@ class FsWrapper {
 		this.stat = stat;
 		this.lstat = stat;
 		this.promises = {};
-		this.promises.access = this.fwAccessPromise.bind(this);
-		this.promises.readFile = this.fwReadFilePromise.bind(this);
-		this.promises.stat = this.fwStatPromise.bind(this);
+		this.promises.access = promisify(this.fwAccess).bind(this);
+		this.promises.readFile = promisify(this.fwReadFile).bind(this);
+		this.promises.stat = promisify(this.fwStat).bind(this);
 	}
 }
 
@@ -339,10 +298,10 @@ function outputLine (message, show) {
 }
 
 // Returns rule configuration from user/workspace configuration
-function getConfig (configuration, uri) {
+async function getConfig (fs, configuration, uri) {
 	let userWorkspaceConfig = configuration.get(sectionConfig);
-	// Bootstrap extend behavior into readConfigSync
-	if (userWorkspaceConfig && userWorkspaceConfig.extends && nodeModulesAvailable) {
+	// Bootstrap extend behavior into readConfig
+	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
 		const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
 		const workspaceFolderUri = getWorkspaceFolderUri(uri);
 		const useHomedir =
@@ -351,14 +310,15 @@ function getConfig (configuration, uri) {
 			!workspaceFolderUri ||
 			(workspaceFolderUri.scheme !== schemeFile);
 		const os = require("node:os");
-		const extendBase = useHomedir ?
+		const extendBase = (useHomedir && os && os.homedir) ?
 			os.homedir() :
 			posixPath(workspaceFolderUri.fsPath);
 		const {expandTildePath} = require("markdownlint/helpers");
 		const expanded = expandTildePath(userWorkspaceConfig.extends, os);
 		const extendPath = path.resolve(extendBase, expanded);
 		try {
-			const extendConfig = markdownlint.readConfigSync(extendPath, configParsers);
+			const markdownlint = require("markdownlint").promises;
+			const extendConfig = await markdownlint.readConfig(extendPath, configParsers, fs);
 			userWorkspaceConfig = {
 				...extendConfig,
 				...userWorkspaceConfig
@@ -468,9 +428,9 @@ function getDefaultMarkdownItPlugins () {
 	];
 }
 // Gets the value of the optionsDefault parameter to markdownlint-cli2
-function getOptionsDefault (workspaceConfiguration, config) {
+async function getOptionsDefault (fs, workspaceConfiguration, config) {
 	return {
-		"config": config || getConfig(workspaceConfiguration),
+		"config": config || await getConfig(fs, workspaceConfiguration),
 		"customRules": getCustomRules(workspaceConfiguration),
 		"markdownItPlugins": getDefaultMarkdownItPlugins()
 	};
@@ -484,81 +444,57 @@ function getOptionsOverride () {
 }
 
 // Wraps getting options and calling into markdownlint-cli2
-function markdownlintWrapper (document) {
-	// Load user/workspace configuration
+async function markdownlintWrapper (document) {
+	// Prepare markdownlint-cli2 parameters
+	const scheme = document.uri.scheme;
+	const isSchemeFile = scheme === schemeFile;
+	const independentDocument = !schemeFileSystemLike.has(scheme);
+	const name = posixPath(document.uri.fsPath);
+	const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
+	const fs = independentDocument ?
+		null :
+		new FsWrapper(workspaceFolderUri);
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-	const config = getConfig(configuration, document.uri);
-	const text = document.getText();
-	if (nodeModulesAvailable) {
-		// Prepare markdownlint-cli2 parameters
-		const scheme = document.uri.scheme;
-		const isSchemeFile = scheme === schemeFile;
-		const independentDocument = !schemeFileSystemLike.has(scheme);
-		const name = posixPath(document.uri.fsPath);
-		const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
-		const fs = independentDocument ?
-			null :
-			new FsWrapper(workspaceFolderUri);
-		const directory = independentDocument ?
-			null :
-			(workspaceFolderUri ?
-				posixPath(workspaceFolderUri.fsPath) :
-				path.posix.dirname(name));
-		const argv = independentDocument ?
-			[] :
-			[ `:${name}` ];
-		const contents = independentDocument ?
-			"nonFileContents" :
-			"fileContents";
-		let results = [];
-		// eslint-disable-next-line func-style
-		const captureResultsFormatter = (options) => {
-			results = options.results;
-		};
-		const parameters = {
-			fs,
-			directory,
-			argv,
-			[contents]: {
-				[name]: text
-			},
-			"noErrors": true,
-			"noGlobs": true,
-			"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
-			"optionsDefault": getOptionsDefault(configuration, config),
-			"optionsOverride": {
-				...getOptionsOverride(),
-				"outputFormatters": [ [ captureResultsFormatter ] ]
-			}
-		};
-		// Invoke markdownlint-cli2
-		const {"main": markdownlintCli2} = require("markdownlint-cli2");
-		return markdownlintCli2(parameters)
-			.catch((error) => outputLine(errorExceptionPrefix + error.stack, true))
-			.then(() => results);
-		// If necessary some day to filter results by matching file name...
-		// .then(() => results.filter((result) => isSchemeUntitled || (result.fileName === path.posix.relative(directory, name))))
-	}
-	// Else invoke markdownlint (don't use markdownlint.promises.markdownlint which is invalid in web worker context)
-	const options = {
-		"strings": {
-			text
-		},
-		config,
-		"markdownItPlugins": getDefaultMarkdownItPlugins(),
-		"resultVersion": 3
+	const config = await getConfig(fs, configuration, document.uri);
+	const directory = independentDocument ?
+		null :
+		(workspaceFolderUri ?
+			posixPath(workspaceFolderUri.fsPath) :
+			path.posix.dirname(name));
+	const argv = independentDocument ?
+		[] :
+		[ `:${name}` ];
+	const contents = independentDocument ?
+		"nonFileContents" :
+		"fileContents";
+	let results = [];
+	// eslint-disable-next-line func-style
+	const captureResultsFormatter = (options) => {
+		results = options.results;
 	};
-	return new Promise((resolve, reject) => {
-		markdownlint(options, (error, results) => {
-			if (error) {
-				reject(error);
-			} else {
-				resolve(results);
-			}
-		});
-	})
-		.catch((error) => outputLine("ERROR: Exception while linting with markdownlint:\n" + error.stack, true))
-		.then((results) => results.text);
+	const parameters = {
+		fs,
+		directory,
+		argv,
+		[contents]: {
+			[name]: document.getText()
+		},
+		"noErrors": true,
+		"noGlobs": true,
+		"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
+		"optionsDefault": await getOptionsDefault(fs, configuration, config),
+		"optionsOverride": {
+			...getOptionsOverride(),
+			"outputFormatters": [ [ captureResultsFormatter ] ]
+		}
+	};
+	// Invoke markdownlint-cli2
+	const {"main": markdownlintCli2} = require("markdownlint-cli2");
+	return markdownlintCli2(parameters)
+		.catch((error) => outputLine(errorExceptionPrefix + error.stack, true))
+		.then(() => results);
+	// If necessary some day to filter results by matching file name...
+	// .then(() => results.filter((result) => isSchemeUntitled || (result.fileName === path.posix.relative(directory, name))))
 }
 
 // Returns if the document is Markdown
@@ -570,26 +506,27 @@ function isMarkdownDocument (document) {
 }
 
 // Lints Markdown files in the workspace folder tree
-function lintWorkspace (logString) {
+async function lintWorkspace (logString) {
 	const workspaceFolderUri = getWorkspaceFolderUri();
-	if (workspaceFolderUri && nodeModulesAvailable) {
+	if (workspaceFolderUri) {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
 		const isSchemeFile = workspaceFolderUri.scheme === schemeFile;
+		const fs = new FsWrapper(workspaceFolderUri);
 		const parameters = {
-			"fs": new FsWrapper(workspaceFolderUri),
+			fs,
 			"argv": configuration.get(sectionLintWorkspaceGlobs),
 			"directory": posixPath(workspaceFolderUri.fsPath),
 			"logMessage": logString,
 			"logError": logString,
 			"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
-			"optionsDefault": getOptionsDefault(configuration),
+			"optionsDefault": await getOptionsDefault(fs, configuration),
 			"optionsOverride": getOptionsOverride()
 		};
 		const {"main": markdownlintCli2} = require("markdownlint-cli2");
 		return markdownlintCli2(parameters)
 			.catch((error) => logString(errorExceptionPrefix + error.stack));
 	}
-	return Promise.reject(new Error("No workspace folder or Node modules unavailable."));
+	throw new Error("No workspace folder or Node modules unavailable.");
 }
 
 // Runs the lintWorkspace task to lint all Markdown files in the workspace

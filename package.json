@@ -53,7 +53,11 @@
 		"eslint": "8.20.0",
 		"eslint-plugin-node": "11.1.0",
 		"eslint-plugin-unicorn": "43.0.2",
+		"path-browserify": "1.0.1",
+		"process": "0.11.10",
+		"stream-browserify": "3.0.0",
 		"terser-webpack-plugin": "5.3.3",
+		"util": "0.12.4",
 		"vsce": "2.10.0",
 		"webpack": "5.74.0",
 		"webpack-cli": "4.10.0"
@@ -79,7 +83,7 @@
 		},
 		"virtualWorkspaces": {
 			"supported": "limited",
-			"description": "In web scenarios, access to configuration files is not supported. Default linting settings are used instead."
+			"description": "In virtual workspaces, JavaScript is blocked for custom rules, markdown-it plugins, and configuration files."
 		}
 	},
 	"contributes": {
