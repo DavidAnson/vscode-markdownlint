@@ -53,9 +53,9 @@
         "node/no-callback-literal": "error",
         "node/no-exports-assign": "error",
         "node/no-extraneous-import": "error",
-        "node/no-extraneous-require": ["error", { "allowModules": ["terser-webpack-plugin"] }],
+        "node/no-extraneous-require": ["error"],
         "node/no-missing-import": "error",
-        "node/no-missing-require": ["error", { "allowModules": ["vscode", "markdownlint-cli2"] }],
+        "node/no-missing-require": ["error", { "allowModules": ["vscode"] }],
         "node/no-new-require": "error",
         "node/no-path-concat": "error",
         "node/no-process-exit": "error",
@@ -64,11 +64,7 @@
         "node/no-unpublished-require": "off",
         "node/no-unsupported-features/es-builtins": "error",
         "node/no-unsupported-features/es-syntax": "error",
-        "node/no-unsupported-features/node-builtins": ["error", {
-          "ignores": [
-            "fs.promises"
-          ]
-        }],
+        "node/no-unsupported-features/node-builtins": ["error"],
         "node/process-exit-as-throw": "error",
         "node/shebang": "error",
         "node/no-deprecated-api": "error",
