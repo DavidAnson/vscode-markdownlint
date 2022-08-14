@@ -217,7 +217,7 @@ The above configuration might look like the following in Code's user settings fi
 }
 ```
 
-File paths referenced by `extends` from user settings are resolved relative to the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux). File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder. File paths referenced by `extends` from within the workspace are resolved relative to the file itself.
+File paths referenced by `extends` from user settings are resolved relative to the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux). File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder. File paths referenced by `extends` from configuration files within the workspace are resolved relative to the file itself. Code's [predefined variables](https://code.visualstudio.com/docs/editor/variables-reference) `${userHome}` and `${workspaceFolder}` can be used within an `extends` path from user or workspace settings to override the default behavior.
 
 Configuration sources have the following precedence (in decreasing order):
 

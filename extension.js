@@ -310,11 +310,18 @@ async function getConfig (fs, configuration, uri) {
 			!workspaceFolderUri ||
 			(workspaceFolderUri.scheme !== schemeFile);
 		const os = require("node:os");
-		const extendBase = (useHomedir && os && os.homedir) ?
-			os.homedir() :
-			posixPath(workspaceFolderUri.fsPath);
+		const homedir = os && os.homedir && os.homedir();
+		const workspaceFolderFsPath = workspaceFolderUri && posixPath(workspaceFolderUri.fsPath);
+		// eslint-disable-next-line multiline-ternary
+		const extendBase = ((useHomedir && homedir) ? homedir : workspaceFolderFsPath) || "";
 		const {expandTildePath} = require("markdownlint/helpers");
-		const expanded = expandTildePath(userWorkspaceConfig.extends, os);
+		let expanded = expandTildePath(userWorkspaceConfig.extends, os);
+		if (homedir) {
+			expanded = expanded.replace(/\${userHome}/g, homedir);
+		}
+		if (workspaceFolderFsPath) {
+			expanded = expanded.replace(/\${workspaceFolder}/g, workspaceFolderFsPath);
+		}
 		const extendPath = path.resolve(extendBase, expanded);
 		try {
 			const markdownlint = require("markdownlint").promises;
