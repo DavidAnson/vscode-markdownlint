@@ -450,11 +450,18 @@ function getOptionsOverride () {
 	};
 }
 
+// Gets the value of the noRequire parameter to markdownlint-cli2
+function getNoRequire (scheme) {
+	const isTrusted = vscode.workspace.isTrusted;
+	const isSchemeFile = (scheme === schemeFile);
+	const isDesktop = Boolean(require("node:os").platform());
+	return !isTrusted || !isSchemeFile || !isDesktop;
+}
+
 // Wraps getting options and calling into markdownlint-cli2
 async function markdownlintWrapper (document) {
 	// Prepare markdownlint-cli2 parameters
 	const scheme = document.uri.scheme;
-	const isSchemeFile = scheme === schemeFile;
 	const independentDocument = !schemeFileSystemLike.has(scheme);
 	const name = posixPath(document.uri.fsPath);
 	const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
@@ -488,7 +495,7 @@ async function markdownlintWrapper (document) {
 		},
 		"noErrors": true,
 		"noGlobs": true,
-		"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
+		"noRequire": getNoRequire(scheme),
 		"optionsDefault": await getOptionsDefault(fs, configuration, config),
 		"optionsOverride": {
 			...getOptionsOverride(),
@@ -517,7 +524,6 @@ async function lintWorkspace (logString) {
 	const workspaceFolderUri = getWorkspaceFolderUri();
 	if (workspaceFolderUri) {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
-		const isSchemeFile = workspaceFolderUri.scheme === schemeFile;
 		const fs = new FsWrapper(workspaceFolderUri);
 		const parameters = {
 			fs,
@@ -525,7 +531,7 @@ async function lintWorkspace (logString) {
 			"directory": posixPath(workspaceFolderUri.fsPath),
 			"logMessage": logString,
 			"logError": logString,
-			"noRequire": !vscode.workspace.isTrusted || !isSchemeFile,
+			"noRequire": getNoRequire(workspaceFolderUri.scheme),
 			"optionsDefault": await getOptionsDefault(fs, configuration),
 			"optionsOverride": getOptionsOverride()
 		};
