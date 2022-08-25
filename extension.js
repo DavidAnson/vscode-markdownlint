@@ -28,6 +28,8 @@ const schemeFile = "file";
 //   GitHub Repositories (github.remotehub)
 //   Remote Repositories (ms-vscode.remote-repositories)
 const schemeVscodeVfs = "vscode-vfs";
+// Used by @vscode/test-web when testing web extensions
+const schemeVscodeTestWeb = "vscode-test-web";
 // Used by GistPad (vsls-contrib.gistfs)
 const schemeGist = "gist";
 // Schemes that are okay to lint (as part of a workspace or independently)
@@ -35,12 +37,14 @@ const schemeSupported = new Set([
 	schemeUntitled,
 	schemeFile,
 	schemeVscodeVfs,
+	schemeVscodeTestWeb,
 	schemeGist
 ]);
 // Schemes that are file system-like (support probing for configuration files)
 const schemeFileSystemLike = new Set([
 	schemeFile,
-	schemeVscodeVfs
+	schemeVscodeVfs,
+	schemeVscodeTestWeb
 ]);
 const configParsers = [
 	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
