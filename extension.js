@@ -240,19 +240,38 @@ class FsWrapper {
 	// Constructs a new instance
 	constructor (folderUri) {
 		this.fwFolderUri = folderUri;
-		const access = this.fwAccess.bind(this);
-		const readdir = this.fwReaddir.bind(this);
-		const readFile = this.fwReadFile.bind(this);
-		const stat = this.fwStat.bind(this);
-		this.access = access;
-		this.readdir = readdir;
-		this.readFile = readFile;
-		this.stat = stat;
-		this.lstat = stat;
+		this.access = this.fwAccess.bind(this);
+		this.readdir = this.fwReaddir.bind(this);
+		this.readFile = this.fwReadFile.bind(this);
+		this.stat = this.fwStat.bind(this);
+		this.lstat = this.stat;
 		this.promises = {};
 		this.promises.access = promisify(this.fwAccess).bind(this);
 		this.promises.readFile = promisify(this.fwReadFile).bind(this);
 		this.promises.stat = promisify(this.fwStat).bind(this);
+	}
+}
+
+// A Node-like fs object for a "null" file system
+class FsNull {
+	// Implements fs.access/readdir/readFile/stat
+	static fnError (pathSegment, modeOrOptions, callback) {
+		// eslint-disable-next-line no-param-reassign
+		callback = callback || modeOrOptions;
+		callback(new Error("FsNull.fnError"));
+	}
+
+	// Constructs a new instance
+	constructor () {
+		this.access = FsNull.fnError;
+		this.readdir = this.access;
+		this.readFile = this.access;
+		this.stat = this.access;
+		this.lstat = this.access;
+		this.promises = {};
+		this.promises.access = promisify(FsNull.fnError);
+		this.promises.readFile = this.promises.access;
+		this.promises.stat = this.promises.access;
 	}
 }
 
@@ -466,7 +485,7 @@ async function markdownlintWrapper (document) {
 	const name = posixPath(document.uri.fsPath);
 	const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
 	const fs = independentDocument ?
-		null :
+		new FsNull() :
 		new FsWrapper(workspaceFolderUri);
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	const config = await getConfig(fs, configuration, document.uri);
