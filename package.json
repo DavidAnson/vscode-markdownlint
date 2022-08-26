@@ -147,6 +147,12 @@
 				"url": "./markdownlint-cli2-config-schema.json"
 			}
 		],
+		"taskDefinitions": [
+			{
+				"type": "markdownlint",
+				"when": "workbenchState != empty"
+			}
+		],
 		"problemMatchers": [
 			{
 				"name": "markdownlint",

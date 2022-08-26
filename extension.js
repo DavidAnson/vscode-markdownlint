@@ -554,6 +554,7 @@ async function lintWorkspace (logString) {
 			"directory": posixPath(workspaceFolderUri.fsPath),
 			"logMessage": logString,
 			"logError": logString,
+			"noErrors": true,
 			"noRequire": getNoRequire(workspaceFolderUri.scheme),
 			"optionsDefault": await getOptionsDefault(fs, configuration),
 			"optionsOverride": getOptionsOverride()
@@ -562,7 +563,7 @@ async function lintWorkspace (logString) {
 		return markdownlintCli2(parameters)
 			.catch((error) => logString(errorExceptionPrefix + error.stack));
 	}
-	throw new Error("No workspace folder or Node modules unavailable.");
+	throw new Error("No workspace folder.");
 }
 
 // Runs the lintWorkspace task to lint all Markdown files in the workspace
