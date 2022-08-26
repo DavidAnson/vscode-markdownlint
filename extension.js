@@ -932,6 +932,14 @@ function didChangeVisibleTextEditors (textEditors) {
 	}
 }
 
+// Handles the onDidOpenTextDocument event
+function didOpenTextDocument (document) {
+	if (isMarkdownDocument(document)) {
+		lint(document);
+		suppressLint(document);
+	}
+}
+
 // Handles the onDidChangeTextDocument event
 function didChangeTextDocument (change) {
 	const document = change.document;
@@ -983,6 +991,7 @@ function activate (context) {
 		vscode.window.onDidChangeActiveTextEditor(didChangeActiveTextEditor),
 		vscode.window.onDidChangeTextEditorSelection(didChangeTextEditorSelection),
 		vscode.window.onDidChangeVisibleTextEditors(didChangeVisibleTextEditors),
+		vscode.workspace.onDidOpenTextDocument(didOpenTextDocument),
 		vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
 		vscode.workspace.onDidSaveTextDocument(didSaveTextDocument),
 		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
