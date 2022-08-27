@@ -173,11 +173,11 @@ The default rule configuration disables [`MD013`/`line-length`](https://github.c
 
 > **Note**: `MD002`/`first-heading-h1` and `MD006`/`ul-start-left` are also disabled because they have been deprecated in the `markdownlint` library.
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.cjs`/`.markdownlint.mjs` in any directory of a project.
-Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs`/`.markdownlint-cli2.mjs` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.cjs` in any directory of a project.
+Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
 
 > **Note**: When no folder is open, configuration and options are loaded from the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux).
-> Because JavaScript code is cached after being loaded, edits to `.markdownlint.cjs`, `.markdownlint.mjs`, `.markdownlint-cli2.cjs`, and `.markdownlint-cli2.mjs` require a restart of VS Code.
+> Because JavaScript code is cached after being loaded, edits to `.markdownlint.cjs` and `.markdownlint-cli2.cjs` require a restart of VS Code.
 
 A custom configuration is often defined by a `.markdownlint.json` file in the root of the project:
 
@@ -383,7 +383,7 @@ The following snippets are available when editing a Markdown document (press `Ct
 
 ## Security
 
-Running JavaScript from custom rules, `markdown-it` plugins, or configuration files (such as `.markdownlint.cjs`, `.markdownlint.mjs`, `.markdownlint-cli2.cjs`, and `.markdownlint-cli2.mjs`) could be a security risk, so VS Code's [Workspace Trust setting](https://code.visualstudio.com/docs/editor/workspace-trust) is honored to block JavaScript for untrusted workspaces.
+Running JavaScript from custom rules, `markdown-it` plugins, or configuration files (such as `.markdownlint.cjs` and `.markdownlint-cli2.cjs`) could be a security risk, so VS Code's [Workspace Trust setting](https://code.visualstudio.com/docs/editor/workspace-trust) is honored to block JavaScript for untrusted workspaces.
 
 ## History
 
