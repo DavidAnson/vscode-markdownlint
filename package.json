@@ -34,7 +34,7 @@
 	],
 	"engines": {
 		"node": ">=12",
-		"vscode": "^1.56.0"
+		"vscode": "^1.66.0"
 	},
 	"main": "./bundle",
 	"browser": "./bundle.web",
@@ -48,7 +48,7 @@
 		"minimatch": "5.1.0"
 	},
 	"devDependencies": {
-		"@types/vscode": "1.56.0",
+		"@types/vscode": "1.66.0",
 		"cpy-cli": "4.1.0",
 		"eslint": "8.22.0",
 		"eslint-plugin-node": "11.1.0",
