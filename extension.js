@@ -11,6 +11,9 @@ const configFileGlob = ".markdownlint.{jsonc,json,yaml,yml,cjs}";
 const optionsFileGlob = ".markdownlint-cli2.{jsonc,yaml,cjs}";
 const markdownlintJson = ".markdownlint.json";
 const configFileNames = [
+	".markdownlint-cli2.jsonc",
+	".markdownlint-cli2.yaml",
+	".markdownlint-cli2.cjs",
 	".markdownlint.jsonc",
 	markdownlintJson,
 	".markdownlint.yaml",

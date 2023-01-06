@@ -221,14 +221,14 @@ File paths referenced by `extends` from user settings are resolved relative to t
 
 Configuration sources have the following precedence (in decreasing order):
 
-* `.markdownlint-cli2.{jsonc,yaml,js}` file in the same or parent directory
-* `.markdownlint.{jsonc,json,yaml,yml,js}` file in the same or parent directory
+* `.markdownlint-cli2.{jsonc,yaml,cjs}` file in the same or parent directory
+* `.markdownlint.{jsonc,json,yaml,yml,cjs}` file in the same or parent directory
 * Visual Studio Code user/workspace settings
 * Default configuration (see above)
 
 Configuration changes saved to any location take effect immediately. Files referenced via `extends` are not monitored for changes. Inherited configuration can be explicitly disabled (or re-enabled) in any configuration file.
 
-When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint.{jsonc,json,yaml,yml,js}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` containing the default rule configuration will be opened in the editor in the "pending save" state.
+When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint-cli2.{jsonc,yaml,cjs}` or `.markdownlint.{jsonc,json,yaml,yml,cjs}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` containing the default rule configuration will be opened in the editor in the "pending save" state.
 
 ### markdownlint.focusMode
 
@@ -308,7 +308,7 @@ Or to ignore files by referencing a different file:
 
 The globbing library used for matching `markdownlint.ignore` array values is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
 
-> **Note**: Files can also be ignored (in a way other tools will recognize) via the `ignores` property in `.markdownlint-cli2.{jsonc,yaml,js}`.
+> **Note**: Files can also be ignored (in a way other tools will recognize) via the `ignores` property in `.markdownlint-cli2.{jsonc,yaml,cjs}`.
 
 ### markdownlint.customRules
 
@@ -334,7 +334,7 @@ An example of Code's workspace settings for custom rules might look like the fol
 
 For information about authoring custom rules, see [the `markdownlint` documentation for custom rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md).
 
-> **Note**: Custom rules can also be specified (in a way other tools will recognize) via the `customRules` property in `.markdownlint-cli2.{jsonc,yaml,js}`.
+> **Note**: Custom rules can also be specified (in a way other tools will recognize) via the `customRules` property in `.markdownlint-cli2.{jsonc,yaml,cjs}`.
 
 ### markdownlint.lintWorkspaceGlobs
 
