@@ -359,7 +359,7 @@ For more information about syntax, see the ["Command Line" section of the markdo
 
 Individual warnings can be suppressed with comments in the Markdown file itself:
 
-```md
+```markdown
 <!-- markdownlint-disable MD037 -->
 deliberate space * in * emphasis
 <!-- markdownlint-enable MD037 -->
