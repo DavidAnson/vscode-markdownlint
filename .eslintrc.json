@@ -1,6 +1,6 @@
 {
     "parserOptions": {
-        "ecmaVersion": 2019,
+        "ecmaVersion": 2021,
         "sourceType": "script"
     },
     "env": {
@@ -89,6 +89,7 @@
 
         "unicorn/no-array-push-push": "off",
         "unicorn/no-null": "off",
-        "unicorn/prefer-module": "off"
+        "unicorn/prefer-module": "off",
+        "unicorn/prefer-string-replace-all": "off"
     }
 }

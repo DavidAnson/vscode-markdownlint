@@ -160,7 +160,7 @@ class FsWrapper {
 	// Implements fs.access via vscode.workspace.fs
 	fwAccess (pathSegment, mode, callback) {
 		// eslint-disable-next-line no-param-reassign
-		callback = callback || mode;
+		callback ||= mode;
 		vscode.workspace.fs.stat(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
@@ -172,7 +172,7 @@ class FsWrapper {
 	// Implements fs.readdir via vscode.workspace.fs
 	fwReaddir (pathSegment, options, callback) {
 		// eslint-disable-next-line no-param-reassign
-		callback = callback || options;
+		callback ||= options;
 		vscode.workspace.fs.readDirectory(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
@@ -209,7 +209,7 @@ class FsWrapper {
 	// Implements fs.readFile via vscode.workspace.fs
 	fwReadFile (pathSegment, options, callback) {
 		// eslint-disable-next-line no-param-reassign
-		callback = callback || options;
+		callback ||= options;
 		vscode.workspace.fs.readFile(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
@@ -221,7 +221,7 @@ class FsWrapper {
 	// Implements fs.stat via vscode.workspace.fs
 	fwStat (pathSegment, options, callback) {
 		// eslint-disable-next-line no-param-reassign
-		callback = callback || options;
+		callback ||= options;
 		vscode.workspace.fs.stat(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
@@ -263,7 +263,7 @@ class FsNull {
 	// Implements fs.access/readdir/readFile/stat
 	static fnError (pathSegment, modeOrOptions, callback) {
 		// eslint-disable-next-line no-param-reassign
-		callback = callback || modeOrOptions;
+		callback ||= modeOrOptions;
 		callback(new Error("FsNull.fnError"));
 	}
 
