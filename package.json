@@ -39,13 +39,13 @@
 	"main": "./bundle",
 	"browser": "./bundle.web",
 	"dependencies": {
-		"ignore": "5.2.0",
+		"ignore": "5.2.4",
 		"js-yaml": "4.1.0",
-		"jsonc-parser": "3.1.0",
+		"jsonc-parser": "3.2.0",
 		"markdown-it-texmath": "1.0.0",
 		"markdownlint": "0.27.0",
 		"markdownlint-cli2": "0.6.0",
-		"minimatch": "5.1.0"
+		"minimatch": "5.1.2"
 	},
 	"devDependencies": {
 		"@types/vscode": "1.66.0",
