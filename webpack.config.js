@@ -27,7 +27,18 @@ const baseConfig = 	{
 	"externals": {
 		"vscode": "commonjs vscode"
 	},
-	"plugins": [ new webpack.IgnorePlugin({"resourceRegExp": /katex/}) ]
+	"plugins": [ new webpack.IgnorePlugin({"resourceRegExp": /katex/}) ],
+	"ignoreWarnings": [
+		{
+			"message": /(asset|entrypoint) size limit/
+		},
+		{
+			"message": /dependencies cannot be statically extracted/
+		},
+		{
+			"message": /lazy load some parts of your application/
+		}
+	]
 };
 const config = [
 	{
