@@ -11,13 +11,13 @@ The [Markdown](https://en.wikipedia.org/wiki/Markdown) markup language is design
 ## Install
 
 1. Open [Visual Studio Code](https://code.visualstudio.com/)
-2. Press `Ctrl+P`/`⌘P` to open the Quick Open dialog
+2. Press `Ctrl+P`/`Ctrl+P`/`⌘P` to open the Quick Open dialog
 3. Type `ext install markdownlint` to find the extension
 4. Click the `Install` button, then the `Enable` button
 
 OR
 
-1. Press `Ctrl+Shift+X`/`⇧⌘X` to open the Extensions tab
+1. Press `Ctrl+Shift+X`/`Ctrl+Shift+X`/`⇧⌘X` to open the Extensions tab
 2. Type `markdownlint` to find the extension
 3. Click the `Install` button, then the `Enable` button
 
@@ -28,7 +28,7 @@ OR
 
 ## Use
 
-When editing a Markdown file in Code with `markdownlint` installed, any lines that violate one of `markdownlint`'s rules (see below) will trigger a *Warning* in the editor. Warnings are indicated by a wavy green underline and can also be seen by pressing `Ctrl+Shift+M`/`⇧⌘M` to open the Errors and Warnings dialog. Hover the mouse pointer over a green line to see the warning or press `F8` and `Shift+F8`/`⇧F8` to cycle through all the warnings (markdownlint warnings all begin with `MD###`). For more information about a `markdownlint` warning, place the cursor on a line and click the light bulb icon or press `Ctrl+.`/`⌘.` to open the quick fix dialog. Clicking one of the warnings in the dialog will display that rule's help entry in the default web browser.
+When editing a Markdown file in Code with `markdownlint` installed, any lines that violate one of `markdownlint`'s rules (see below) will trigger a *Warning* in the editor. Warnings are indicated by a wavy green underline and can also be seen by pressing `Ctrl+Shift+M`/`Ctrl+Shift+M`/`⇧⌘M` to open the Errors and Warnings dialog. Hover the mouse pointer over a green line to see the warning or press `F8` and `Shift+F8`/`Shift+F8`/`⇧F8` to cycle through all the warnings (markdownlint warnings all begin with `MD###`). For more information about a `markdownlint` warning, place the cursor on a line and click the light bulb icon or press `Ctrl+.`/`Ctrl+.`/`⌘.` to open the quick fix dialog. Clicking one of the warnings in the dialog will display that rule's help entry in the default web browser.
 
 > For a tutorial, please see [Build an Amazing Markdown Editor Using Visual Studio Code and Pandoc](https://thisdavej.com/build-an-amazing-markdown-editor-using-visual-studio-code-and-pandoc/) by Dave Johnson.
 
@@ -86,7 +86,7 @@ When editing a Markdown file in Code with `markdownlint` installed, any lines th
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md) for more details.
 
-The following rules can be automatically fixed by moving the cursor to a rule violation (wavy underlined text) and typing `Ctrl+.`/`⌘.` or clicking the light bulb icon.
+The following rules can be automatically fixed by moving the cursor to a rule violation (wavy underlined text) and typing `Ctrl+.`/`Ctrl+.`/`⌘.` or clicking the light bulb icon.
 
 * MD004 *ul-style*
 * MD005 *list-indent*
@@ -124,7 +124,7 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 
 All of a document's violations of the above rules can be fixed automatically.
 
-`markdownlint` registers itself as a [source code formatter](https://code.visualstudio.com/docs/editor/codebasics#_formatting) for Markdown files and can be invoked by the `Format Document`/`editor.action.formatDocument` and `Format Selection`/`editor.action.formatSelection` commands, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P`/`⇧⌘P`) or via the default key bindings of `Shift+Alt+F`/`⇧⌥F` (to format the document) and `Ctrl+K Ctrl+F`/`⌘K ⌘F` (to format the selection).
+`markdownlint` registers itself as a [source code formatter](https://code.visualstudio.com/docs/editor/codebasics#_formatting) for Markdown files and can be invoked by the `Format Document`/`editor.action.formatDocument` and `Format Selection`/`editor.action.formatSelection` commands, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P`/`Ctrl+Shift+P`/`⇧⌘P`) or via the default key bindings of `Shift+Alt+F`/`Ctrl+Shift+I`/`⇧⌥F` (to format the document) and `Ctrl+K Ctrl+F`/`Ctrl+K Ctrl+F`/`⌘K ⌘F` (to format the selection).
 To automatically format when saving or pasting into a Markdown document, [configure Visual Studio Code's `editor.formatOnSave` or `editor.formatOnPaste` settings](https://code.visualstudio.com/docs/getstarted/settings) like so:
 
 ```json
@@ -143,13 +143,13 @@ To automatically fix violations when saving a Markdown document, configure Visua
 }
 ```
 
-Automatically-applied fixes from either method can be reverted by `Edit|Undo` or `Ctrl+Z`/`⌘Z`.
+Automatically-applied fixes from either method can be reverted by `Edit|Undo` or `Ctrl+Z`/`Ctrl+Z`/`⌘Z`.
 
 ### Workspace
 
 To lint all Markdown files in the current workspace, run the `markdownlint.lintWorkspace` command (from the Command Palette or by binding it to a keyboard shortcut).
 This will use [`markdownlint-cli2`](https://github.com/DavidAnson/markdownlint-cli2), the same engine that powers the extension, to lint all files and output the results to a new terminal in the "Terminal" panel.
-Results will also appear in the "Problems" panel (`Ctrl+Shift+M`/`⇧⌘M`) because of the [problem matcher](https://code.visualstudio.com/docs/editor/tasks#_defining-a-problem-matcher) included with the extension.
+Results will also appear in the "Problems" panel (`Ctrl+Shift+M`/`Ctrl+Shift+M`/`⇧⌘M`) because of the [problem matcher](https://code.visualstudio.com/docs/editor/tasks#_defining-a-problem-matcher) included with the extension.
 Entries in the "Problems" panel can be clicked to open the corresponding file in the editor.
 To customize the files that are included/excluded when linting a workspace, configure the `markdownlint.lintWorkspaceGlobs` setting (see below) at workspace or user scope.
 
@@ -369,7 +369,7 @@ More information about inline suppressions can be found in the [Configuration se
 
 ## Snippets
 
-The following snippets are available when editing a Markdown document (press `Ctrl+Space`/`⌃Space` for IntelliSense suggestions):
+The following snippets are available when editing a Markdown document (press `Ctrl+Space`/`Ctrl+Space`/`⌃Space` for IntelliSense suggestions):
 
 * `markdownlint-disable`
 * `markdownlint-enable`
