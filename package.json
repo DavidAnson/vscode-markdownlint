@@ -87,6 +87,14 @@
 		}
 	},
 	"contributes": {
+		"languages": [
+			{
+				"id": "ignore",
+				"filenames": [
+					".markdownlintignore"
+				]
+			}
+		],
 		"commands": [
 			{
 				"command": "markdownlint.fixAll",
