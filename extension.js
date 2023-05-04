@@ -375,8 +375,9 @@ function getIgnores (document) {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 		const ignoreValue = configuration.get(sectionIgnore);
 		if (Array.isArray(ignoreValue)) {
+			const minimatch = require("minimatch");
 			for (const ignorePath of ignoreValue) {
-				const ignoreRe = require("minimatch").makeRe(ignorePath, {
+				const ignoreRe = minimatch.makeRe(ignorePath, {
 					"dot": true,
 					"nocomment": true
 				});
