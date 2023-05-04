@@ -1,9 +1,15 @@
 "use strict";
 
-// Minimal requires (requires that may not be needed are inlined to avoid startup cost)
+// Minimal requires (requires that may not be needed are inlined to reduce startup cost)
 const vscode = require("vscode");
+const os = require("node:os");
 const path = require("node:path");
 const {promisify} = require("node:util");
+const {"main": markdownlintCli2} = require("markdownlint-cli2");
+// eslint-disable-next-line no-useless-concat, node/no-missing-require
+const {readConfig} = require("markdownlint-cli2" + "/markdownlint").promises;
+// eslint-disable-next-line no-useless-concat, node/no-missing-require, unicorn/no-keyword-prefix
+const {applyFix, applyFixes, expandTildePath, newLineRe} = require("markdownlint-cli2" + "/markdownlint/helpers");
 
 // Constants
 const extensionDisplayName = "markdownlint";
@@ -297,8 +303,6 @@ class LintWorkspacePseudoterminal {
 	}
 
 	open () {
-		// eslint-disable-next-line unicorn/no-keyword-prefix
-		const {newLineRe} = require("markdownlint/helpers");
 		const logString = (message) => this.writeEmitter.fire(
 			`${message.split(newLineRe).join("\r\n")}\r\n`
 		);
@@ -334,12 +338,10 @@ async function getConfig (fs, configuration, uri) {
 				(userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
 			!workspaceFolderUri ||
 			(workspaceFolderUri.scheme !== schemeFile);
-		const os = require("node:os");
 		const homedir = os && os.homedir && os.homedir();
 		const workspaceFolderFsPath = workspaceFolderUri && posixPath(workspaceFolderUri.fsPath);
 		// eslint-disable-next-line multiline-ternary
 		const extendBase = ((useHomedir && homedir) ? homedir : workspaceFolderFsPath) || "";
-		const {expandTildePath} = require("markdownlint/helpers");
 		let expanded = expandTildePath(userWorkspaceConfig.extends, os);
 		if (homedir) {
 			expanded = expanded.replace(/\${userHome}/g, homedir);
@@ -349,8 +351,7 @@ async function getConfig (fs, configuration, uri) {
 		}
 		const extendPath = path.resolve(extendBase, expanded);
 		try {
-			const markdownlint = require("markdownlint").promises;
-			const extendConfig = await markdownlint.readConfig(extendPath, configParsers, fs);
+			const extendConfig = await readConfig(extendPath, configParsers, fs);
 			userWorkspaceConfig = {
 				...extendConfig,
 				...userWorkspaceConfig
@@ -479,7 +480,7 @@ function getOptionsOverride () {
 function getNoRequire (scheme) {
 	const isTrusted = vscode.workspace.isTrusted;
 	const isSchemeFile = (scheme === schemeFile);
-	const isDesktop = Boolean(require("node:os").platform());
+	const isDesktop = Boolean(os && os.platform());
 	return !isTrusted || !isSchemeFile || !isDesktop;
 }
 
@@ -528,7 +529,6 @@ async function markdownlintWrapper (document) {
 		}
 	};
 	// Invoke markdownlint-cli2
-	const {"main": markdownlintCli2} = require("markdownlint-cli2");
 	return markdownlintCli2(parameters)
 		.catch((error) => outputLine(errorExceptionPrefix + error.stack, true))
 		.then(() => results);
@@ -561,7 +561,6 @@ async function lintWorkspace (logString) {
 			"optionsDefault": await getOptionsDefault(fs, configuration),
 			"optionsOverride": getOptionsOverride()
 		};
-		const {"main": markdownlintCli2} = require("markdownlint-cli2");
 		return markdownlintCli2(parameters)
 			.catch((error) => logString(errorExceptionPrefix + error.stack));
 	}
@@ -718,7 +717,6 @@ function fixLine (lineIndex, fixInfo) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor && fixInfo) {
-			const {applyFix} = require("markdownlint/helpers");
 			const document = editor.document;
 			const lineNumber = fixInfo.lineNumber || (lineIndex + 1);
 			const {text, range} = document.lineAt(lineNumber - 1);
@@ -760,7 +758,6 @@ function fixAll () {
 			if (isMarkdownDocument(document)) {
 				return markdownlintWrapper(document)
 					.then((errors) => {
-						const {applyFixes} = require("markdownlint/helpers");
 						const text = document.getText();
 						const fixedText = applyFixes(text, errors);
 						return (text === fixedText) ?
@@ -793,7 +790,6 @@ function formatDocument (document, range) {
 						}
 						return false;
 					});
-					const {applyFixes} = require("markdownlint/helpers");
 					const text = document.getText();
 					const fixedText = applyFixes(text, rangeErrors);
 					const start = document.lineAt(0).range.start;
