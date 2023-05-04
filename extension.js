@@ -480,7 +480,7 @@ function getOptionsOverride () {
 function getNoRequire (scheme) {
 	const isTrusted = vscode.workspace.isTrusted;
 	const isSchemeFile = (scheme === schemeFile);
-	const isDesktop = Boolean(os && os.platform());
+	const isDesktop = Boolean(os && os.platform && os.platform());
 	return !isTrusted || !isSchemeFile || !isDesktop;
 }
 
