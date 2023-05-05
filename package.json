@@ -21,8 +21,8 @@
 	"scripts": {
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
-		"docker-npm-install": "docker run --rm --tty --name npm-install --volume $PWD:/home/workdir --workdir /home/workdir --user node node:16 npm install",
-		"docker-npm-run-upgrade": "docker run --rm --tty --name npm-run-upgrade --volume $PWD:/home/workdir --workdir /home/workdir --user node node:16 npm run upgrade",
+		"docker-npm-install": "docker run --rm --tty --name npm-install --volume $PWD:/home/workdir --workdir /home/workdir --user node node:latest npm install",
+		"docker-npm-run-upgrade": "docker run --rm --tty --name npm-run-upgrade --volume $PWD:/home/workdir --workdir /home/workdir --user node node:latest npm run upgrade",
 		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js && markdownlint-cli2 *.md",
 		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && node expand-config-schema.js && node generate-config-schema.js",
 		"test": "npm run lint && npm run compile && npm run schema && git diff --exit-code",
