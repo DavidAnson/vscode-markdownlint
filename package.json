@@ -34,7 +34,7 @@
 	],
 	"engines": {
 		"node": ">=14",
-		"vscode": "^1.66.0"
+		"vscode": "^1.75.0"
 	},
 	"main": "./bundle",
 	"browser": "./bundle.web",
@@ -47,7 +47,7 @@
 		"minimatch": "9.0.0"
 	},
 	"devDependencies": {
-		"@types/vscode": "1.66.0",
+		"@types/vscode": "1.75.0",
 		"cpy-cli": "4.2.0",
 		"eslint": "8.39.0",
 		"eslint-plugin-node": "11.1.0",
@@ -69,11 +69,7 @@
 		"multi-root ready"
 	],
 	"activationEvents": [
-		"onLanguage:markdown",
-		"onCommand:markdownlint.fixAll",
-		"onCommand:markdownlint.lintWorkspace",
-		"onCommand:markdownlint.openConfigFile",
-		"onCommand:markdownlint.toggleLinting"
+		"onLanguage:markdown"
 	],
 	"capabilities": {
 		"untrustedWorkspaces": {
