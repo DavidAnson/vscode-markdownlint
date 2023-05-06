@@ -66,9 +66,11 @@ const defaultConfig = {
 };
 
 const clickForInfo = "More information about ";
-const clickToFix = "Fix this violation of ";
+const clickToFixThis = "Fix this violation of ";
+const clickToFixRulePrefix = "Fix all violations of ";
+const inTheDocument = " in the document";
 const fixLineCommandName = "markdownlint.fixLine";
-const fixAllCommandTitle = `Fix all supported ${extensionDisplayName} violations in the document`;
+const fixAllCommandTitle = `Fix all supported ${extensionDisplayName} violations${inTheDocument}`;
 const fixAllCommandName = "markdownlint.fixAll";
 const lintWorkspaceCommandName = "markdownlint.lintWorkspace";
 const openConfigFileCommandName = "markdownlint.openConfigFile";
@@ -655,9 +657,9 @@ function provideCodeActions (document, range, codeActionContext) {
 	for (const diagnostic of extensionDiagnostics) {
 		const ruleName = diagnostic.code.value || diagnostic.code;
 		const ruleNameAlias = diagnostic.message.split(":")[0];
-		// Provide code action to fix the violation
 		if (diagnostic.fixInfo) {
-			const fixTitle = clickToFix + ruleNameAlias;
+			// Provide code action to fix the violation
+			const fixTitle = clickToFixThis + ruleNameAlias;
 			const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
 			fixAction.command = {
 				"title": fixTitle,
@@ -681,14 +683,24 @@ function provideCodeActions (document, range, codeActionContext) {
 				"command": openCommand,
 				"arguments": [ ruleInformationUri ]
 			};
-			infoAction.diagnostics = [ diagnostic ];
 			addToCodeActions(infoAction);
+		}
+		if (diagnostic.fixInfo) {
+			// Provide code action to fix all similar violations
+			const fixTitle = clickToFixRulePrefix + ruleNameAlias + inTheDocument;
+			const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
+			fixAction.command = {
+				"title": fixTitle,
+				"command": fixAllCommandName,
+				"arguments": [ ruleName ]
+			};
+			addToCodeActions(fixAction);
 		}
 	}
 	if (extensionDiagnostics.length > 0) {
 		// eslint-disable-next-line func-style
 		const registerFixAllCodeAction = (codeActionKind) => {
-			// Register a "fix all" code action
+			// Provide code action for fixing all violations
 			const sourceFixAllAction = new vscode.CodeAction(
 				fixAllCommandTitle,
 				codeActionKind
@@ -701,7 +713,7 @@ function provideCodeActions (document, range, codeActionContext) {
 		};
 		registerFixAllCodeAction(codeActionKindSourceFixAllExtension);
 		registerFixAllCodeAction(codeActionKindQuickFix);
-		// Add information about configuring rules
+		// Provide code action for information about configuring rules
 		const configureInfoAction = new vscode.CodeAction(clickForConfigureInfo, codeActionKindQuickFix);
 		configureInfoAction.command = {
 			"title": clickForConfigureInfo,
@@ -751,7 +763,7 @@ function fixLine (lineIndex, fixInfo) {
 }
 
 // Fixes all violations in the active document
-function fixAll () {
+function fixAll (ruleNameFilter) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
@@ -760,7 +772,9 @@ function fixAll () {
 				return markdownlintWrapper(document)
 					.then((errors) => {
 						const text = document.getText();
-						const fixedText = applyFixes(text, errors);
+						const errorsToFix =
+							errors.filter((error) => (!ruleNameFilter || (error.ruleNames[0] === ruleNameFilter)));
+						const fixedText = applyFixes(text, errorsToFix);
 						return (text === fixedText) ?
 							null :
 							editor.edit((editBuilder) => {
