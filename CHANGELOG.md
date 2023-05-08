@@ -1,5 +1,6 @@
 # Changes
 
+* 0.50.0 - Improved rules
 * 0.49.0 - Improved rules and documentation
 * 0.48.0 - New rules, better linting in browser
 * 0.47.0 - Miscellaneous improvements
