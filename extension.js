@@ -99,6 +99,7 @@ const applicationConfiguration = {};
 const ruleNameToInformationUri = {};
 let outputChannel = null;
 let diagnosticCollection = null;
+let diagnosticGeneration = 0;
 let runMap = {};
 let ignores = null;
 let lintingEnabled = true;
@@ -586,9 +587,10 @@ function lint (document) {
 	if (!lintingEnabled || !isMarkdownDocument(document)) {
 		return;
 	}
-	// Check ignore list
 	const diagnostics = [];
 	let task = Promise.resolve();
+	const targetGeneration = diagnosticGeneration;
+	// Check ignore list
 	const relativePath = vscode.workspace.asRelativePath(document.uri, false);
 	const normalizedPath = relativePath.split(path.sep).join("/");
 	if (getIgnores(document).every((ignoreTest) => !ignoreTest(normalizedPath))) {
@@ -640,7 +642,11 @@ function lint (document) {
 			});
 	}
 	// Publish
-	task.then(() => diagnosticCollection.set(document.uri, diagnostics));
+	task.then(() => {
+		if (targetGeneration === diagnosticGeneration) {
+			diagnosticCollection.set(document.uri, diagnostics);
+		}
+	});
 }
 
 // Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
@@ -865,6 +871,7 @@ function clearDiagnosticsAndLintVisibleFiles (eventUri) {
 		outputLine(`INFO: Re-linting due to "${eventUri.fsPath}" change.`);
 	}
 	diagnosticCollection.clear();
+	diagnosticGeneration++;
 	lintVisibleFiles();
 }
 
