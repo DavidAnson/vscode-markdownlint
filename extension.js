@@ -114,14 +114,16 @@ function posixPath (p) {
 	return p.split(path.sep).join(path.posix.sep);
 }
 
-// Gets the workspace folder Uri (if any) for the document Uri (if specified)
-function getWorkspaceFolderUri (documentUri) {
-	if (documentUri) {
-		const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
-		return workspaceFolder ?
-			workspaceFolder.uri :
-			vscode.Uri.joinPath(documentUri, "..");
-	}
+// Gets the workspace folder Uri for the document Uri
+function getDocumentWorkspaceFolderUri (documentUri) {
+	const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
+	return workspaceFolder ?
+		workspaceFolder.uri :
+		vscode.Uri.joinPath(documentUri, "..");
+}
+
+// Gets the workspace folder Uri for the "root" (first) workspace folder (or null)
+function getRootWorkspaceFolderUri () {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	return (workspaceFolders && (workspaceFolders.length > 0)) ?
 		workspaceFolders[0].uri :
@@ -335,23 +337,20 @@ async function getConfig (fs, configuration, uri) {
 	// Bootstrap extend behavior into readConfig
 	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
 		const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
-		const workspaceFolderUri = getWorkspaceFolderUri(uri);
+		const workspaceFolderUri = getDocumentWorkspaceFolderUri(uri);
 		const useHomedir =
 			(userWorkspaceConfigMetadata.globalValue &&
 				(userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
-			!workspaceFolderUri ||
 			(workspaceFolderUri.scheme !== schemeFile);
 		const homedir = os && os.homedir && os.homedir();
-		const workspaceFolderFsPath = workspaceFolderUri && posixPath(workspaceFolderUri.fsPath);
+		const workspaceFolderFsPath = posixPath(workspaceFolderUri.fsPath);
 		// eslint-disable-next-line multiline-ternary
 		const extendBase = ((useHomedir && homedir) ? homedir : workspaceFolderFsPath) || "";
 		let expanded = expandTildePath(userWorkspaceConfig.extends, os);
 		if (homedir) {
 			expanded = expanded.replace(/\${userHome}/g, homedir);
 		}
-		if (workspaceFolderFsPath) {
-			expanded = expanded.replace(/\${workspaceFolder}/g, workspaceFolderFsPath);
-		}
+		expanded = expanded.replace(/\${workspaceFolder}/g, workspaceFolderFsPath);
 		const extendPath = path.resolve(extendBase, expanded);
 		try {
 			const extendConfig = await readConfig(extendPath, configParsers, fs);
@@ -392,25 +391,23 @@ function getIgnores (document) {
 			ignoreFile = ignoreValue;
 		}
 		// Handle .markdownlintignore
-		const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
-		if (workspaceFolderUri) {
-			const ignoreFileUri = vscode.Uri.joinPath(
-				workspaceFolderUri,
-				ignoreFile
-			);
-			vscode.workspace.fs.stat(ignoreFileUri).then(
-				() => vscode.workspace.fs.readFile(ignoreFileUri).then(
-					(ignoreBytes) => {
-						const ignoreString = new TextDecoder().decode(ignoreBytes);
-						const ignore = require("ignore").default;
-						const ignoreInstance = ignore().add(ignoreString);
-						ignores.push((file) => ignoreInstance.ignores(file));
-						clearDiagnosticsAndLintVisibleFiles();
-					}
-				),
-				() => null
-			);
-		}
+		const workspaceFolderUri = getDocumentWorkspaceFolderUri(document.uri);
+		const ignoreFileUri = vscode.Uri.joinPath(
+			workspaceFolderUri,
+			ignoreFile
+		);
+		vscode.workspace.fs.stat(ignoreFileUri).then(
+			() => vscode.workspace.fs.readFile(ignoreFileUri).then(
+				(ignoreBytes) => {
+					const ignoreString = new TextDecoder().decode(ignoreBytes);
+					const ignore = require("ignore").default;
+					const ignoreInstance = ignore().add(ignoreString);
+					ignores.push((file) => ignoreInstance.ignores(file));
+					clearDiagnosticsAndLintVisibleFiles();
+				}
+			),
+			() => null
+		);
 	}
 	return ignores;
 }
@@ -494,7 +491,7 @@ async function markdownlintWrapper (document) {
 	const scheme = document.uri.scheme;
 	const independentDocument = !schemeFileSystemLike.has(scheme);
 	const name = posixPath(document.uri.fsPath);
-	const workspaceFolderUri = getWorkspaceFolderUri(document.uri);
+	const workspaceFolderUri = getDocumentWorkspaceFolderUri(document.uri);
 	const fs = independentDocument ?
 		new FsNull() :
 		new FsWrapper(workspaceFolderUri);
@@ -502,9 +499,7 @@ async function markdownlintWrapper (document) {
 	const config = await getConfig(fs, configuration, document.uri);
 	const directory = independentDocument ?
 		null :
-		(workspaceFolderUri ?
-			posixPath(workspaceFolderUri.fsPath) :
-			path.posix.dirname(name));
+		posixPath(workspaceFolderUri.fsPath);
 	const argv = independentDocument ?
 		[] :
 		[ `:${name}` ];
@@ -550,7 +545,7 @@ function isMarkdownDocument (document) {
 
 // Lints Markdown files in the workspace folder tree
 async function lintWorkspace (logString) {
-	const workspaceFolderUri = getWorkspaceFolderUri();
+	const workspaceFolderUri = getRootWorkspaceFolderUri();
 	if (workspaceFolderUri) {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
 		const fs = new FsWrapper(workspaceFolderUri);
@@ -827,7 +822,7 @@ function formatDocument (document, range) {
 
 // Creates or opens the markdownlint configuration file for the workspace
 function openConfigFile () {
-	const workspaceFolderUri = getWorkspaceFolderUri();
+	const workspaceFolderUri = getRootWorkspaceFolderUri();
 	if (workspaceFolderUri) {
 		Promise.all(configFileNames.map((configFileName) => {
 			const fileUri = vscode.Uri.joinPath(workspaceFolderUri, configFileName);
@@ -1089,7 +1084,7 @@ function activate (context) {
 	context.subscriptions.push(diagnosticCollection);
 
 	// Hook up to file system changes for custom config file(s)
-	const workspaceFolderUri = getWorkspaceFolderUri();
+	const workspaceFolderUri = getRootWorkspaceFolderUri();
 	if (workspaceFolderUri) {
 		const relativeConfigFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + configFileGlob);
 		const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
