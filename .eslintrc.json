@@ -89,6 +89,7 @@
         "node/prefer-promises/fs": "error",
 
         "unicorn/no-array-push-push": "off",
+        "unicorn/no-array-reduce": "off",
         "unicorn/no-null": "off",
         "unicorn/prefer-module": "off",
         "unicorn/prefer-string-replace-all": "off"

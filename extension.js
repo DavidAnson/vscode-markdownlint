@@ -544,26 +544,33 @@ function isMarkdownDocument (document) {
 }
 
 // Lints Markdown files in the workspace folder tree
-async function lintWorkspace (logString) {
-	const workspaceFolderUri = getRootWorkspaceFolderUri();
-	if (workspaceFolderUri) {
-		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
-		const fs = new FsWrapper(workspaceFolderUri);
-		const parameters = {
-			fs,
-			"argv": configuration.get(sectionLintWorkspaceGlobs),
-			"directory": posixPath(workspaceFolderUri.fsPath),
-			"logMessage": logString,
-			"logError": logString,
-			"noErrors": true,
-			"noRequire": getNoRequire(workspaceFolderUri.scheme),
-			"optionsDefault": await getOptionsDefault(fs, configuration),
-			"optionsOverride": getOptionsOverride()
-		};
-		return markdownlintCli2(parameters)
-			.catch((error) => logString(errorExceptionPrefix + error.stack));
-	}
-	throw new Error("No workspace folder.");
+function lintWorkspace (logString) {
+	const workspaceFolderUris = (vscode.workspace.workspaceFolders || []).map((folder) => folder.uri);
+	return workspaceFolderUris.reduce(
+		(previousPromise, workspaceFolderUri) => previousPromise.then(() => {
+			logString(`Linting workspace folder "${workspaceFolderUri.toString()}"...`);
+			const fs = new FsWrapper(workspaceFolderUri);
+			const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
+			return getOptionsDefault(fs, configuration)
+				.then((optionsDefault) => {
+					const parameters = {
+						fs,
+						"argv": configuration.get(sectionLintWorkspaceGlobs),
+						"directory": posixPath(workspaceFolderUri.fsPath),
+						"logMessage": logString,
+						"logError": logString,
+						"noErrors": true,
+						"noRequire": getNoRequire(workspaceFolderUri.scheme),
+						optionsDefault,
+						"optionsOverride": getOptionsOverride()
+					};
+					return markdownlintCli2(parameters)
+						.catch((error) => logString(errorExceptionPrefix + error.stack))
+						.then(() => logString(""));
+				});
+		}),
+		Promise.resolve()
+	);
 }
 
 // Runs the lintWorkspace task to lint all Markdown files in the workspace
