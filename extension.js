@@ -97,6 +97,7 @@ const firstSegmentRe = /^\/{1,2}[^/]+\//;
 // Variables
 const applicationConfiguration = {};
 const ruleNameToInformationUri = {};
+const workspaceFolderUriToDisposables = new Map();
 let outputChannel = null;
 let diagnosticCollection = null;
 let diagnosticGeneration = 0;
@@ -1000,6 +1001,53 @@ function didGrantWorkspaceTrust () {
 	didChangeConfiguration();
 }
 
+// Creates all file system watchers for the specified workspace folder Uri
+function createFileSystemWatchers (workspaceFolderUri) {
+	disposeFileSystemWatchers(workspaceFolderUri);
+	const relativeConfigFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + configFileGlob);
+	const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
+	const relativeOptionsFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + optionsFileGlob);
+	const optionsWatcher = vscode.workspace.createFileSystemWatcher(relativeOptionsFileGlob);
+	const relativeIgnoreFilePath = new vscode.RelativePattern(workspaceFolderUri, ignoreFileName);
+	const ignoreWatcher = vscode.workspace.createFileSystemWatcher(relativeIgnoreFilePath);
+	workspaceFolderUriToDisposables.set(
+		workspaceFolderUri,
+		[
+			configWatcher,
+			configWatcher.onDidCreate(clearDiagnosticsAndLintVisibleFiles),
+			configWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
+			configWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles),
+			optionsWatcher,
+			optionsWatcher.onDidCreate(clearDiagnosticsAndLintVisibleFiles),
+			optionsWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
+			optionsWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles),
+			ignoreWatcher,
+			ignoreWatcher.onDidCreate(clearIgnores),
+			ignoreWatcher.onDidChange(clearIgnores),
+			ignoreWatcher.onDidDelete(clearIgnores)
+		]
+	);
+}
+
+// Disposes of all file system watchers for the specified workspace folder Uri
+function disposeFileSystemWatchers (workspaceFolderUri) {
+	const disposables = workspaceFolderUriToDisposables.get(workspaceFolderUri) || [];
+	for (const disposable of disposables) {
+		disposable.dispose();
+	}
+	workspaceFolderUriToDisposables.delete(workspaceFolderUri);
+}
+
+// Handles the onDidChangeWorkspaceFolders event
+function didChangeWorkspaceFolders (changes) {
+	for (const workspaceFolderUri of changes.removed.map((folder) => folder.uri)) {
+		disposeFileSystemWatchers(workspaceFolderUri);
+	}
+	for (const workspaceFolderUri of changes.added.map((folder) => folder.uri)) {
+		createFileSystemWatchers(workspaceFolderUri);
+	}
+}
+
 function activate (context) {
 	// Create OutputChannel
 	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
@@ -1018,7 +1066,8 @@ function activate (context) {
 		vscode.workspace.onDidSaveTextDocument(didSaveTextDocument),
 		vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
 		vscode.workspace.onDidChangeConfiguration(didChangeConfiguration),
-		vscode.workspace.onDidGrantWorkspaceTrust(didGrantWorkspaceTrust)
+		vscode.workspace.onDidGrantWorkspaceTrust(didGrantWorkspaceTrust),
+		vscode.workspace.onDidChangeWorkspaceFolders(didChangeWorkspaceFolders)
 	);
 
 	// Register CodeActionsProvider
@@ -1091,37 +1140,20 @@ function activate (context) {
 	context.subscriptions.push(diagnosticCollection);
 
 	// Hook up to file system changes for custom config file(s)
-	const workspaceFolderUri = getRootWorkspaceFolderUri();
-	if (workspaceFolderUri) {
-		const relativeConfigFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + configFileGlob);
-		const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
-		context.subscriptions.push(
-			configWatcher,
-			configWatcher.onDidCreate(clearDiagnosticsAndLintVisibleFiles),
-			configWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
-			configWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles)
-		);
-		const relativeOptionsFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + optionsFileGlob);
-		const optionsWatcher = vscode.workspace.createFileSystemWatcher(relativeOptionsFileGlob);
-		context.subscriptions.push(
-			optionsWatcher,
-			optionsWatcher.onDidCreate(clearDiagnosticsAndLintVisibleFiles),
-			optionsWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
-			optionsWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles)
-		);
-		const relativeIgnoreFilePath = new vscode.RelativePattern(workspaceFolderUri, ignoreFileName);
-		const ignoreWatcher = vscode.workspace.createFileSystemWatcher(relativeIgnoreFilePath);
-		context.subscriptions.push(
-			ignoreWatcher,
-			ignoreWatcher.onDidCreate(clearIgnores),
-			ignoreWatcher.onDidChange(clearIgnores),
-			ignoreWatcher.onDidDelete(clearIgnores)
-		);
-	}
+	didChangeWorkspaceFolders({
+		"added": vscode.workspace.workspaceFolders || [],
+		"removed": []
+	});
 
-	// Cancel any pending operations during deactivation
+	// Cancel any pending operations and dispose of all file system watchers during deactivation
 	context.subscriptions.push({
-		"dispose": () => suppressLint(throttle.document)
+		"dispose": () => {
+			suppressLint(throttle.document);
+			didChangeWorkspaceFolders({
+				"added": [],
+				"removed": vscode.workspace.workspaceFolders || []
+			});
+		}
 	});
 
 	// Lint all visible documents
