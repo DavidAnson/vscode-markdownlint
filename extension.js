@@ -123,14 +123,6 @@ function getDocumentWorkspaceFolderUri (documentUri) {
 		vscode.Uri.joinPath(documentUri, "..");
 }
 
-// Gets the workspace folder Uri for the "root" (first) workspace folder (or null)
-function getRootWorkspaceFolderUri () {
-	const workspaceFolders = vscode.workspace.workspaceFolders;
-	return (workspaceFolders && (workspaceFolders.length > 0)) ?
-		workspaceFolders[0].uri :
-		null;
-}
-
 // A Node-like fs object implemented using vscode.workspace.fs
 class FsWrapper {
 	// Returns true
@@ -828,10 +820,10 @@ function formatDocument (document, range) {
 	});
 }
 
-// Creates or opens the markdownlint configuration file for the workspace
+// Creates or opens the markdownlint configuration file for each workspace
 function openConfigFile () {
-	const workspaceFolderUri = getRootWorkspaceFolderUri();
-	if (workspaceFolderUri) {
+	const workspaceFolderUris = (vscode.workspace.workspaceFolders || []).map((folder) => folder.uri);
+	for (const workspaceFolderUri of workspaceFolderUris) {
 		Promise.all(configFileNames.map((configFileName) => {
 			const fileUri = vscode.Uri.joinPath(workspaceFolderUri, configFileName);
 			return vscode.workspace.fs.stat(fileUri).then(
