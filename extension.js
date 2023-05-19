@@ -98,11 +98,11 @@ const firstSegmentRe = /^\/{1,2}[^/]+\//;
 const applicationConfiguration = {};
 const ruleNameToInformationUri = {};
 const workspaceFolderUriToDisposables = new Map();
+const workspaceFolderUriToIgnores = new Map();
 let outputChannel = null;
 let diagnosticCollection = null;
 let diagnosticGeneration = 0;
 let runMap = {};
-let ignores = null;
 let lintingEnabled = true;
 const throttle = {
 	"document": null,
@@ -363,8 +363,10 @@ async function getConfig (fs, configuration, uri) {
 
 // Returns ignore configuration for user/workspace
 function getIgnores (document) {
-	if (!Array.isArray(ignores)) {
-		ignores = [];
+	const workspaceFolderUri = getDocumentWorkspaceFolderUri(document.uri);
+	if (!workspaceFolderUriToIgnores.has(workspaceFolderUri)) {
+		const ignores = [];
+		workspaceFolderUriToIgnores.set(workspaceFolderUri, ignores);
 		let ignoreFile = ignoreFileName;
 		// Handle "ignore" configuration
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
@@ -384,7 +386,6 @@ function getIgnores (document) {
 			ignoreFile = ignoreValue;
 		}
 		// Handle .markdownlintignore
-		const workspaceFolderUri = getDocumentWorkspaceFolderUri(document.uri);
 		const ignoreFileUri = vscode.Uri.joinPath(
 			workspaceFolderUri,
 			ignoreFile
@@ -402,7 +403,7 @@ function getIgnores (document) {
 			() => null
 		);
 	}
-	return ignores;
+	return workspaceFolderUriToIgnores.get(workspaceFolderUri);
 }
 
 // Clears the ignore list
@@ -411,7 +412,7 @@ function clearIgnores (eventUri) {
 		`"${eventUri.fsPath}"` :
 		"setting";
 	outputLine(`INFO: Resetting ignore cache due to ${source} change.`);
-	ignores = null;
+	workspaceFolderUriToIgnores.clear();
 	if (eventUri) {
 		clearDiagnosticsAndLintVisibleFiles();
 	}
