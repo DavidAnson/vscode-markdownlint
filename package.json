@@ -43,8 +43,8 @@
 		"js-yaml": "4.1.0",
 		"jsonc-parser": "3.2.0",
 		"markdown-it-texmath": "1.0.0",
-		"markdownlint-cli2": "0.7.1",
-		"minimatch": "9.0.0"
+		"markdownlint-cli2": "0.8.1",
+		"minimatch": "9.0.1"
 	},
 	"devDependencies": {
 		"@types/vscode": "1.75.0",
