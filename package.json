@@ -33,7 +33,7 @@
 		"Formatters"
 	],
 	"engines": {
-		"node": ">=14",
+		"node": ">=16",
 		"vscode": "^1.75.0"
 	},
 	"main": "./bundle",
