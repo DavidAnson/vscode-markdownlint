@@ -619,14 +619,26 @@
       "properties": {
         "lines_above": {
           "description": "Blank lines above heading",
-          "type": "integer",
-          "minimum": 0,
+          "type": [
+            "integer",
+            "array"
+          ],
+          "items": {
+            "type": "integer"
+          },
+          "minimum": -1,
           "default": 1
         },
         "lines_below": {
           "description": "Blank lines below heading",
-          "type": "integer",
-          "minimum": 0,
+          "type": [
+            "integer",
+            "array"
+          ],
+          "items": {
+            "type": "integer"
+          },
+          "minimum": -1,
           "default": 1
         }
       },
@@ -642,14 +654,26 @@
       "properties": {
         "lines_above": {
           "description": "Blank lines above heading",
-          "type": "integer",
-          "minimum": 0,
+          "type": [
+            "integer",
+            "array"
+          ],
+          "items": {
+            "type": "integer"
+          },
+          "minimum": -1,
           "default": 1
         },
         "lines_below": {
           "description": "Blank lines below heading",
-          "type": "integer",
-          "minimum": 0,
+          "type": [
+            "integer",
+            "array"
+          ],
+          "items": {
+            "type": "integer"
+          },
+          "minimum": -1,
           "default": 1
         }
       },
@@ -665,14 +689,26 @@
       "properties": {
         "lines_above": {
           "description": "Blank lines above heading",
-          "type": "integer",
-          "minimum": 0,
+          "type": [
+            "integer",
+            "array"
+          ],
+          "items": {
+            "type": "integer"
+          },
+          "minimum": -1,
           "default": 1
         },
         "lines_below": {
           "description": "Blank lines below heading",
-          "type": "integer",
-          "minimum": 0,
+          "type": [
+            "integer",
+            "array"
+          ],
+          "items": {
+            "type": "integer"
+          },
+          "minimum": -1,
           "default": 1
         }
       },
@@ -834,7 +870,7 @@
       "default": true,
       "properties": {
         "punctuation": {
-          "description": "Punctuation characters not allowed at end of headings",
+          "description": "Punctuation characters",
           "type": "string",
           "default": ".,;:!。，；：！"
         }
@@ -850,7 +886,7 @@
       "default": true,
       "properties": {
         "punctuation": {
-          "description": "Punctuation characters not allowed at end of headings",
+          "description": "Punctuation characters",
           "type": "string",
           "default": ".,;:!。，；：！"
         }
@@ -1591,7 +1627,7 @@
       "default": true,
       "properties": {
         "style": {
-          "description": "Emphasis style should be consistent",
+          "description": "Emphasis style",
           "type": "string",
           "enum": [
             "consistent",
@@ -1612,7 +1648,7 @@
       "default": true,
       "properties": {
         "style": {
-          "description": "Emphasis style should be consistent",
+          "description": "Emphasis style",
           "type": "string",
           "enum": [
             "consistent",
@@ -1633,7 +1669,7 @@
       "default": true,
       "properties": {
         "style": {
-          "description": "Strong style should be consistent",
+          "description": "Strong style",
           "type": "string",
           "enum": [
             "consistent",
@@ -1654,7 +1690,7 @@
       "default": true,
       "properties": {
         "style": {
-          "description": "Strong style should be consistent",
+          "description": "Strong style",
           "type": "string",
           "enum": [
             "consistent",

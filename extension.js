@@ -442,25 +442,11 @@ function getCustomRules (configuration) {
 	return customRules;
 }
 
-// Gets the default markdown-it plugins for markdownlint-cli2
-function getDefaultMarkdownItPlugins () {
-	return [
-		[
-			require("markdown-it-texmath"),
-			{
-				"engine": {
-					"renderToString": () => ""
-				}
-			}
-		]
-	];
-}
 // Gets the value of the optionsDefault parameter to markdownlint-cli2
 async function getOptionsDefault (fs, workspaceConfiguration, config) {
 	return {
 		"config": config || await getConfig(fs, workspaceConfiguration),
-		"customRules": getCustomRules(workspaceConfiguration),
-		"markdownItPlugins": getDefaultMarkdownItPlugins()
+		"customRules": getCustomRules(workspaceConfiguration)
 	};
 }
 
