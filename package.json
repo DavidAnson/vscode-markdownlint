@@ -48,17 +48,17 @@
 	},
 	"devDependencies": {
 		"@types/vscode": "1.75.0",
-		"cpy-cli": "4.2.0",
-		"eslint": "8.42.0",
+		"cpy-cli": "5.0.0",
+		"eslint": "8.48.0",
 		"eslint-plugin-node": "11.1.0",
-		"eslint-plugin-unicorn": "47.0.0",
+		"eslint-plugin-unicorn": "48.0.1",
 		"path-browserify": "1.0.1",
 		"process": "0.11.10",
 		"stream-browserify": "3.0.0",
 		"terser-webpack-plugin": "5.3.9",
 		"util": "0.12.5",
 		"vsce": "2.15.0",
-		"webpack": "5.86.0",
+		"webpack": "5.88.2",
 		"webpack-cli": "5.1.4"
 	},
 	"keywords": [
