@@ -44,7 +44,7 @@
 		"jsonc-parser": "3.2.0",
 		"markdown-it-texmath": "1.0.0",
 		"markdownlint-cli2": "0.8.1",
-		"minimatch": "9.0.1"
+		"minimatch": "9.0.3"
 	},
 	"devDependencies": {
 		"@types/vscode": "1.75.0",
