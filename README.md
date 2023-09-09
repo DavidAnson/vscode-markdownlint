@@ -125,7 +125,7 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 All of a document's violations of the above rules can be fixed automatically.
 
 `markdownlint` registers itself as a [source code formatter](https://code.visualstudio.com/docs/editor/codebasics#_formatting) for Markdown files and can be invoked by the `Format Document`/`editor.action.formatDocument` and `Format Selection`/`editor.action.formatSelection` commands, either from the [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette) (via `View|Command Palette...` or `Ctrl+Shift+P`/`Ctrl+Shift+P`/`⇧⌘P`) or via the default key bindings of `Shift+Alt+F`/`Ctrl+Shift+I`/`⇧⌥F` (to format the document) and `Ctrl+K Ctrl+F`/`Ctrl+K Ctrl+F`/`⌘K ⌘F` (to format the selection).
-To automatically format when saving or pasting into a Markdown document, [configure Visual Studio Code's `editor.formatOnSave` or `editor.formatOnPaste` settings](https://code.visualstudio.com/docs/getstarted/settings) like so:
+To automatically format when saving or pasting into a Markdown document, [configure Visual Studio Code's `editor.formatOnSave` or `editor.formatOnPaste` settings]([https://code.visualstudio.com/docs/getstarted/settings](https://code.visualstudio.com/docs/getstarted/settings#_language-specific-editor-settings)) like so:
 
 ```json
 "[markdown]": {
