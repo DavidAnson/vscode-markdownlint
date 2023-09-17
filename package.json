@@ -24,7 +24,7 @@
 		"docker-npm-install": "docker run --rm --tty --name npm-install --volume $PWD:/home/workdir --workdir /home/workdir --user node node:latest npm install",
 		"docker-npm-run-upgrade": "docker run --rm --tty --name npm-run-upgrade --volume $PWD:/home/workdir --workdir /home/workdir --user node node:latest npm run upgrade",
 		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js && markdownlint-cli2 *.md",
-		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && node expand-config-schema.js && node generate-config-schema.js",
+		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && node expand-config-schema.js && node generate-config-schema.js && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
 		"test": "npm run lint && npm run compile && npm run schema && git diff --exit-code",
 		"upgrade": "npx --yes npm-check-updates --upgrade"
 	},
@@ -42,7 +42,7 @@
 		"ignore": "5.2.4",
 		"js-yaml": "4.1.0",
 		"jsonc-parser": "3.2.0",
-		"markdownlint-cli2": "0.9.2",
+		"markdownlint-cli2": "0.10.0",
 		"minimatch": "9.0.3"
 	},
 	"devDependencies": {
@@ -1953,13 +1953,35 @@
 						},
 						"MD052": {
 							"description": "MD052/reference-links-images - Reference links and images should use a label that is defined",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"shortcut_syntax": {
+									"description": "Include shortcut syntax",
+									"type": "boolean",
+									"default": false
+								}
+							},
+							"additionalProperties": false
 						},
 						"reference-links-images": {
 							"description": "MD052/reference-links-images - Reference links and images should use a label that is defined",
-							"type": "boolean",
-							"default": true
+							"type": [
+								"boolean",
+								"object"
+							],
+							"default": true,
+							"properties": {
+								"shortcut_syntax": {
+									"description": "Include shortcut syntax",
+									"type": "boolean",
+									"default": false
+								}
+							},
+							"additionalProperties": false
 						},
 						"MD053": {
 							"description": "MD053/link-image-reference-definitions - Link and image reference definitions should be needed",

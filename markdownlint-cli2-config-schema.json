@@ -1,102 +1,114 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
-	"title": "markdownlint-cli2 configuration schema",
-	"type": "object",
-	"properties": {
-		"config": {
-			"$ref": "./markdownlint-config-schema.json"
-		},
-		"customRules": {
-			"description": "Module names or paths of custom rules to load and use when linting",
-			"type": "array",
-			"default": [],
-			"items": {
-				"description": "Module name or path of a custom rule",
-				"type": "string",
-				"minLength": 1
-			}
-		},
-		"fix": {
-			"description": "Whether to enable fixing of linting errors reported by rules that emit fix information",
-			"type": "boolean",
-			"default": false
-		},
-		"frontMatter": {
-			"description": "Regular expression used to match and ignore any front matter at the beginning of a document",
-			"type": "string",
-			"minLength": 1,
-			"default": ""
-		},
-		"globs": {
-			"description": "Glob expressions to include when linting (only valid at the root)",
-			"type": "array",
-			"default": [],
-			"items": {
-				"description": "Glob expression of files to lint",
-				"type": "string",
-				"minLength": 1
-			}
-		},
-		"ignores": {
-			"description": "Glob expressions to ignore when linting",
-			"type": "array",
-			"default": [],
-			"items": {
-				"description": "Glob expression of files to ignore",
-				"type": "string",
-				"minLength": 1
-			}
-		},
-		"markdownItPlugins": {
-			"description": "markdown-it plugins to load and use when linting",
-			"type": "array",
-			"default": [],
-			"items": {
-				"description": "Name or path of a markdown-it plugin followed by parameters",
-				"type": "array",
-				"items": [
-					{
-						"description": "Name or path of a markdown-it plugin",
-						"type": "string",
-						"minLength": 1
-					},
-					{
-						"description": "Parameter(s) to pass to the markdown-it plugin"
-					}
-				],
-				"minItems": 1
-			}
-		},
-		"noInlineConfig": {
-			"description": "Whether to disable support of HTML comments within Markdown content",
-			"type": "boolean",
-			"default": false
-		},
-		"noProgress": {
-			"description": "Whether to disable the display of progress on stdout (only valid at the root)",
-			"type": "boolean",
-			"default": false
-		},
-		"outputFormatters": {
-			"description": "Output formatters to load and use to customize markdownlint-cli2 output (only valid at the root)",
-			"type": "array",
-			"default": [],
-			"items": {
-				"description": "Name or path of an output formatter followed by parameters",
-				"type": "array",
-				"items": [
-					{
-						"description": "Name or path of an output formatter",
-						"type": "string",
-						"minLength": 1
-					},
-					{
-						"description": "Parameter(s) to pass to the output formatter"
-					}
-				],
-				"minItems": 1
-			}
-		}
-	},
-	"additionalProperties": false
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "markdownlint-cli2 configuration schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "description": "JSON Schema URI (used by some editors)",
+      "type": "string",
+      "default": "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/main/schema/markdownlint-cli2-config-schema.json"
+    },
+    "config": {
+      "description": "markdownlint-cli2 configuration schema",
+      "$ref": "./markdownlint-config-schema.json",
+      "default": {}
+    },
+    "customRules": {
+      "description": "Module names or paths of custom rules to load and use when linting",
+      "type": "array",
+      "default": [],
+      "items": {
+        "description": "Module name or path of a custom rule",
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "fix": {
+      "description": "Whether to enable fixing of linting errors reported by rules that emit fix information",
+      "type": "boolean",
+      "default": false
+    },
+    "frontMatter": {
+      "description": "Regular expression used to match and ignore any front matter at the beginning of a document",
+      "type": "string",
+      "minLength": 1,
+      "default": ""
+    },
+    "globs": {
+      "description": "Glob expressions to include when linting (only valid at the root)",
+      "type": "array",
+      "default": [],
+      "items": {
+        "description": "Glob expression of files to lint",
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "ignores": {
+      "description": "Glob expressions to ignore when linting",
+      "type": "array",
+      "default": [],
+      "items": {
+        "description": "Glob expression of files to ignore",
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "markdownItPlugins": {
+      "description": "markdown-it plugins to load and use when linting",
+      "type": "array",
+      "default": [],
+      "items": {
+        "description": "Name or path of a markdown-it plugin followed by parameters",
+        "type": "array",
+        "items": [
+          {
+            "description": "Name or path of a markdown-it plugin",
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "description": "Parameter(s) to pass to the markdown-it plugin"
+          }
+        ],
+        "minItems": 1
+      }
+    },
+    "noInlineConfig": {
+      "description": "Whether to disable support of HTML comments within Markdown content",
+      "type": "boolean",
+      "default": false
+    },
+    "noProgress": {
+      "description": "Whether to disable the display of progress on stdout (only valid at the root)",
+      "type": "boolean",
+      "default": false
+    },
+    "outputFormatters": {
+      "description": "Output formatters to load and use to customize markdownlint-cli2 output (only valid at the root)",
+      "type": "array",
+      "default": [],
+      "items": {
+        "description": "Name or path of an output formatter followed by parameters",
+        "type": "array",
+        "items": [
+          {
+            "description": "Name or path of an output formatter",
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "description": "Parameter(s) to pass to the output formatter"
+          }
+        ],
+        "minItems": 1
+      }
+    },
+    "showFound": {
+      "description": "Whether to show the list of found files on stdout (only valid at the root)",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "additionalProperties": false
 }
