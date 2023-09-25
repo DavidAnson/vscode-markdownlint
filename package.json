@@ -50,7 +50,7 @@
 		"@types/vscode": "1.75.0",
 		"@vscode/test-electron": "2.3.4",
 		"cpy-cli": "5.0.0",
-		"eslint": "8.48.0",
+		"eslint": "8.50.0",
 		"eslint-plugin-node": "11.1.0",
 		"eslint-plugin-unicorn": "48.0.1",
 		"path-browserify": "1.0.1",
