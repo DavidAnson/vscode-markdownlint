@@ -116,6 +116,7 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD047 *single-trailing-newline*
 * MD049 *emphasis-style*
 * MD050 *strong-style*
+* MD051 *link-fragments*
 * MD053 *link-image-reference-definitions*
 
 ## Commands
