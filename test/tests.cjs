@@ -127,7 +127,7 @@ const tests = [
 				}),
 				vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
 					callbackWrapper(reject, () => {
-						const {uris} = diagnosticChangeEvent;
+						const uris = diagnosticChangeEvent.uris.filter((uri) => uri.scheme === "file");
 						assert.equal(uris.length, 1);
 						const [ uri ] = uris;
 						const diagnostics = vscode.languages.getDiagnostics(uri);

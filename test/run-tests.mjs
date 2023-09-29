@@ -16,6 +16,15 @@ try {
       // TypeError: Failed to fetch
     ]
   });
+  // @ts-ignore
+  await runTests({
+    extensionDevelopmentPath,
+    extensionTestsPath,
+    "launchArgs": [
+      "--disable-extensions",
+      "."
+    ]
+  });
 } catch (error) {
   console.error(`TEST FAILURE: ${error}`);
   process.exit(1);
