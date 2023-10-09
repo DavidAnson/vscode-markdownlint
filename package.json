@@ -18,6 +18,7 @@
 	"bugs": {
 		"url": "https://github.com/DavidAnson/vscode-markdownlint/issues"
 	},
+	"funding": "https://github.com/sponsors/DavidAnson",
 	"scripts": {
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
