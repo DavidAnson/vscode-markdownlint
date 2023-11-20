@@ -2,7 +2,4 @@
 
 "use strict";
 
-module.exports = {
-  "fileURLToPath": () => "",
-  "pathToFileURL": () => ""
-};
+module.exports = {};

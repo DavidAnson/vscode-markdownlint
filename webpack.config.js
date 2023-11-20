@@ -27,7 +27,16 @@ const baseConfig = 	{
 	"externals": {
 		"vscode": "commonjs vscode"
 	},
-	"plugins": [ new webpack.IgnorePlugin({"resourceRegExp": /katex/}) ],
+	"plugins": [
+		// Rewrite requires to remove "node:" prefix
+		new webpack.NormalModuleReplacementPlugin(
+			nodeModulePrefixRe,
+			(resource) => {
+				const module = resource.request.replace(nodeModulePrefixRe, "");
+				resource.request = module;
+			}
+		)
+	],
 	"ignoreWarnings": [
 		{
 			"message": /(asset|entrypoint) size limit/
@@ -41,19 +50,7 @@ const baseConfig = 	{
 	]
 };
 const config = [
-	{
-		...baseConfig,
-		"plugins": [
-			...baseConfig.plugins,
-			new webpack.NormalModuleReplacementPlugin(
-				nodeModulePrefixRe,
-				(resource) => {
-					const module = resource.request.replace(nodeModulePrefixRe, "");
-					resource.request = module;
-				}
-			)
-		]
-	},
+	baseConfig,
 	{
 		...baseConfig,
 		"target": "webworker",
@@ -64,16 +61,7 @@ const config = [
 		},
 		"plugins": [
 			...baseConfig.plugins,
-			new webpack.NormalModuleReplacementPlugin(
-				nodeModulePrefixRe,
-				(resource) => {
-					let module = resource.request.replace(nodeModulePrefixRe, "");
-					if (module === "url") {
-						module = "url-stub";
-					}
-					resource.request = module;
-				}
-			),
+			// Intercept use of "process" to provide stub implementation
 			new webpack.ProvidePlugin({
 				"process": "process-wrapper"
 			})
@@ -83,10 +71,10 @@ const config = [
 				"fs": false,
 				"os": require.resolve("./webworker/os-stub.js"),
 				"path": require.resolve("path-browserify"),
-				"process": require.resolve("./webworker/process-wrapper.js"),
-				"process-wrapper": require.resolve("./webworker/process-wrapper.js"),
+				"process": require.resolve("./webworker/process-stub.js"),
+				"process-wrapper": require.resolve("./webworker/process-stub.js"),
 				"stream": require.resolve("stream-browserify"),
-				"url-stub": require.resolve("./webworker/url-stub.js"),
+				"url": require.resolve("./webworker/url-stub.js"),
 				"util": require.resolve("util")
 			}
 		}
