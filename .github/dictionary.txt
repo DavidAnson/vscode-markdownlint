@@ -4,7 +4,6 @@ blockquote
 CLI
 CommonMark
 config
-first-header-h1
 first-heading-h1
 first-line-h1
 formatter
