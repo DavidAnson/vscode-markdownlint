@@ -72,8 +72,8 @@ function openLintEditVerifyFixAll () {
 						assert.equal(md019.code.value, "MD019");
 						assert.equal(
 							// @ts-ignore
-							md019.code.target.toString(),
-							"https://github.com/DavidAnson/markdownlint/blob/v0.31.1/doc/md019.md"
+							md019.code.target.toString().replace(/v\d+\.\d+\.\d+/, "v0.0.0"),
+							"https://github.com/DavidAnson/markdownlint/blob/v0.0.0/doc/md019.md"
 						);
 						assert.equal(
 							md019.message,
@@ -86,8 +86,8 @@ function openLintEditVerifyFixAll () {
 						assert.equal(md012.code.value, "MD012");
 						assert.equal(
 							// @ts-ignore
-							md012.code.target.toString(),
-							"https://github.com/DavidAnson/markdownlint/blob/v0.31.1/doc/md012.md"
+							md012.code.target.toString().replace(/v\d+\.\d+\.\d+/, "v0.0.0"),
+							"https://github.com/DavidAnson/markdownlint/blob/v0.0.0/doc/md012.md"
 						);
 						assert.equal(
 							md012.message,

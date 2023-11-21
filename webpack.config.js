@@ -61,6 +61,13 @@ const config = [
 		},
 		"plugins": [
 			...baseConfig.plugins,
+			// Intercept existing "unicorn-magic" package to provide missing import
+			new webpack.NormalModuleReplacementPlugin(
+				/^unicorn-magic$/u,
+				(resource) => {
+					resource.request = require.resolve("./webworker/unicorn-magic-stub.js");
+				}
+			),
 			// Intercept use of "process" to provide stub implementation
 			new webpack.ProvidePlugin({
 				"process": "process-wrapper"

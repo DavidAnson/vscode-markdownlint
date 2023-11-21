@@ -74,6 +74,16 @@
         "minItems": 1
       }
     },
+    "modulePaths": {
+      "description": "Additional paths to resolve module locations from",
+      "type": "array",
+      "default": [],
+      "items": {
+        "description": "Path to resolve module locations from",
+        "type": "string",
+        "minLength": 1
+      }
+    },
     "noInlineConfig": {
       "description": "Whether to disable support of HTML comments within Markdown content",
       "type": "boolean",
