@@ -12,6 +12,7 @@ globbing
 IntelliSense
 JSON
 JSONC
+LLMs
 macOS
 markdownlint
 markdownlint-cli2
