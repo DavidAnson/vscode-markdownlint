@@ -44,6 +44,7 @@ function callbackWrapper (reject, callback) {
 	}
 }
 
+// Open README.md, create 2 violations, verify diagnostics, run fixAll command
 function openLintEditVerifyFixAll () {
 	return testWrapper((resolve, reject, disposables) => {
 		let fixedAll = false;
@@ -108,6 +109,7 @@ function openLintEditVerifyFixAll () {
 	});
 }
 
+// Open README.md, create two violations, close file, verify no diagnostics
 function openLintEditCloseClean () {
 	return testWrapper((resolve, reject, disposables) => {
 		let closedActiveEditor = false;
@@ -142,6 +144,37 @@ function openLintEditCloseClean () {
 	});
 }
 
+// Open README.md, add non-default violation (autolink), verify diagnostic
+function addNonDefaultViolation () {
+	return testWrapper((resolve, reject, disposables) => {
+		disposables.push(
+			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
+				callbackWrapper(reject, () => {
+					if (textEditor) {
+						assert.ok(textEditor.document.uri.path.endsWith("/README.md"));
+						textEditor.edit((editBuilder) => {
+							editBuilder.insert(new vscode.Position(2, 0), "<https:\\example.com>\n\n");
+						});
+					}
+				});
+			}),
+			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
+				callbackWrapper(reject, () => {
+					const uris = diagnosticChangeEvent.uris.filter((uri) => uri.scheme === "file");
+					assert.equal(uris.length, 1);
+					const [ uri ] = uris;
+					const diagnostics = vscode.languages.getDiagnostics(uri);
+					if (diagnostics.length === 1) {
+						resolve();
+					}
+				});
+			})
+		);
+		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")));
+	});
+}
+
+// Run lintWorkspace command
 function lintWorkspace () {
 	return testWrapper((resolve, reject, disposables) => {
 		disposables.push(
@@ -159,7 +192,8 @@ function lintWorkspace () {
 
 const tests = [
 	openLintEditVerifyFixAll,
-	openLintEditCloseClean
+	openLintEditCloseClean,
+	addNonDefaultViolation
 ];
 if (vscode.workspace.workspaceFolders) {
 	tests.push(
