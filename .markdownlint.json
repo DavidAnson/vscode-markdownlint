@@ -24,6 +24,11 @@
 		"style": "---"
 	},
 	"line-length": false,
+	"link-image-style": {
+		"autolink": false,
+		"collapsed": false,
+		"shortcut": false
+	},
 	"no-duplicate-heading": {
 		"siblings_only": true
 	},

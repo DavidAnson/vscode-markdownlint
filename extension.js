@@ -498,7 +498,6 @@ async function markdownlintWrapper (document) {
 		[contents]: {
 			[name]: document.getText()
 		},
-		"noErrors": true,
 		"noGlobs": true,
 		"noRequire": getNoRequire(scheme),
 		"optionsDefault": await getOptionsDefault(fs, configuration, config),
@@ -539,7 +538,6 @@ function lintWorkspace (logString) {
 						"directory": posixPath(workspaceFolderUri.fsPath),
 						"logMessage": logString,
 						"logError": logString,
-						"noErrors": true,
 						"noRequire": getNoRequire(workspaceFolderUri.scheme),
 						optionsDefault,
 						"optionsOverride": getOptionsOverride()
