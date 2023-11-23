@@ -8,8 +8,14 @@ const {tests} = require("./tests.cjs");
 function run () {
 	return tests.reduce((previous, current) => previous.then(() => {
 		// eslint-disable-next-line no-console
-		console.log(`${current.name}...`);
-		return current();
+		console.log(`- ${current.name}...`);
+		return current()
+			.then(
+				// eslint-disable-next-line no-console
+				() => console.log("- ok"),
+				// eslint-disable-next-line no-console
+				(error) => console.log(`- FAIL: ${error}`)
+			);
 	}), Promise.resolve());
 }
 

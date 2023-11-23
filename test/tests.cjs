@@ -6,27 +6,34 @@
 /* eslint-disable func-style */
 
 const assert = require("node:assert");
+const fs = require("node:fs/promises");
 const path = require("node:path");
 const vscode = require("vscode");
 
+// eslint-disable-next-line no-empty-function
+function noop () {}
+
 function testWrapper (test) {
 	return new Promise((resolve, reject) => {
-		const timeout = setTimeout(() => reject(new Error("TEST TIMEOUT")), 10_000);
 		const disposables = [];
+		// eslint-disable-next-line no-use-before-define
+		const timeout = setTimeout(() => rejectWrapper(new Error("TEST TIMEOUT")), 10_000);
 		const cleanup = () => {
 			clearTimeout(timeout);
 			for (const disposable of disposables) {
 				disposable.dispose();
 			}
-			vscode.commands.executeCommand("workbench.action.closeAllEditors");
+			return vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor")
+				.then(() => {
+					const workspaceSettingsJson = path.join(__dirname, "..", ".vscode", "settings.json");
+					return fs.access(workspaceSettingsJson).then(() => fs.rm(workspaceSettingsJson), noop);
+				});
 		};
 		const resolveWrapper = (value) => {
-			resolve(value);
-			cleanup();
+			cleanup().then(() => resolve(value), reject);
 		};
 		const rejectWrapper = (reason) => {
-			reject(reason);
-			cleanup();
+			cleanup().then(() => reject(reason?.stack), reject);
 		};
 		try {
 			test(resolveWrapper, rejectWrapper, disposables);
@@ -57,7 +64,8 @@ function openLintEditVerifyFixAll () {
 						editBuilder.insert(new vscode.Position(0, 1), " ");
 						// MD012
 						editBuilder.insert(new vscode.Position(1, 0), "\n");
-					});
+					})
+						.then(noop, reject);
 				});
 			}),
 			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
@@ -105,7 +113,8 @@ function openLintEditVerifyFixAll () {
 				});
 			})
 		);
-		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")));
+		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")))
+			.then(noop, reject);
 	});
 }
 
@@ -121,7 +130,8 @@ function openLintEditCloseClean () {
 						textEditor.edit((editBuilder) => {
 							editBuilder.insert(new vscode.Position(0, 1), " ");
 							editBuilder.insert(new vscode.Position(1, 0), "\n");
-						});
+						})
+							.then(noop, reject);
 					}
 				});
 			}),
@@ -140,13 +150,15 @@ function openLintEditCloseClean () {
 				});
 			})
 		);
-		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")));
+		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")))
+			.then(noop, reject);
 	});
 }
 
 // Open README.md, add non-default violation (autolink), verify diagnostic
 function addNonDefaultViolation () {
 	return testWrapper((resolve, reject, disposables) => {
+		let validated = false;
 		disposables.push(
 			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
 				callbackWrapper(reject, () => {
@@ -154,7 +166,8 @@ function addNonDefaultViolation () {
 						assert.ok(textEditor.document.uri.path.endsWith("/README.md"));
 						textEditor.edit((editBuilder) => {
 							editBuilder.insert(new vscode.Position(2, 0), "<https:\\example.com>\n\n");
-						});
+						})
+							.then(noop, reject);
 					}
 				});
 			}),
@@ -164,13 +177,73 @@ function addNonDefaultViolation () {
 					assert.equal(uris.length, 1);
 					const [ uri ] = uris;
 					const diagnostics = vscode.languages.getDiagnostics(uri);
-					if (diagnostics.length === 1) {
+					if ((diagnostics.length === 1) && !validated) {
+						// @ts-ignore
+						assert.equal(diagnostics[0].code.value, "MD054");
+						validated = true;
+						vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor")
+							.then(noop, reject);
+					} else if ((diagnostics.length === 0) && validated) {
+						// Make sure diagonstics are clean for next test
 						resolve();
 					}
 				});
 			})
 		);
-		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")));
+		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")))
+			.then(noop, reject);
+	});
+}
+
+// Open README.md, update settings, verify diagnostics
+function dynamicWorkspaceSettingsChange () {
+	return testWrapper((resolve, reject, disposables) => {
+		let editedSettings = false;
+		let validated = false;
+		disposables.push(
+			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
+				callbackWrapper(reject, () => {
+					if (textEditor) {
+						assert.ok(textEditor.document.uri.path.endsWith("/README.md"));
+						textEditor.edit((editBuilder) => {
+							editBuilder.insert(new vscode.Position(2, 0), "---\n\n***\n\n");
+						})
+							.then(
+								() => {
+									editedSettings = true;
+									return vscode.workspace.getConfiguration("markdownlint")
+										.update("ignore", undefined, vscode.ConfigurationTarget.Workspace);
+								}
+							)
+							.then(noop, reject);
+					}
+				});
+			}),
+			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
+				callbackWrapper(reject, () => {
+					const uris = diagnosticChangeEvent.uris.filter(
+						(uri) => (uri.scheme === "file") && (uri.path.endsWith(".md"))
+					);
+					assert.equal(uris.length, 1);
+					const [ uri ] = uris;
+					const diagnostics = vscode.languages.getDiagnostics(uri);
+					if ((diagnostics.length > 0) && !editedSettings) {
+						reject(new Error("Unexpected diagnostics for ignored file"));
+					} else if ((diagnostics.length > 0) && editedSettings) {
+						validated = true;
+						vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor")
+							.then(noop, reject);
+					} else if ((diagnostics.length === 0) && validated) {
+						// Make sure diagonstics are clean for next test
+						resolve();
+					}
+				});
+			})
+		);
+		vscode.workspace.getConfiguration("markdownlint")
+			.update("ignore", [ "README.md" ], vscode.ConfigurationTarget.Workspace)
+			.then(() => vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md"))))
+			.then(noop, reject);
 	});
 }
 
@@ -186,7 +259,8 @@ function lintWorkspace () {
 				});
 			})
 		);
-		vscode.commands.executeCommand("markdownlint.lintWorkspace");
+		vscode.commands.executeCommand("markdownlint.lintWorkspace")
+			.then(noop, reject);
 	});
 }
 
@@ -197,6 +271,8 @@ const tests = [
 ];
 if (vscode.workspace.workspaceFolders) {
 	tests.push(
+		dynamicWorkspaceSettingsChange,
+		// Run this last because its diagnostics persist after test completion
 		lintWorkspace
 	);
 }
