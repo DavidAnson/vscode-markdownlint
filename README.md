@@ -81,6 +81,7 @@ When editing a Markdown file in Code with `markdownlint` installed, any lines th
 * **[MD051](https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md051.md)** *link-fragments* - Link fragments should be valid
 * **[MD052](https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md052.md)** *reference-links-images* - Reference links and images should use a label that is defined
 * **[MD053](https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md053.md)** *link-image-reference-definitions* - Link and image reference definitions should be needed
+* **[MD054](https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md054.md)** *link-image-style* - Link and image style
 
 See [markdownlint's Rules.md file](https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/Rules.md) for more details.
 
@@ -88,7 +89,6 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 
 * MD004 *ul-style*
 * MD005 *list-indent*
-* MD006 *ul-start-left*
 * MD007 *ul-indent*
 * MD009 *no-trailing-spaces*
 * MD010 *no-hard-tabs*
@@ -116,6 +116,7 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD050 *strong-style*
 * MD051 *link-fragments*
 * MD053 *link-image-reference-definitions*
+* MD054 *link-image-style*
 
 ## Commands
 
@@ -169,8 +170,6 @@ The default rule configuration disables [`MD013`/`line-length`](https://github.c
     "MD013": false
 }
 ```
-
-> **Note**: `MD002`/`first-heading-h1` and `MD006`/`ul-start-left` are also disabled because they have been deprecated in the `markdownlint` library.
 
 Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.cjs` in any directory of a project.
 Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).

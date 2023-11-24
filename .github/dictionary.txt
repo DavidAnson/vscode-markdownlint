@@ -4,7 +4,6 @@ blockquote
 CLI
 CommonMark
 config
-first-heading-h1
 first-line-h1
 formatter
 gitignore
@@ -38,7 +37,6 @@ suppressions
 TOML
 UI
 ul-indent
-ul-start-left
 ul-style
 untrusted
 workspaces
