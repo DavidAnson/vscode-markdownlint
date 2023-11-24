@@ -75,7 +75,6 @@ function openLintEditVerifyFixAll () {
 					const [ uri ] = uris;
 					const diagnostics = vscode.languages.getDiagnostics(uri);
 					if ((diagnostics.length > 0) && !fixedAll) {
-						// eslint-disable-next-line array-element-newline
 						const [ md019, md012 ] = diagnostics;
 						// @ts-ignore
 						assert.equal(md019.code.value, "MD019");

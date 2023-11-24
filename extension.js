@@ -189,7 +189,7 @@ class FsWrapper {
 						] = nameAndType;
 						return options.withFileTypes ?
 							{
-								/* eslint-disable multiline-ternary, no-bitwise */
+								/* eslint-disable no-bitwise */
 								"isBlockDevice": FsWrapper.fwFalse,
 								"isCharacterDevice": FsWrapper.fwFalse,
 								"isDirectory": (fileType & vscode.FileType.Directory) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
@@ -198,7 +198,7 @@ class FsWrapper {
 								"isSocket": FsWrapper.fwFalse,
 								"isSymbolicLink":
 									(fileType & vscode.FileType.SymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
-								/* eslint-enable multiline-ternary, no-bitwise */
+								/* eslint-enable no-bitwise */
 								name
 							} :
 							name;
@@ -231,7 +231,7 @@ class FsWrapper {
 		).then(
 			(fileStat) => {
 				// Stub required properties for fast-glob
-				/* eslint-disable dot-notation, multiline-ternary, no-bitwise */
+				/* eslint-disable dot-notation, no-bitwise */
 				fileStat["isBlockDevice"] = FsWrapper.fwFalse;
 				fileStat["isCharacterDevice"] = FsWrapper.fwFalse;
 				fileStat["isDirectory"] = (fileStat.type & vscode.FileType.Directory) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
@@ -240,7 +240,7 @@ class FsWrapper {
 				fileStat["isSocket"] = FsWrapper.fwFalse;
 				fileStat["isSymbolicLink"] =
 					(fileStat.type & vscode.FileType.SymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
-				/* eslint-enable dot-notation, multiline-ternary, no-bitwise */
+				/* eslint-enable dot-notation, no-bitwise */
 				callback(null, fileStat);
 			},
 			callback
@@ -337,7 +337,6 @@ async function getConfig (fs, configuration, uri) {
 			(workspaceFolderUri.scheme !== schemeFile);
 		const homedir = os && os.homedir && os.homedir();
 		const workspaceFolderFsPath = posixPath(workspaceFolderUri.fsPath);
-		// eslint-disable-next-line multiline-ternary
 		const extendBase = ((useHomedir && homedir) ? homedir : workspaceFolderFsPath) || "";
 		let expanded = expandTildePath(userWorkspaceConfig.extends, os);
 		if (homedir) {
