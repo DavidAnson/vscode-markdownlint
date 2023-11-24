@@ -14,10 +14,11 @@ Package versions for `dependencies` and `devDependencies` should be specified ex
 The short explanation is that doing otherwise eventually leads to inconsistent behavior and broken functionality.
 (See [Pin your npm/yarn dependencies][pin-dependencies] for a longer explanation.)
 
-Run tests before sending a pull request via `npm test` in the [usual manner][npm-scripts].
-Tests should all pass on all platforms.
+Run basic tests via `npm test`.
+Run UI tests via `npm run test-ui`.
+Lint by running `npm run lint`.
 
-Pull requests should contain a single commit.
+Pull requests should contain a single commit that addresses a single issue.
 If necessary, squash multiple commits before creating the pull request and when making changes.
 (See [Git Tools - Rewriting History][rewriting-history] for details.)
 
@@ -38,7 +39,6 @@ Thank you!
 
 [closing-keywords]: https://help.github.com/articles/closing-issues-using-keywords/
 [issues]: https://github.com/DavidAnson/vscode-markdownlint/issues
-[npm-scripts]: https://docs.npmjs.com/misc/scripts
 [pin-dependencies]: https://maxleiter.com/blog/pin-dependencies
 [rewriting-history]: https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History
 

@@ -20,6 +20,7 @@
 	},
 	"funding": "https://github.com/sponsors/DavidAnson",
 	"scripts": {
+		"ci": "npm test && npm run test-ui",
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
 		"docker-npm-install": "docker run --rm --tty --name npm-install --volume $PWD:/home/workdir --workdir /home/workdir --user node node:latest npm install",
