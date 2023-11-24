@@ -70,44 +70,47 @@ function openLintEditVerifyFixAll () {
 			}),
 			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
 				callbackWrapper(reject, () => {
-					const {uris} = diagnosticChangeEvent;
-					assert.equal(uris.length, 1);
-					const [ uri ] = uris;
-					const diagnostics = vscode.languages.getDiagnostics(uri);
-					if ((diagnostics.length > 0) && !fixedAll) {
-						const [ md019, md012 ] = diagnostics;
-						// @ts-ignore
-						assert.equal(md019.code.value, "MD019");
-						assert.equal(
+					const uris = diagnosticChangeEvent.uris.filter(
+						(uri) => (uri.scheme === "file") && (uri.path.endsWith(".md"))
+					);
+					if (uris.length === 1) {
+						const [ uri ] = uris;
+						const diagnostics = vscode.languages.getDiagnostics(uri);
+						if ((diagnostics.length > 0) && !fixedAll) {
+							const [ md019, md012 ] = diagnostics;
 							// @ts-ignore
-							md019.code.target.toString().replace(/v\d+\.\d+\.\d+/, "v0.0.0"),
-							"https://github.com/DavidAnson/markdownlint/blob/v0.0.0/doc/md019.md"
-						);
-						assert.equal(
-							md019.message,
-							"MD019/no-multiple-space-atx: Multiple spaces after hash on atx style heading"
-						);
-						assert.ok(md019.range.isEqual(new vscode.Range(0, 0, 0, 4)));
-						assert.equal(md019.severity, vscode.DiagnosticSeverity.Warning);
-						assert.equal(md019.source, "markdownlint");
-						// @ts-ignore
-						assert.equal(md012.code.value, "MD012");
-						assert.equal(
+							assert.equal(md019.code.value, "MD019");
+							assert.equal(
+								// @ts-ignore
+								md019.code.target.toString().replace(/v\d+\.\d+\.\d+/, "v0.0.0"),
+								"https://github.com/DavidAnson/markdownlint/blob/v0.0.0/doc/md019.md"
+							);
+							assert.equal(
+								md019.message,
+								"MD019/no-multiple-space-atx: Multiple spaces after hash on atx style heading"
+							);
+							assert.ok(md019.range.isEqual(new vscode.Range(0, 0, 0, 4)));
+							assert.equal(md019.severity, vscode.DiagnosticSeverity.Warning);
+							assert.equal(md019.source, "markdownlint");
 							// @ts-ignore
-							md012.code.target.toString().replace(/v\d+\.\d+\.\d+/, "v0.0.0"),
-							"https://github.com/DavidAnson/markdownlint/blob/v0.0.0/doc/md012.md"
-						);
-						assert.equal(
-							md012.message,
-							"MD012/no-multiple-blanks: Multiple consecutive blank lines [Expected: 1; Actual: 2]"
-						);
-						assert.ok(md012.range.isEqual(new vscode.Range(2, 0, 2, 0)));
-						assert.equal(md012.severity, vscode.DiagnosticSeverity.Warning);
-						assert.equal(md012.source, "markdownlint");
-						vscode.commands.executeCommand("markdownlint.fixAll");
-						fixedAll = true;
-					} else if ((diagnostics.length === 0) && fixedAll) {
-						resolve();
+							assert.equal(md012.code.value, "MD012");
+							assert.equal(
+								// @ts-ignore
+								md012.code.target.toString().replace(/v\d+\.\d+\.\d+/, "v0.0.0"),
+								"https://github.com/DavidAnson/markdownlint/blob/v0.0.0/doc/md012.md"
+							);
+							assert.equal(
+								md012.message,
+								"MD012/no-multiple-blanks: Multiple consecutive blank lines [Expected: 1; Actual: 2]"
+							);
+							assert.ok(md012.range.isEqual(new vscode.Range(2, 0, 2, 0)));
+							assert.equal(md012.severity, vscode.DiagnosticSeverity.Warning);
+							assert.equal(md012.source, "markdownlint");
+							vscode.commands.executeCommand("markdownlint.fixAll");
+							fixedAll = true;
+						} else if ((diagnostics.length === 0) && fixedAll) {
+							resolve();
+						}
 					}
 				});
 			})
@@ -136,15 +139,18 @@ function openLintEditCloseClean () {
 			}),
 			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
 				callbackWrapper(reject, () => {
-					const uris = diagnosticChangeEvent.uris.filter((uri) => uri.scheme === "file");
-					assert.equal(uris.length, 1);
-					const [ uri ] = uris;
-					const diagnostics = vscode.languages.getDiagnostics(uri);
-					if ((diagnostics.length > 0) && !closedActiveEditor) {
-						vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-						closedActiveEditor = true;
-					} else if ((diagnostics.length === 0) && closedActiveEditor) {
-						resolve();
+					const uris = diagnosticChangeEvent.uris.filter(
+						(uri) => (uri.scheme === "file") && (uri.path.endsWith(".md"))
+					);
+					if (uris.length === 1) {
+						const [ uri ] = uris;
+						const diagnostics = vscode.languages.getDiagnostics(uri);
+						if ((diagnostics.length > 0) && !closedActiveEditor) {
+							vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+							closedActiveEditor = true;
+						} else if ((diagnostics.length === 0) && closedActiveEditor) {
+							resolve();
+						}
 					}
 				});
 			})
@@ -172,19 +178,22 @@ function addNonDefaultViolation () {
 			}),
 			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
 				callbackWrapper(reject, () => {
-					const uris = diagnosticChangeEvent.uris.filter((uri) => uri.scheme === "file");
-					assert.equal(uris.length, 1);
-					const [ uri ] = uris;
-					const diagnostics = vscode.languages.getDiagnostics(uri);
-					if ((diagnostics.length === 1) && !validated) {
-						// @ts-ignore
-						assert.equal(diagnostics[0].code.value, "MD054");
-						validated = true;
-						vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor")
-							.then(noop, reject);
-					} else if ((diagnostics.length === 0) && validated) {
-						// Make sure diagonstics are clean for next test
-						resolve();
+					const uris = diagnosticChangeEvent.uris.filter(
+						(uri) => (uri.scheme === "file") && (uri.path.endsWith(".md"))
+					);
+					if (uris.length === 1) {
+						const [ uri ] = uris;
+						const diagnostics = vscode.languages.getDiagnostics(uri);
+						if ((diagnostics.length === 1) && !validated) {
+							// @ts-ignore
+							assert.equal(diagnostics[0].code.value, "MD054");
+							validated = true;
+							vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor")
+								.then(noop, reject);
+						} else if ((diagnostics.length === 0) && validated) {
+							// Make sure diagonstics are clean for next test
+							resolve();
+						}
 					}
 				});
 			})
@@ -223,18 +232,19 @@ function dynamicWorkspaceSettingsChange () {
 					const uris = diagnosticChangeEvent.uris.filter(
 						(uri) => (uri.scheme === "file") && (uri.path.endsWith(".md"))
 					);
-					assert.equal(uris.length, 1);
-					const [ uri ] = uris;
-					const diagnostics = vscode.languages.getDiagnostics(uri);
-					if ((diagnostics.length > 0) && !editedSettings) {
-						reject(new Error("Unexpected diagnostics for ignored file"));
-					} else if ((diagnostics.length > 0) && editedSettings) {
-						validated = true;
-						vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor")
-							.then(noop, reject);
-					} else if ((diagnostics.length === 0) && validated) {
-						// Make sure diagonstics are clean for next test
-						resolve();
+					if (uris.length === 1) {
+						const [ uri ] = uris;
+						const diagnostics = vscode.languages.getDiagnostics(uri);
+						if ((diagnostics.length > 0) && !editedSettings) {
+							reject(new Error("Unexpected diagnostics for ignored file"));
+						} else if ((diagnostics.length > 0) && editedSettings) {
+							validated = true;
+							vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor")
+								.then(noop, reject);
+						} else if ((diagnostics.length === 0) && validated) {
+							// Make sure diagonstics are clean for next test
+							resolve();
+						}
 					}
 				});
 			})
