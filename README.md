@@ -332,7 +332,9 @@ An example of Code's workspace settings for custom rules might look like the fol
 
 For information about authoring custom rules, see [the `markdownlint` documentation for custom rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md).
 
-> **Note**: Custom rules can also be specified (in a way other tools will recognize) via the `customRules` property in `.markdownlint-cli2.{jsonc,yaml,cjs}`.
+> **Note**: Custom rules can also be specified (in a portable way other tools will recognize) via the [`customRules` property in `.markdownlint-cli2.{jsonc,yaml,cjs}`](https://github.com/DavidAnson/markdownlint-cli2#configuration).
+> In `markdownlint-cli2` configuration files, the `modulePaths` property can be used in conjunction to specify one or more additional paths for resolving module references.
+> This can be used to work around the VS Code limitation that globally-installed Node modules are unavailable by setting `modulePaths` to the location of the global module path (typically `/usr/local/lib/node_modules` on macOS/Linux or `~/AppData/Roaming/npm/node_modules` on Windows).
 
 ### markdownlint.lintWorkspaceGlobs
 
