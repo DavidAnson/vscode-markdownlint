@@ -79,7 +79,7 @@ const lintAllTaskName = `Lint all Markdown files in the workspace with ${extensi
 const problemMatcherName = `$${extensionDisplayName}`;
 const clickForConfigureInfo = `Details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
-const errorExceptionPrefix = "ERROR: Exception while linting with markdownlint-cli2:\n";
+const errorExceptionPrefix = "Exception while linting with markdownlint-cli2:\n";
 const openCommand = "vscode.open";
 const sectionConfig = "config";
 const sectionCustomRules = "customRules";
@@ -100,6 +100,7 @@ const ruleNameToInformationUri = {};
 const workspaceFolderUriToDisposables = new Map();
 const workspaceFolderUriToIgnores = new Map();
 let outputChannel = null;
+let outputChannelShown = false;
 let diagnosticCollection = null;
 let diagnosticGeneration = 0;
 let runMap = {};
@@ -315,11 +316,13 @@ class LintWorkspacePseudoterminal {
 	}
 }
 
-// Writes date and message to the output channel
-function outputLine (message, show) {
-	const datePrefix = "[" + (new Date()).toLocaleTimeString() + "] ";
-	outputChannel.appendLine(datePrefix + message);
-	if (show) {
+// Writes time, importance, and message to the output channel
+function outputLine (message, isError) {
+	const time = (new Date()).toLocaleTimeString();
+	const importance = isError ? "ERROR" : "INFO";
+	outputChannel.appendLine(`[${time}] ${importance}: ${message}`);
+	if (isError && !outputChannelShown) {
+		outputChannelShown = true;
 		outputChannel.show(true);
 	}
 }
@@ -410,7 +413,7 @@ function clearIgnores (eventUri) {
 	const source = eventUri ?
 		`"${eventUri.fsPath}"` :
 		"setting";
-	outputLine(`INFO: Resetting ignore cache due to ${source} change.`);
+	outputLine(`Resetting ignore cache due to ${source} change.`);
 	workspaceFolderUriToIgnores.clear();
 	if (eventUri) {
 		clearDiagnosticsAndLintVisibleFiles();
@@ -847,10 +850,11 @@ function toggleLinting () {
 // Clears diagnostics and lints all visible files
 function clearDiagnosticsAndLintVisibleFiles (eventUri) {
 	if (eventUri) {
-		outputLine(`INFO: Re-linting due to "${eventUri.fsPath}" change.`);
+		outputLine(`Re-linting due to "${eventUri.fsPath}" change.`);
 	}
 	diagnosticCollection.clear();
 	diagnosticGeneration++;
+	outputChannelShown = false;
 	lintVisibleFiles();
 }
 
@@ -869,7 +873,7 @@ function getRun (document) {
 	// Read workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	runMap[name] = configuration.get(sectionRun);
-	outputLine("INFO: Linting for \"" + name + "\" will be run \"" + runMap[name] + "\".");
+	outputLine("Linting for \"" + name + "\" will be run \"" + runMap[name] + "\".");
 	return runMap[name];
 }
 
@@ -964,7 +968,7 @@ function didCloseTextDocument (document) {
 // Handles the onDidChangeConfiguration event
 function didChangeConfiguration (change) {
 	if (!change || change.affectsConfiguration(extensionDisplayName)) {
-		outputLine("INFO: Resetting configuration cache due to setting change.");
+		outputLine("Resetting configuration cache due to setting change.");
 		getApplicationConfiguration();
 		clearRunMap();
 		clearIgnores();
