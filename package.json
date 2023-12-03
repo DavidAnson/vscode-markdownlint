@@ -50,9 +50,9 @@
 	},
 	"devDependencies": {
 		"@types/vscode": "1.75.0",
-		"@vscode/test-electron": "2.3.7",
+		"@vscode/test-electron": "2.3.8",
 		"cpy-cli": "5.0.0",
-		"eslint": "8.54.0",
+		"eslint": "8.55.0",
 		"eslint-plugin-node": "11.1.0",
 		"eslint-plugin-unicorn": "49.0.0",
 		"path-browserify": "1.0.1",
