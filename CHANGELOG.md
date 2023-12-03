@@ -1,5 +1,6 @@
 # Changes
 
+* 0.53.0 - Improved rules, removed deprecated rules/aliases
 * 0.52.0 - Improved rules, performance
 * 0.51.0 - Improved rules, better multi-root workspace handling
 * 0.50.0 - Improved rules
