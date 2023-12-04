@@ -118,7 +118,7 @@
 				},
 				{
 					"command": "markdownlint.lintWorkspace",
-					"when": "workbenchState != empty"
+					"when": "workbenchState != empty && terminalProcessSupported"
 				},
 				{
 					"command": "markdownlint.openConfigFile",
