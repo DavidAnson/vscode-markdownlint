@@ -27,7 +27,8 @@
 	"link-image-style": {
 		"autolink": false,
 		"collapsed": false,
-		"shortcut": false
+		"shortcut": false,
+		"url_inline": false
 	},
 	"no-duplicate-heading": {
 		"siblings_only": true
@@ -75,6 +76,9 @@
 	},
 	"strong-style": {
 		"style": "asterisk"
+	},
+	"table-pipe-style": {
+		"style": "leading_and_trailing"
 	},
 	"ul-style": {
 		"style": "asterisk"
