@@ -26,7 +26,7 @@
 		"docker-npm-install": "docker run --rm --tty --name npm-install --volume $PWD:/home/workdir --workdir /home/workdir --user node node:latest npm install",
 		"docker-npm-run-upgrade": "docker run --rm --tty --name npm-run-upgrade --volume $PWD:/home/workdir --workdir /home/workdir --user node node:latest npm run upgrade",
 		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js test/*.cjs && markdownlint-cli2 *.md",
-		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && node expand-config-schema.js && node generate-config-schema.js && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
+		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && node generate-config-schema.js && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
 		"test": "npm run lint && npm run compile && npm run schema && git diff --exit-code",
 		"test-ui": "node ./test/run-tests.mjs",
 		"upgrade": "npx --yes npm-check-updates --upgrade"
