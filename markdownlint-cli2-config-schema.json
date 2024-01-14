@@ -1,21 +1,21 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/v0.12.0/schema/markdownlint-cli2-config-schema.json",
+  "$id": "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/v0.12.1/schema/markdownlint-cli2-config-schema.json",
   "title": "markdownlint-cli2 configuration schema",
   "type": "object",
   "properties": {
     "$schema": {
       "description": "JSON Schema URI (expected by some editors)",
       "type": "string",
-      "default": "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/v0.12.0/schema/markdownlint-cli2-config-schema.json"
+      "default": "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/v0.12.1/schema/markdownlint-cli2-config-schema.json"
     },
     "config": {
-      "description": "markdownlint-cli2 configuration schema",
+      "description": "markdownlint configuration schema : https://github.com/DavidAnson/markdownlint/blob/v0.33.0/schema/.markdownlint.jsonc",
       "$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.33.0/schema/markdownlint-config-schema.json",
       "default": {}
     },
     "customRules": {
-      "description": "Module names or paths of custom rules to load and use when linting",
+      "description": "Module names or paths of custom rules to load and use when linting : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "array",
       "default": [],
       "items": {
@@ -25,18 +25,18 @@
       }
     },
     "fix": {
-      "description": "Whether to enable fixing of linting errors reported by rules that emit fix information",
+      "description": "Whether to enable fixing of linting errors reported by rules that emit fix information : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "boolean",
       "default": false
     },
     "frontMatter": {
-      "description": "Regular expression used to match and ignore any front matter at the beginning of a document",
+      "description": "Regular expression used to match and ignore any front matter at the beginning of a document : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "string",
       "minLength": 1,
       "default": ""
     },
     "globs": {
-      "description": "Glob expressions to include when linting (only valid at the root)",
+      "description": "Glob expressions to include when linting (only valid at the root) : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "array",
       "default": [],
       "items": {
@@ -46,7 +46,7 @@
       }
     },
     "ignores": {
-      "description": "Glob expressions to ignore when linting",
+      "description": "Glob expressions to ignore when linting : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "array",
       "default": [],
       "items": {
@@ -56,7 +56,7 @@
       }
     },
     "markdownItPlugins": {
-      "description": "markdown-it plugins to load and use when linting",
+      "description": "markdown-it plugins to load and use when linting : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "array",
       "default": [],
       "items": {
@@ -76,7 +76,7 @@
       }
     },
     "modulePaths": {
-      "description": "Additional paths to resolve module locations from",
+      "description": "Additional paths to resolve module locations from : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "array",
       "default": [],
       "items": {
@@ -86,17 +86,17 @@
       }
     },
     "noInlineConfig": {
-      "description": "Whether to disable support of HTML comments within Markdown content",
+      "description": "Whether to disable support of HTML comments within Markdown content : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "boolean",
       "default": false
     },
     "noProgress": {
-      "description": "Whether to disable the display of progress on stdout (only valid at the root)",
+      "description": "Whether to disable the display of progress on stdout (only valid at the root) : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "boolean",
       "default": false
     },
     "outputFormatters": {
-      "description": "Output formatters to load and use to customize markdownlint-cli2 output (only valid at the root)",
+      "description": "Output formatters to load and use to customize markdownlint-cli2 output (only valid at the root) : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "array",
       "default": [],
       "items": {
@@ -116,7 +116,7 @@
       }
     },
     "showFound": {
-      "description": "Whether to show the list of found files on stdout (only valid at the root)",
+      "description": "Whether to show the list of found files on stdout (only valid at the root) : https://github.com/DavidAnson/markdownlint-cli2/blob/v0.12.1/README.md#markdownlint-cli2jsonc",
       "type": "boolean",
       "default": false
     }
