@@ -519,8 +519,19 @@ async function markdownlintWrapper (document) {
 // Returns if the document is Markdown
 function isMarkdownDocument (document) {
 	return (
+		// Markdown document with supported URI scheme
+		// (Filters out problematic custom schemes like "comment" and "svn")
 		(document.languageId === markdownLanguageId) &&
-		schemeSupported.has(document.uri.scheme)
+		schemeSupported.has(document.uri.scheme) &&
+		(
+			// Non-virtual document or document authority matches an open workspace
+			// (Filters out problematic scenarios like source control where vscode
+			// .workspace.fs says documents of any name exist with content "")
+			(document.uri.scheme !== schemeVscodeVfs) ||
+			vscode.workspace.workspaceFolders
+				.filter((folder) => folder.uri.scheme === document.uri.scheme)
+				.some((folder) => folder.uri.authority === document.uri.authority)
+		)
 	);
 }
 
