@@ -110,6 +110,12 @@ const throttle = {
 	"timeout": null
 };
 
+// Converts an Error object into a string
+// (May duplicate name/message if present in stack)
+function errorString (error) {
+	return `${error.name}: ${error.message}\n${error.stack}`;
+}
+
 // Converts to a POSIX-style path
 // eslint-disable-next-line id-length
 function posixPath (p) {
@@ -510,7 +516,7 @@ async function markdownlintWrapper (document) {
 	};
 	// Invoke markdownlint-cli2
 	return markdownlintCli2(parameters)
-		.catch((error) => outputLine(errorExceptionPrefix + error.stack, true))
+		.catch((error) => outputLine(errorExceptionPrefix + errorString(error), true))
 		.then(() => results);
 	// If necessary some day to filter results by matching file name...
 	// .then(() => results.filter((result) => isSchemeUntitled || (result.fileName === path.posix.relative(directory, name))))
@@ -556,7 +562,7 @@ function lintWorkspace (logString) {
 						"optionsOverride": getOptionsOverride()
 					};
 					return markdownlintCli2(parameters)
-						.catch((error) => logString(errorExceptionPrefix + error.stack))
+						.catch((error) => logString(errorExceptionPrefix + errorString(error)))
 						.then(() => logString(""));
 				});
 		}),
