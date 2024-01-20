@@ -1013,8 +1013,9 @@ function createFileSystemWatchers (workspaceFolderUri) {
 	const optionsWatcher = vscode.workspace.createFileSystemWatcher(relativeOptionsFileGlob);
 	const relativeIgnoreFilePath = new vscode.RelativePattern(workspaceFolderUri, ignoreFileName);
 	const ignoreWatcher = vscode.workspace.createFileSystemWatcher(relativeIgnoreFilePath);
+	const workspaceFolderUriString = workspaceFolderUri.toString();
 	workspaceFolderUriToDisposables.set(
-		workspaceFolderUri,
+		workspaceFolderUriString,
 		[
 			configWatcher,
 			configWatcher.onDidCreate(clearDiagnosticsAndLintVisibleFiles),
@@ -1034,11 +1035,12 @@ function createFileSystemWatchers (workspaceFolderUri) {
 
 // Disposes of all file system watchers for the specified workspace folder Uri
 function disposeFileSystemWatchers (workspaceFolderUri) {
-	const disposables = workspaceFolderUriToDisposables.get(workspaceFolderUri) || [];
+	const workspaceFolderUriString = workspaceFolderUri.toString();
+	const disposables = workspaceFolderUriToDisposables.get(workspaceFolderUriString) || [];
 	for (const disposable of disposables) {
 		disposable.dispose();
 	}
-	workspaceFolderUriToDisposables.delete(workspaceFolderUri);
+	workspaceFolderUriToDisposables.delete(workspaceFolderUriString);
 }
 
 // Handles the onDidChangeWorkspaceFolders event
