@@ -95,14 +95,19 @@ const networkShareRe = /^\\\\[^\\]+\\/;
 const firstSegmentRe = /^\/{1,2}[^/]+\//;
 
 // Variables
+/** @type {Object.<string, any>} */
 const applicationConfiguration = {};
+/** @type {Object.<string, vscode.Uri>} */
 const ruleNameToInformationUri = {};
+/** @type {Map<string, Array<vscode.Disposable>>} */
 const workspaceFolderUriToDisposables = new Map();
+/** @type {Map<string, Array<(string)=>boolean>>} */
 const workspaceFolderUriToIgnores = new Map();
 let outputChannel = null;
 let outputChannelShown = false;
 let diagnosticCollection = null;
 let diagnosticGeneration = 0;
+/** @type {Object.<string, string>} */
 let runMap = {};
 let lintingEnabled = true;
 const throttle = {
@@ -372,9 +377,10 @@ async function getConfig (fs, configuration, uri) {
 // Returns ignore configuration for user/workspace
 function getIgnores (document) {
 	const workspaceFolderUri = getDocumentWorkspaceFolderUri(document.uri);
-	if (!workspaceFolderUriToIgnores.has(workspaceFolderUri)) {
+	const workspaceFolderUriString = workspaceFolderUri.toString();
+	if (!workspaceFolderUriToIgnores.has(workspaceFolderUriString)) {
 		const ignores = [];
-		workspaceFolderUriToIgnores.set(workspaceFolderUri, ignores);
+		workspaceFolderUriToIgnores.set(workspaceFolderUriString, ignores);
 		let ignoreFile = ignoreFileName;
 		// Handle "ignore" configuration
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
@@ -411,7 +417,7 @@ function getIgnores (document) {
 			() => null
 		);
 	}
-	return workspaceFolderUriToIgnores.get(workspaceFolderUri);
+	return workspaceFolderUriToIgnores.get(workspaceFolderUriString);
 }
 
 // Clears the ignore list
