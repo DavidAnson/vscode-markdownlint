@@ -55,7 +55,7 @@ const schemeFileSystemLike = new Set([
 	schemeVscodeTestWeb
 ]);
 const configParsers = [
-	(content) => JSON.parse(require("jsonc-parser").stripComments(content)),
+	jsoncParse,
 	(content) => require("js-yaml").load(content)
 ];
 const codeActionKindQuickFix = vscode.CodeActionKind.QuickFix;
@@ -120,6 +120,21 @@ const throttle = {
 function errorString (error) {
 	return `${error.name}: ${error.message}\n${error.stack}`;
 }
+
+// Parses JSONC text and returns an object
+function jsoncParse (text) {
+	const { parse, printParseErrorCode } = require("jsonc-parser");
+	const errors = [];
+	const result = parse(text, errors, { "allowTrailingComma": true });
+	if (errors.length > 0) {
+		const aggregate = errors.map(
+			(error) => `${printParseErrorCode(error.error)} (offset ${error.offset}, length ${error.length})`
+		).join(", ");
+		throw new Error(`Unable to parse JSON(C) content, ${aggregate}`);
+	}
+	return result;
+}
+
 
 // Converts to a POSIX-style path
 // eslint-disable-next-line id-length
