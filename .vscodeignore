@@ -1,6 +1,8 @@
 .github
 .vscode
 node_modules
+test
+webworker
 .eslintrc.json
 .gitignore
 .markdownlint.json
