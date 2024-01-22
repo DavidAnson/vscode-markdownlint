@@ -187,6 +187,50 @@ function addNonDefaultViolation () {
 	});
 }
 
+// Open README.md, create violations, save file, open diff view, undo edits
+function openEditDiffRevert () {
+	return testWrapper((resolve, reject, disposables) => {
+		let runOnce = false;
+		let intervalId = null;
+		disposables.push(
+			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
+				// eslint-disable-next-line consistent-return
+				callbackWrapper(reject, () => {
+					if (!runOnce) {
+						runOnce = true;
+						assert.ok(textEditor.document.uri.path.endsWith("/CHANGELOG.md"));
+						return textEditor.edit((editBuilder) => {
+							editBuilder.insert(new vscode.Position(0, 1), " ");
+							editBuilder.insert(new vscode.Position(1, 0), "\n");
+						}).then(
+							() => textEditor.document.save()
+						);
+					}
+				});
+			}),
+			vscode.workspace.onDidSaveTextDocument(() => {
+				callbackWrapper(reject, () => {
+					intervalId = setInterval(() => vscode.commands.executeCommand("git.openChange"), 50);
+				});
+			}),
+			vscode.window.onDidChangeVisibleTextEditors((textEditors) => {
+				callbackWrapper(reject, () => {
+					if (textEditors.length === 2) {
+						clearInterval(intervalId);
+						vscode.commands.executeCommand("undo").then(
+							() => vscode.commands.executeCommand("workbench.action.files.save")
+						).then(
+							() => vscode.commands.executeCommand("workbench.action.closeAllEditors")
+						).then(resolve);
+					}
+				});
+			})
+		);
+		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "CHANGELOG.md")))
+			.then(noop, reject);
+	});
+}
+
 // Open README.md, update settings, verify diagnostics
 function dynamicWorkspaceSettingsChange () {
 	return testWrapper((resolve, reject, disposables) => {
@@ -258,6 +302,7 @@ const tests = [
 ];
 if (vscode.workspace.workspaceFolders) {
 	tests.push(
+		openEditDiffRevert,
 		dynamicWorkspaceSettingsChange,
 		// Run this last because its diagnostics persist after test completion
 		lintWorkspace
