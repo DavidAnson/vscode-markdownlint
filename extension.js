@@ -115,10 +115,22 @@ const throttle = {
 	"timeout": null
 };
 
-// Converts an Error object into a string
-// (May duplicate name/message if present in stack)
+// Converts an Error (or AggregateError) object into a string
 function errorString (error) {
-	return `${error.name}: ${error.message}\n${error.stack}`;
+	// eslint-disable-next-line func-style, unicorn/prevent-abbreviations, unicorn/consistent-function-scoping
+	const stringifyError = (err) => {
+		const nameMessage = `${err.name}: ${err.message}`;
+		const stack = err.stack || "[NO STACK]";
+		const result = stack.startsWith(nameMessage) ? stack : `${nameMessage}\n${stack}`;
+		return result;
+	};
+	const errors = [
+		error,
+		...(error.errors || [])
+	];
+	// eslint-disable-next-line unicorn/prevent-abbreviations
+	const result = errors.map((err) => stringifyError(err)).join("\n");
+	return result;
 }
 
 // Parses JSONC text and returns an object
