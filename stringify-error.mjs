@@ -8,15 +8,17 @@
 function errorString (error) {
 	// eslint-disable-next-line func-style, unicorn/prevent-abbreviations, unicorn/consistent-function-scoping
 	const stringifyError = (err) => {
-		const nameMessage = `${err.name}: ${err.message}`;
-		const stack = err.stack || "[NO STACK]";
+		const name = err?.name || "[NO NAME]";
+		const message = err?.message || JSON.stringify(err);
+		const stack = err?.stack || "[NO STACK]";
+		const nameMessage = `${name}: ${message}`;
 		const result = stack.startsWith(nameMessage) ? stack : `${nameMessage}\n${stack}`;
 		return result;
 	};
 	const errors = [
 		error,
 		// @ts-ignore
-		...(error.errors || [])
+		...(error?.errors || [])
 	];
 	// eslint-disable-next-line unicorn/prevent-abbreviations
 	const result = errors.map((err) => stringifyError(err)).join("\n");
