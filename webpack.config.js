@@ -15,6 +15,7 @@ const baseConfig = 	{
 		]
 	},
 	"output": {
+		"asyncChunks": false,
 		"path": __dirname,
 		"filename": "bundle.js",
 		"libraryTarget": "commonjs2"

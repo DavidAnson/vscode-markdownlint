@@ -1,3 +1,5 @@
+// @ts-check
+
 "use strict";
 
 // Minimal requires (requires that may not be needed are inlined to reduce startup cost)
@@ -115,24 +117,6 @@ const throttle = {
 	"timeout": null
 };
 
-// Converts an Error (or AggregateError) object into a string
-function errorString (error) {
-	// eslint-disable-next-line func-style, unicorn/prevent-abbreviations, unicorn/consistent-function-scoping
-	const stringifyError = (err) => {
-		const nameMessage = `${err.name}: ${err.message}`;
-		const stack = err.stack || "[NO STACK]";
-		const result = stack.startsWith(nameMessage) ? stack : `${nameMessage}\n${stack}`;
-		return result;
-	};
-	const errors = [
-		error,
-		...(error.errors || [])
-	];
-	// eslint-disable-next-line unicorn/prevent-abbreviations
-	const result = errors.map((err) => stringifyError(err)).join("\n");
-	return result;
-}
-
 // Parses JSONC text and returns an object
 function jsoncParse (text) {
 	const { parse, printParseErrorCode } = require("jsonc-parser");
@@ -146,7 +130,6 @@ function jsoncParse (text) {
 	}
 	return result;
 }
-
 
 // Converts to a POSIX-style path
 // eslint-disable-next-line id-length
@@ -549,7 +532,10 @@ async function markdownlintWrapper (document) {
 	};
 	// Invoke markdownlint-cli2
 	return markdownlintCli2(parameters)
-		.catch((error) => outputLine(errorExceptionPrefix + errorString(error), true))
+		// eslint-disable-next-line node/no-unsupported-features/es-syntax
+		.catch((error) => import("./stringify-error.mjs").then(
+			(stringifyError) => outputLine(errorExceptionPrefix + stringifyError.default(error), true)
+		))
 		.then(() => results);
 	// If necessary some day to filter results by matching file name...
 	// .then(() => results.filter((result) => isSchemeUntitled || (result.fileName === path.posix.relative(directory, name))))
@@ -595,7 +581,10 @@ function lintWorkspace (logString) {
 						"optionsOverride": getOptionsOverride()
 					};
 					return markdownlintCli2(parameters)
-						.catch((error) => logString(errorExceptionPrefix + errorString(error)))
+						// eslint-disable-next-line node/no-unsupported-features/es-syntax
+						.catch((error) => import("./stringify-error.mjs").then(
+							(stringifyError) => logString(errorExceptionPrefix + stringifyError.default(error))
+						))
 						.then(() => logString(""));
 				});
 		}),
