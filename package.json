@@ -23,10 +23,10 @@
 		"ci": "npm test && npm run test-ui",
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
-		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js test/*.cjs && markdownlint-cli2 *.md",
+		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js test-ui/*.cjs && markdownlint-cli2 *.md",
 		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
 		"test": "npm run lint && npm run compile && npm run schema && git diff --exit-code",
-		"test-ui": "node ./test/run-tests.mjs",
+		"test-ui": "node ./test-ui/run-tests.mjs",
 		"test-web": "npm install --no-save @vscode/test-web && sed -i '.bak' -e 's/\\/{{uuid}}\\./\\//' node_modules/@vscode/test-web/out/server/workbench.js && vscode-test-web --browser=none --verbose --extensionDevelopmentPath=. .",
 		"upgrade": "npx --yes npm-check-updates --upgrade"
 	},
