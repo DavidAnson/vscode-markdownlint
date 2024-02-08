@@ -3,26 +3,33 @@
 /**
  * String-ifies an Error (or AggregateError) object.
  * @param {Error} error Error object to string-ify.
+ * @param {Number} [indent] Spaces to start indent.
  * @returns {String} Error details.
  */
-function errorString (error) {
-	// eslint-disable-next-line func-style, unicorn/prevent-abbreviations, unicorn/consistent-function-scoping
-	const stringifyError = (err) => {
-		const name = err?.name || "[NO NAME]";
-		const message = err?.message || JSON.stringify(err);
-		const stack = err?.stack || "[NO STACK]";
-		const nameMessage = `${name}: ${message}`;
-		const result = stack.startsWith(nameMessage) ? stack : `${nameMessage}\n${stack}`;
-		return result;
-	};
-	const errors = [
-		error,
-		// @ts-ignore
-		...(error?.errors || [])
-	];
-	// eslint-disable-next-line unicorn/prevent-abbreviations
-	const result = errors.map((err) => stringifyError(err)).join("\n");
-	return result;
+function stringifyError (error, indent = 0) {
+	const name = error?.name || "[NO NAME]";
+	const message = error?.message || JSON.stringify(error);
+	const stack = error?.stack || "[NO STACK]";
+	// @ts-ignore
+	const cause = error?.cause;
+	// @ts-ignore
+	const errors = error?.errors || [];
+	const result = [ `${name}: ${message}`, "stack:" ];
+	const frames = stack.split(/\r\n?|\n/g);
+	for (const frame of frames.slice((frames[0] === result[0]) ? 1 : 0)) {
+		result.push(` ${frame.trim()}`);
+	}
+	if (cause) {
+		result.push("cause:")
+		result.push(stringifyError(cause, indent + 1))
+	}
+	if (errors.length > 0) {
+		result.push("errors:")
+		for (const err of errors) {
+			result.push(stringifyError(err, indent + 1))
+		}
+	}
+	return result.map((s) => `${" ".repeat(indent)}${s}`).join("\n");
 }
 
-export default errorString;
+export default stringifyError;
