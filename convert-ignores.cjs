@@ -2,7 +2,7 @@
 
 "use strict";
 
-const { minimatch } = require("minimatch");
+const picomatch = require("picomatch/posix");
 
 /**
  * Converts an array of ignore strings to ignore functions.
@@ -10,17 +10,9 @@ const { minimatch } = require("minimatch");
  * @returns {Function[]} Array of ignore functions.
  */
 function convertIgnores (ignores) {
-	const result = [];
-	for (const ignore of ignores) {
-		const ignoreRe = minimatch.makeRe(ignore, {
-			"dot": true,
-			"nocomment": true
-		});
-		if (ignoreRe) {
-			result.push((file) => ignoreRe.test(file));
-		}
-	}
-	return result;
+	return ignores.map(
+		(ignore) => picomatch(ignore, { "dot": true })
+	);
 }
 
 module.exports = convertIgnores;
