@@ -396,15 +396,9 @@ function getIgnores (document) {
 		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 		const ignoreValue = configuration.get(sectionIgnore);
 		if (Array.isArray(ignoreValue)) {
-			const minimatch = require("minimatch");
-			for (const ignorePath of ignoreValue) {
-				const ignoreRe = minimatch.makeRe(ignorePath, {
-					"dot": true,
-					"nocomment": true
-				});
-				if (ignoreRe) {
-					ignores.push((file) => ignoreRe.test(file));
-				}
+			const convertIgnores = require("./convert-ignores.cjs");
+			for (const ignore of convertIgnores(ignoreValue)) {
+				ignores.push(ignore);
 			}
 		} else if (typeof ignoreValue === "string") {
 			ignoreFile = ignoreValue;
