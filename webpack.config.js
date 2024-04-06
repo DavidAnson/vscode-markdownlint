@@ -2,6 +2,8 @@
 
 "use strict";
 
+/* eslint-disable n/no-unpublished-require */
+
 const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 

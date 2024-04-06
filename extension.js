@@ -8,9 +8,9 @@ const os = require("node:os");
 const path = require("node:path");
 const {promisify} = require("node:util");
 const {"main": markdownlintCli2} = require("markdownlint-cli2");
-// eslint-disable-next-line no-useless-concat, node/no-missing-require
+// eslint-disable-next-line no-useless-concat
 const {readConfig} = require("markdownlint-cli2" + "/markdownlint").promises;
-// eslint-disable-next-line no-useless-concat, node/no-missing-require, unicorn/no-keyword-prefix
+// eslint-disable-next-line no-useless-concat, unicorn/no-keyword-prefix
 const {applyFix, applyFixes, expandTildePath, newLineRe} = require("markdownlint-cli2" + "/markdownlint/helpers");
 
 // Constants
@@ -526,7 +526,6 @@ async function markdownlintWrapper (document) {
 	};
 	// Invoke markdownlint-cli2
 	return markdownlintCli2(parameters)
-		// eslint-disable-next-line node/no-unsupported-features/es-syntax
 		.catch((error) => import("./stringify-error.mjs").then(
 			(stringifyError) => outputLine(errorExceptionPrefix + stringifyError.default(error), true)
 		))
@@ -575,7 +574,6 @@ function lintWorkspace (logString) {
 						"optionsOverride": getOptionsOverride()
 					};
 					return markdownlintCli2(parameters)
-						// eslint-disable-next-line node/no-unsupported-features/es-syntax
 						.catch((error) => import("./stringify-error.mjs").then(
 							(stringifyError) => logString(errorExceptionPrefix + stringifyError.default(error))
 						))
