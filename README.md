@@ -175,11 +175,11 @@ The default rule configuration disables [`MD013`/`line-length`](https://github.c
 }
 ```
 
-Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.cjs` in any directory of a project.
-Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
+Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.cjs`/`.markdownlint.mjs` in any directory of a project.
+Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs`/`.markdownlint-cli2.mjs` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
 
 > **Note**: When no folder is open, configuration and options are loaded from the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux).
-> Because JavaScript code is cached after being loaded, edits to `.markdownlint.cjs` and `.markdownlint-cli2.cjs` require a restart of VS Code.
+> Because JavaScript code is cached after being loaded, edits to `.markdownlint.cjs`/`.markdownlint.mjs`/`.markdownlint-cli2.cjs`/`.markdownlint-cli2.mjs` require a restart of VS Code.
 
 A custom configuration is often defined by a `.markdownlint.json` file in the root of the project:
 
@@ -223,14 +223,14 @@ File paths referenced by `extends` from user settings are resolved relative to t
 
 Configuration sources have the following precedence (in decreasing order):
 
-* `.markdownlint-cli2.{jsonc,yaml,cjs}` file in the same or parent directory
-* `.markdownlint.{jsonc,json,yaml,yml,cjs}` file in the same or parent directory
+* `.markdownlint-cli2.{jsonc,yaml,cjs,mjs}` file in the same or parent directory
+* `.markdownlint.{jsonc,json,yaml,yml,cjs,mjs}` file in the same or parent directory
 * Visual Studio Code user/workspace settings
 * Default configuration (see above)
 
 Configuration changes saved to any location take effect immediately. Files referenced via `extends` are not monitored for changes. Inherited configuration can be explicitly disabled (or re-enabled) in any configuration file.
 
-When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint-cli2.{jsonc,yaml,cjs}` or `.markdownlint.{jsonc,json,yaml,yml,cjs}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` containing the default rule configuration will be opened in the editor in the "pending save" state.
+When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint-cli2.{jsonc,yaml,cjs,mjs}` or `.markdownlint.{jsonc,json,yaml,yml,cjs,mjs}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` containing the default rule configuration will be opened in the editor in the "pending save" state.
 
 ### markdownlint.focusMode
 
@@ -310,7 +310,7 @@ Or to ignore files by referencing a different file:
 
 The globbing library used for matching `markdownlint.ignore` array values is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
 
-> **Note**: Files can also be ignored (in a way other tools will recognize) via the `ignores` property in `.markdownlint-cli2.{jsonc,yaml,cjs}`.
+> **Note**: Files can also be ignored (in a way other tools will recognize) via the `ignores` property in `.markdownlint-cli2.{jsonc,yaml,cjs,mjs}`.
 
 ### markdownlint.customRules
 
@@ -336,7 +336,7 @@ An example of VS Code's workspace settings for custom rules might look like the 
 
 For information about authoring custom rules, see [the `markdownlint` documentation for custom rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md).
 
-> **Note**: Custom rules can also be specified (in a portable way other tools will recognize) via the [`customRules` property in `.markdownlint-cli2.{jsonc,yaml,cjs}`](https://github.com/DavidAnson/markdownlint-cli2#configuration).
+> **Note**: Custom rules can also be specified (in a portable way other tools will recognize) via the [`customRules` property in `.markdownlint-cli2.{jsonc,yaml,cjs,mjs}`](https://github.com/DavidAnson/markdownlint-cli2#configuration).
 > In `markdownlint-cli2` configuration files, the `modulePaths` property can be used in conjunction to specify one or more additional paths for resolving module references.
 > This can be used to work around the VS Code limitation that globally-installed Node modules are unavailable by setting `modulePaths` to the location of the global module path (typically `/usr/local/lib` on macOS/Linux or `~/AppData/Roaming/npm` on Windows).
 
@@ -387,7 +387,7 @@ The following snippets are available when editing a Markdown document (press `Ct
 
 ## Security
 
-Running JavaScript from custom rules, `markdown-it` plugins, or configuration files (such as `.markdownlint.cjs` and `.markdownlint-cli2.cjs`) could be a security risk, so VS Code's [Workspace Trust setting](https://code.visualstudio.com/docs/editor/workspace-trust) is honored to block JavaScript for untrusted workspaces.
+Running JavaScript from custom rules, `markdown-it` plugins, or configuration files (such as `.markdownlint.cjs`/`.markdownlint.mjs`/`.markdownlint-cli2.cjs`/`.markdownlint-cli2.mjs`) could be a security risk, so VS Code's [Workspace Trust setting](https://code.visualstudio.com/docs/editor/workspace-trust) is honored to block JavaScript for untrusted workspaces.
 
 ## History
 
