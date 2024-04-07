@@ -28,9 +28,11 @@ OR
 
 ## Use
 
-When editing a Markdown file in Code with `markdownlint` installed, any lines that violate one of `markdownlint`'s rules (see below) will trigger a *Warning* in the editor. Warnings are indicated by a wavy green underline and can also be seen by pressing `Ctrl+Shift+M`/`Ctrl+Shift+M`/`⇧⌘M` to open the Errors and Warnings dialog. Hover the mouse pointer over a green line to see the warning or press `F8` and `Shift+F8`/`Shift+F8`/`⇧F8` to cycle through all the warnings (markdownlint warnings all begin with `MD###`). For more information about a `markdownlint` warning, place the cursor on a line and click the light bulb icon or press `Ctrl+.`/`Ctrl+.`/`⌘.` to open the quick fix dialog. Clicking one of the warnings in the dialog will display that rule's help entry in the default web browser.
+When editing a Markdown file in VS Code with `markdownlint` installed, any lines that violate one of `markdownlint`'s rules (see below) will trigger a *Warning* in the editor. Warnings are indicated by a wavy green underline and can also be seen by pressing `Ctrl+Shift+M`/`Ctrl+Shift+M`/`⇧⌘M` to open the Errors and Warnings dialog. Hover the mouse pointer over a green line to see the warning or press `F8` and `Shift+F8`/`Shift+F8`/`⇧F8` to cycle through all the warnings (markdownlint warnings all begin with `MD###`). For more information about a `markdownlint` warning, place the cursor on a line and click the light bulb icon or press `Ctrl+.`/`Ctrl+.`/`⌘.` to open the quick fix dialog. Clicking one of the warnings in the dialog will display that rule's help entry in the default web browser.
 
 > For a tutorial, please see [Build an Amazing Markdown Editor Using Visual Studio Code and Pandoc](https://thisdavej.com/build-an-amazing-markdown-editor-using-visual-studio-code-and-pandoc/) by Dave Johnson.
+
+By default, `markdownlint` will scan and report issues for files that VS Code treats as Markdown. You can see what language mode the current file has in the Status Bar at the bottom of the window and you can [change the language mode for the current file](https://code.visualstudio.com/docs/languages/overview#_change-the-language-for-the-selected-file). If you have a custom file type that VS Code should always treat as Markdown, you can [associate that file extension with the `markdown` language identifier](https://code.visualstudio.com/docs/languages/overview#_add-a-file-extension-to-a-language).
 
 ## Rules
 
@@ -201,9 +203,9 @@ To extend another configuration file, such a file can use the `extends` property
 
 Files referenced via `extends` do not need to be part of the current project (but usually are).
 
-Rules can also be configured using Code's support for [user and workspace settings](https://code.visualstudio.com/docs/customization/userandworkspace).
+Rules can also be configured using VS Code's support for [user and workspace settings](https://code.visualstudio.com/docs/customization/userandworkspace).
 
-The above configuration might look like the following in Code's user settings file:
+The above configuration might look like the following in VS Code's user settings file:
 
 ```json
 {
@@ -217,7 +219,7 @@ The above configuration might look like the following in Code's user settings fi
 }
 ```
 
-File paths referenced by `extends` from user settings are resolved relative to the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux). File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder. File paths referenced by `extends` from configuration files within the workspace are resolved relative to the file itself. Code's [predefined variables](https://code.visualstudio.com/docs/editor/variables-reference) `${userHome}` and `${workspaceFolder}` can be used within an `extends` path from user or workspace settings to override the default behavior.
+File paths referenced by `extends` from user settings are resolved relative to the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux). File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder. File paths referenced by `extends` from configuration files within the workspace are resolved relative to the file itself. VS Code's [predefined variables](https://code.visualstudio.com/docs/editor/variables-reference) `${userHome}` and `${workspaceFolder}` can be used within an `extends` path from user or workspace settings to override the default behavior.
 
 Configuration sources have the following precedence (in decreasing order):
 
@@ -234,7 +236,7 @@ When a workspace is open, running the `markdownlint.openConfigFile` command (fro
 
 By default, all linting issues are logged and highlighted as you type or edit a document. This includes "transient" issues like `MD009`/`no-trailing-spaces` such as when typing at the end of a line.
 
-If you find this distracting, linting can be configured to ignore issues on the same line as the cursor. This looks like the following in Code's user settings:
+If you find this distracting, linting can be configured to ignore issues on the same line as the cursor. This looks like the following in VS Code's user settings:
 
 ```json
 {
@@ -260,7 +262,7 @@ The value of `2` in the example above will ignore issues on the line with the cu
 
 By default, linting is performed as you type or edit a document. Linting is fast and efficient and should not interfere with typical workflows.
 
-If you find this distracting, linting can be configured to run only when the document is saved. This looks like the following in Code's user settings:
+If you find this distracting, linting can be configured to run only when the document is saved. This looks like the following in VS Code's user settings:
 
 ```json
 {
@@ -283,7 +285,7 @@ test/*.md
 !test/except/this/one.md
 ```
 
-An example of using Code's workspace configuration to ignore files by glob might be:
+An example of using VS Code's workspace configuration to ignore files by glob might be:
 
 ```json
 {
@@ -312,11 +314,11 @@ The globbing library used for matching `markdownlint.ignore` array values is [mi
 
 ### markdownlint.customRules
 
-Custom rules can be specified in Code's user/workspace configuration to apply additional linting beyond the default set of rules. Custom rules are specified by the path to a JavaScript file or the name of or path to an [npm](https://www.npmjs.com/) package exporting one rule or an array of rules ([examples of custom rules](https://www.npmjs.com/search?q=keywords:markdownlint-rule)).
+Custom rules can be specified in VS Code's user/workspace configuration to apply additional linting beyond the default set of rules. Custom rules are specified by the path to a JavaScript file or the name of or path to an [npm](https://www.npmjs.com/) package exporting one rule or an array of rules ([examples of custom rules](https://www.npmjs.com/search?q=keywords:markdownlint-rule)).
 
-Paths are typically relative to the root of the current workspace (or the user's home directory when no folder is open) and should begin with `./` to [differentiate the relative path from a module identifier](https://nodejs.org/docs/latest-v18.x/api/modules.html#file-modules). Paths can be absolute and begin with `/`, though this is discouraged because it does not work reliably across different machines. If implementing custom rules in a workspace, consider committing the rule code under the `.vscode` directory where it will be separate from other workspace content and available to everyone who clones the repository. Paths of the form `{extension}/path` are relative to the base directory of the Code extension named `extension` (which must already be installed). This syntax allows custom rules to be included within another extension's package, though this is discouraged because it introduces a subtle dependency on the other extension.
+Paths are typically relative to the root of the current workspace (or the user's home directory when no folder is open) and should begin with `./` to [differentiate the relative path from a module identifier](https://nodejs.org/docs/latest-v18.x/api/modules.html#file-modules). Paths can be absolute and begin with `/`, though this is discouraged because it does not work reliably across different machines. If implementing custom rules in a workspace, consider committing the rule code under the `.vscode` directory where it will be separate from other workspace content and available to everyone who clones the repository. Paths of the form `{extension}/path` are relative to the base directory of the VS Code extension named `extension` (which must already be installed). This syntax allows custom rules to be included within another extension's package, though this is discouraged because it introduces a subtle dependency on the other extension.
 
-An example of Code's workspace settings for custom rules might look like the following:
+An example of VS Code's workspace settings for custom rules might look like the following:
 
 ```json
 {
