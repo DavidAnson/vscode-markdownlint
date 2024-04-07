@@ -12,7 +12,7 @@ Although everyone has their own preferences and opinions, a pull request is not 
 
 Package versions for `dependencies` and `devDependencies` should be specified exactly (also known as "pinning").
 The short explanation is that doing otherwise eventually leads to inconsistent behavior and broken functionality.
-(See [Pin your npm/yarn dependencies][pin-dependencies] for a longer explanation.)
+(See [Why I pin dependency versions in Node.js packages][version-pinning] for a longer explanation.)
 
 Run basic tests via `npm test`.
 Run UI tests via `npm run test-ui`.
@@ -39,7 +39,7 @@ Thank you!
 
 [closing-keywords]: https://help.github.com/articles/closing-issues-using-keywords/
 [issues]: https://github.com/DavidAnson/vscode-markdownlint/issues
-[pin-dependencies]: https://maxleiter.com/blog/pin-dependencies
 [rewriting-history]: https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History
+[version-pinning]: https://dlaa.me/blog/post/versionpinning
 
 <!-- markdownlint-disable-file required-headings -->
