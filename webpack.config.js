@@ -66,6 +66,13 @@ const config = [
 		},
 		"plugins": [
 			...baseConfig.plugins,
+			// Intercept "node:stream/promises" lacking a browserify entry
+			new webpack.NormalModuleReplacementPlugin(
+				/^stream\/promises$/u,
+				(resource) => {
+					resource.request = require.resolve("./webworker/stream-promises.js");
+				}
+			),
 			// Intercept existing "unicorn-magic" package to provide missing import
 			new webpack.NormalModuleReplacementPlugin(
 				/^unicorn-magic$/u,
@@ -73,7 +80,7 @@ const config = [
 					resource.request = require.resolve("./webworker/unicorn-magic-stub.js");
 				}
 			),
-			// Intercept use of "process" to provide stub implementation
+			// Intercept use of "process" to provide implementation
 			new webpack.ProvidePlugin({
 				"process": "process-wrapper"
 			})

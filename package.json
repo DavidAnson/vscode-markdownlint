@@ -42,9 +42,7 @@
 	"browser": "./bundle.web",
 	"dependencies": {
 		"ignore": "5.3.0",
-		"js-yaml": "4.1.0",
-		"jsonc-parser": "3.2.1",
-		"markdownlint-cli2": "0.12.1",
+		"markdownlint-cli2": "0.13.0",
 		"picomatch": "4.0.1"
 	},
 	"devDependencies": {

@@ -8,10 +8,9 @@ const os = require("node:os");
 const path = require("node:path");
 const {promisify} = require("node:util");
 const {"main": markdownlintCli2} = require("markdownlint-cli2");
-// eslint-disable-next-line no-useless-concat
-const {readConfig} = require("markdownlint-cli2" + "/markdownlint").promises;
-// eslint-disable-next-line no-useless-concat, unicorn/no-keyword-prefix
-const {applyFix, applyFixes, expandTildePath, newLineRe} = require("markdownlint-cli2" + "/markdownlint/helpers");
+const {readConfig} = require("markdownlint-cli2/markdownlint").promises;
+// eslint-disable-next-line unicorn/no-keyword-prefix
+const {applyFix, applyFixes, expandTildePath, newLineRe} = require("markdownlint-cli2/markdownlint/helpers");
 
 // Constants
 const extensionDisplayName = "markdownlint";
@@ -56,10 +55,6 @@ const schemeFileSystemLike = new Set([
 	schemeVscodeVfs,
 	schemeVscodeTestWeb
 ]);
-const configParsers = [
-	jsoncParse,
-	(content) => require("js-yaml").load(content)
-];
 const codeActionKindQuickFix = vscode.CodeActionKind.QuickFix;
 const codeActionKindSourceFixAll = vscode.CodeActionKind.SourceFixAll;
 const codeActionKindSourceFixAllExtension = codeActionKindSourceFixAll.append(extensionDisplayName);
@@ -116,20 +111,6 @@ const throttle = {
 	"document": null,
 	"timeout": null
 };
-
-// Parses JSONC text and returns an object
-function jsoncParse (text) {
-	const { parse, printParseErrorCode } = require("jsonc-parser");
-	const errors = [];
-	const result = parse(text, errors, { "allowTrailingComma": true });
-	if (errors.length > 0) {
-		const aggregate = errors.map(
-			(error) => `${printParseErrorCode(error.error)} (offset ${error.offset}, length ${error.length})`
-		).join(", ");
-		throw new Error(`Unable to parse JSON(C) content, ${aggregate}`);
-	}
-	return result;
-}
 
 // Converts to a POSIX-style path
 // eslint-disable-next-line id-length
@@ -369,6 +350,7 @@ async function getConfig (fs, configuration, uri) {
 		expanded = expanded.replace(/\${workspaceFolder}/g, workspaceFolderFsPath);
 		const extendPath = path.resolve(extendBase, expanded);
 		try {
+			const configParsers = require("markdownlint-cli2/parsers");
 			const extendConfig = await readConfig(extendPath, configParsers, fs);
 			userWorkspaceConfig = {
 				...extendConfig,
