@@ -65,7 +65,6 @@
 			"### markdownlint.config",
 			"### markdownlint.focusMode",
 			"### markdownlint.run",
-			"### markdownlint.ignore",
 			"### markdownlint.customRules",
 			"### markdownlint.lintWorkspaceGlobs",
 			"## Suppress",

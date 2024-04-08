@@ -273,45 +273,6 @@ If you find this distracting, linting can be configured to run only when the doc
 
 > **Note**: When configured to run `onSave`, the list of reported issues will become outdated while the document is edited and will update when the document is saved.
 
-### markdownlint.ignore
-
-If a workspace contains generated content or other Markdown files that trigger warnings but cannot be fixed, it may be helpful to ignore (skip) those files when linting. This can be done by creating a file named `.markdownlintignore` in the root of the project or by updating the user/workspace configuration's `markdownlint.ignore` setting with an array of glob expressions matching the relevant file names. Alternatively, the `markdownlint.ignore` setting can be a string identifying a file to use instead of `.markdownlintignore`.
-
-When using a `.markdownlintignore` file (or overriding it), the content of the file follows the rules for [gitignore](https://git-scm.com/docs/gitignore) and may look something like:
-
-```ini
-# Ignore Markdown files in the test directory
-test/*.md
-!test/except/this/one.md
-```
-
-An example of using VS Code's workspace configuration to ignore files by glob might be:
-
-```json
-{
-    "editor.someSetting": true,
-    "markdownlint.ignore": [
-        "ignore.md",
-        "directory/ignore.md",
-        "**/ignore.md",
-        "**/*.md"
-    ]
-}
-```
-
-Or to ignore files by referencing a different file:
-
-```json
-{
-    "editor.someSetting": true,
-    "markdownlint.ignore": ".gitignore"
-}
-```
-
-The globbing library used for matching `markdownlint.ignore` array values is [minimatch](https://github.com/isaacs/minimatch) with the `dot` and `nocomment` options enabled. Matching is case-sensitive and paths are resolved relative to the root of the workspace. The directory separator is `/`, even on Windows.
-
-> **Note**: Files can also be ignored (in a way other tools will recognize) via the `ignores` property in `.markdownlint-cli2.{jsonc,yaml,cjs,mjs}`.
-
 ### markdownlint.customRules
 
 Custom rules can be specified in VS Code's user/workspace configuration to apply additional linting beyond the default set of rules. Custom rules are specified by the path to a JavaScript file or the name of or path to an [npm](https://www.npmjs.com/) package exporting one rule or an array of rules ([examples of custom rules](https://www.npmjs.com/search?q=keywords:markdownlint-rule)).

@@ -200,6 +200,7 @@
 				},
 				"markdownlint.ignore": {
 					"description": "Array or file of glob expressions to ignore when linting",
+					"deprecationMessage": "Deprecated, use .markdownlint-cli2.{jsonc,yaml,cjs,mjs} and set 'gitignore' or 'ignores'",
 					"scope": "resource",
 					"type": [
 						"array",

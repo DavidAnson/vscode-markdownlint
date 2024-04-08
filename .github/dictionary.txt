@@ -6,8 +6,6 @@ CommonMark
 config
 first-line-h1
 formatter
-gitignore
-globbing
 IntelliSense
 JSON
 JSONC
@@ -18,7 +16,6 @@ markdownlint-cli2
 markdownlint's
 matcher
 MD\d\d\d
-minimatch
 no-bare-urls
 no-blanks-blockquote
 no-inline-html
