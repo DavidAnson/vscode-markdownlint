@@ -240,7 +240,7 @@
 					"description": "markdownlint config object",
 					"scope": "resource",
 					"type": "object",
-					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.33.0/schema/markdownlint-config-schema.json",
+					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.34.0/schema/markdownlint-config-schema.json",
 					"default": {}
 				}
 			}
