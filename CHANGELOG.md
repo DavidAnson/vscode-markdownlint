@@ -1,6 +1,6 @@
 # Changes
 
-* 0.55.0 - Improved rules, new configuration options
+* 0.55.0 - Improved rules, deprecated `markdownlint.ignore`
 * 0.54.0 - Improved rules, JSONC handling
 * 0.53.0 - Improved rules, removed deprecated rules/aliases
 * 0.52.0 - Improved rules, performance
