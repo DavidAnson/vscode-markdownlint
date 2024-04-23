@@ -9,6 +9,7 @@ webworker
 .npmrc
 .vscodeignore
 CONTRIBUTING.md
+eslint.config.mjs
 extension.js
 generate-config-schema.js
 jsconfig.json

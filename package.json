@@ -23,7 +23,7 @@
 		"ci": "npm test && npm run test-ui",
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
-		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js *.cjs test-ui/*.cjs && markdownlint-cli2 *.md",
+		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js *.cjs test-ui/*.cjs eslint.config.mjs --max-warnings 0 && markdownlint-cli2 *.md",
 		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
 		"test": "node --test --experimental-test-coverage && npm run lint && npm run compile && npm run schema && git diff --exit-code",
 		"test-ui": "node ./test-ui/run-tests.mjs",
@@ -46,10 +46,11 @@
 		"picomatch": "4.0.2"
 	},
 	"devDependencies": {
+		"@eslint/js": "9.1.1",
 		"@types/vscode": "1.75.0",
 		"@vscode/test-electron": "2.3.9",
 		"cpy-cli": "5.0.0",
-		"eslint": "8.56.0",
+		"eslint": "9.1.1",
 		"eslint-plugin-n": "17.2.1",
 		"eslint-plugin-unicorn": "52.0.0",
 		"path-browserify": "1.0.1",
