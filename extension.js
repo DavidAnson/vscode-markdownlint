@@ -14,20 +14,18 @@ const {applyFix, applyFixes, expandTildePath, newLineRe} = require("markdownlint
 
 // Constants
 const extensionDisplayName = "markdownlint";
-const configFileGlob = ".markdownlint.{jsonc,json,yaml,yml,cjs,mjs}";
-const optionsFileGlob = ".markdownlint-cli2.{jsonc,yaml,cjs,mjs}";
+const configFileGlob = ".markdownlint.{jsonc,json,yaml,yml,cjs}";
+const optionsFileGlob = ".markdownlint-cli2.{jsonc,yaml,cjs}";
 const markdownlintJson = ".markdownlint.json";
 const configFileNames = [
 	".markdownlint-cli2.jsonc",
 	".markdownlint-cli2.yaml",
 	".markdownlint-cli2.cjs",
-	".markdownlint-cli2.mjs",
 	".markdownlint.jsonc",
 	markdownlintJson,
 	".markdownlint.yaml",
 	".markdownlint.yml",
-	".markdownlint.cjs",
-	".markdownlint.mjs"
+	".markdownlint.cjs"
 ];
 const ignoreFileName = ".markdownlintignore";
 const markdownLanguageId = "markdown";
