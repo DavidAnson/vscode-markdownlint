@@ -176,9 +176,9 @@ The default rule configuration disables [`MD013`/`line-length`](https://github.c
 ```
 
 Rules can be enabled, disabled, and customized by creating a [JSON](https://en.wikipedia.org/wiki/JSON) file named `.markdownlint.jsonc`/`.markdownlint.json` or a [YAML](https://en.wikipedia.org/wiki/YAML) file named `.markdownlint.yaml`/`.markdownlint.yml` or a [JavaScript](https://en.wikipedia.org/wiki/JavaScript) file named `.markdownlint.cjs` in any directory of a project.
-Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs` in any directory of a project. For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
+Additionally, options (which include rules and things like [`markdown-it` plugins](https://www.npmjs.com/search?q=keywords:markdown-it-plugin) and other settings) can be configured by creating a JSON file named `.markdownlint-cli2.jsonc` or a YAML file named `.markdownlint-cli2.yaml` or a JavaScript file named `.markdownlint-cli2.cjs` in any directory of a project.
 
-> **Note**: Because JavaScript code is cached after being loaded, edits to `.markdownlint.cjs`/`.markdownlint-cli2.cjs` require a restart of VS Code.
+> For more information about configuration file precedence and complete examples, see the [Configuration section of the markdownlint-cli2 README.md](https://github.com/DavidAnson/markdownlint-cli2#configuration).
 
 A custom configuration is often defined by a `.markdownlint.json` file in the root of the project:
 
@@ -236,6 +236,8 @@ Configuration sources have the following precedence (in decreasing order):
 Configuration changes saved to any location take effect immediately. Files referenced via `extends` are not monitored for changes. Inherited configuration can be explicitly disabled (or re-enabled) in any configuration file.
 
 When a workspace is open, running the `markdownlint.openConfigFile` command (from the Command Palette or by binding it to a keyboard shortcut) will open an editor for the `.markdownlint-cli2.{jsonc,yaml,cjs}` or `.markdownlint.{jsonc,json,yaml,yml,cjs}` configuration file in the root of the workspace. If none of these files exist, a new `.markdownlint.json` containing the default rule configuration will be opened in the editor in the "pending save" state.
+
+> **Note**: Because JavaScript is cached by VS Code after being loaded, edits to `.markdownlint.cjs`/`.markdownlint-cli2.cjs` require a restart of VS Code.
 
 ### markdownlint.focusMode
 
