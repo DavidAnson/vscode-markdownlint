@@ -353,3 +353,6 @@ Running JavaScript from custom rules, `markdown-it` plugins, or configuration fi
 ## History
 
 See [CHANGELOG.md](CHANGELOG.md).
+{
+    "MD013": false
+}[![Latest Release Monitor](https://github.com/microsoft/vscode/actions/workflows/latest-release-monitor.yml/badge.svg?branch=main)](https://github.com/microsoft/vscode/actions/workflows/latest-release-monitor.yml)[![Latest Release Monitor](https://github.com/microsoft/vscode/actions/workflows/latest-release-monitor.yml/badge.svg)](https://github.com/microsoft/vscode/actions/workflows/latest-release-monitor.yml)
