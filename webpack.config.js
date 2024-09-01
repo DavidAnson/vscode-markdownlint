@@ -27,7 +27,7 @@ const baseConfig = {
 	"optimization": {
 		// "minimize": false,
 		// "moduleIds": "named",
-		"minimizer": [ new TerserPlugin({"extractComments": false}) ]
+		"minimizer": [ new TerserPlugin({ "extractComments": false }) ]
 	},
 	"externals": {
 		"vscode": "commonjs vscode"

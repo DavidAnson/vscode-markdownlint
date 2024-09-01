@@ -6,11 +6,11 @@
 const vscode = require("vscode");
 const os = require("node:os");
 const path = require("node:path");
-const {promisify} = require("node:util");
-const {"main": markdownlintCli2} = require("markdownlint-cli2");
-const {readConfig} = require("markdownlint-cli2/markdownlint").promises;
+const { promisify } = require("node:util");
+const { "main": markdownlintCli2 } = require("markdownlint-cli2");
+const { readConfig } = require("markdownlint-cli2/markdownlint").promises;
 // eslint-disable-next-line unicorn/no-keyword-prefix
-const {applyFix, applyFixes, expandTildePath, newLineRe} = require("markdownlint-cli2/markdownlint/helpers");
+const { applyFix, applyFixes, expandTildePath, newLineRe } = require("markdownlint-cli2/markdownlint/helpers");
 
 // Constants
 const extensionDisplayName = "markdownlint";
@@ -161,7 +161,7 @@ class FsWrapper {
 			posixPathSegment = posixPathSegment.replace(firstSegmentRe, "/");
 		}
 		// Return consistently-formatted Uri with specified path
-		return this.fwFolderUri.with({"path": posixPathSegment});
+		return this.fwFolderUri.with({ "path": posixPathSegment });
 	}
 
 	// Implements fs.access via vscode.workspace.fs
@@ -568,7 +568,7 @@ function lintWorkspace (logString) {
 
 // Runs the lintWorkspace task to lint all Markdown files in the workspace
 function lintWorkspaceViaTask () {
-	return vscode.tasks.fetchTasks({"type": extensionDisplayName})
+	return vscode.tasks.fetchTasks({ "type": extensionDisplayName })
 		.then((tasks) => {
 			const lintWorkspaceTask = tasks.find((task) => task.name === lintAllTaskName);
 			return lintWorkspaceTask ?
@@ -592,7 +592,7 @@ function lint (document) {
 		// Lint
 		task = markdownlintWrapper(document)
 			.then((results) => {
-				const {activeTextEditor} = vscode.window;
+				const { activeTextEditor } = vscode.window;
 				for (const result of results) {
 					// Create Diagnostics
 					const lineNumber = result.lineNumber;
@@ -733,7 +733,7 @@ function fixLine (lineIndex, fixInfo) {
 		if (editor && fixInfo) {
 			const document = editor.document;
 			const lineNumber = fixInfo.lineNumber || (lineIndex + 1);
-			const {text, range} = document.lineAt(lineNumber - 1);
+			const { text, range } = document.lineAt(lineNumber - 1);
 			const fixedText = applyFix(text, fixInfo, "\n");
 			return editor.edit((editBuilder) => {
 				if (typeof fixedText === "string") {
@@ -743,11 +743,11 @@ function fixLine (lineIndex, fixInfo) {
 					if (lineNumber === 1) {
 						if (document.lineCount > 1) {
 							const nextLine = document.lineAt(range.end.line + 1);
-							deleteRange = range.with({"end": nextLine.range.start});
+							deleteRange = range.with({ "end": nextLine.range.start });
 						}
 					} else {
 						const previousLine = document.lineAt(range.start.line - 1);
-						deleteRange = range.with({"start": previousLine.range.end});
+						deleteRange = range.with({ "start": previousLine.range.end });
 					}
 					editBuilder.delete(deleteRange);
 				}
@@ -798,7 +798,7 @@ function formatDocument (document, range) {
 			return markdownlintWrapper(document)
 				.then((errors) => {
 					const rangeErrors = errors.filter((error) => {
-						const {fixInfo} = error;
+						const { fixInfo } = error;
 						if (fixInfo) {
 							// eslint-disable-next-line unicorn/consistent-destructuring
 							const line = error.lineNumber - 1;
@@ -838,7 +838,7 @@ function openConfigFile () {
 			} else {
 				// File does not exist, create one
 				const fileUri = vscode.Uri.joinPath(workspaceFolderUri, markdownlintJson);
-				const untitledFileUri = fileUri.with({"scheme": schemeUntitled});
+				const untitledFileUri = fileUri.with({ "scheme": schemeUntitled });
 				vscode.window.showTextDocument(untitledFileUri).then(
 					(editor) => {
 						editor.edit((editBuilder) => {
@@ -1066,7 +1066,7 @@ function activate (context) {
 	);
 
 	// Register CodeActionsProvider
-	const documentSelector = {"language": markdownLanguageId};
+	const documentSelector = { "language": markdownLanguageId };
 	const codeActionProvider = {
 		provideCodeActions
 	};
@@ -1100,7 +1100,7 @@ function activate (context) {
 		() => Promise.resolve(new LintWorkspacePseudoterminal())
 	);
 	const lintWorkspaceTask = new vscode.Task(
-		{"type": extensionDisplayName},
+		{ "type": extensionDisplayName },
 		vscode.TaskScope.Workspace,
 		lintAllTaskName,
 		extensionDisplayName,

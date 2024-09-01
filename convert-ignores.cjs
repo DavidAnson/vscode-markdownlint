@@ -11,7 +11,7 @@ const picomatch = require("picomatch/posix");
  */
 function convertIgnores (ignores) {
 	return ignores.map(
-		(ignore) => picomatch(ignore, {"dot": true})
+		(ignore) => picomatch(ignore, { "dot": true })
 	);
 }
 

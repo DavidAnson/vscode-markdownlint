@@ -309,4 +309,4 @@ if (vscode.workspace.workspaceFolders) {
 	);
 }
 
-module.exports = {tests};
+module.exports = { tests };

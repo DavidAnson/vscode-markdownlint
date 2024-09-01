@@ -50,7 +50,7 @@ export default [
 			"no-tabs": "off",
 			"no-ternary": "off",
 			"no-undefined": "off",
-			"no-use-before-define": [ "error", {"functions": false} ],
+			"no-use-before-define": [ "error", { "functions": false } ],
 			"one-var": "off",
 			"operator-linebreak": [ "error", "after" ],
 			"padded-blocks": "off",
@@ -61,11 +61,10 @@ export default [
 			"sort-imports": "off",
 			"sort-keys": "off",
 
-			"n/no-missing-require": [ "error", {"allowModules": [ "vscode" ]} ],
+			"n/no-missing-require": [ "error", { "allowModules": [ "vscode" ] } ],
 
 			"@stylistic/array-bracket-spacing": [ "error", "always" ],
-			"@stylistic/indent": [ "error", "tab", {"ObjectExpression": "first"} ],
-			"@stylistic/object-curly-spacing": [ "error", "never" ],
+			"@stylistic/indent": [ "error", "tab", { "ObjectExpression": "first" } ],
 			"@stylistic/operator-linebreak": [ "error", "after" ],
 			"@stylistic/space-before-function-paren": [ "error", "always" ],
 
