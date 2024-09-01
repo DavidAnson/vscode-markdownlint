@@ -8,7 +8,7 @@ const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 
 const nodeModulePrefixRe = /^node:/u;
-const baseConfig = 	{
+const baseConfig = {
 	"target": "node",
 	"entry": "./extension.js",
 	"module": {

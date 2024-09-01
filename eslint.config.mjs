@@ -2,15 +2,26 @@
 
 import js from "@eslint/js";
 import eslintPluginN from "eslint-plugin-n";
+import eslintPluginStylistic from "@stylistic/eslint-plugin";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
 export default [
 	js.configs.all,
 	eslintPluginN.configs["flat/recommended"],
+	eslintPluginStylistic.configs.customize({
+		"arrowParens": true,
+		"braceStyle": "1tbs",
+		"commaDangle": "never",
+		"indent": "tab",
+		"jsx": false,
+		"quoteProps": "always",
+		"quotes": "double",
+		"semi": true
+	}),
 	eslintPluginUnicorn.configs["flat/all"],
 	{
 		"languageOptions": {
-			"sourceType": "commonjs",
+			"sourceType": "commonjs"
 		},
 		"linterOptions": {
 			"reportUnusedDisableDirectives": true
@@ -39,7 +50,7 @@ export default [
 			"no-tabs": "off",
 			"no-ternary": "off",
 			"no-undefined": "off",
-			"no-use-before-define": [ "error", { "functions": false } ],
+			"no-use-before-define": [ "error", {"functions": false} ],
 			"one-var": "off",
 			"operator-linebreak": [ "error", "after" ],
 			"padded-blocks": "off",
@@ -50,7 +61,13 @@ export default [
 			"sort-imports": "off",
 			"sort-keys": "off",
 
-			"n/no-missing-require": [ "error", { "allowModules": [ "vscode" ] } ],
+			"n/no-missing-require": [ "error", {"allowModules": [ "vscode" ]} ],
+
+			"@stylistic/array-bracket-spacing": [ "error", "always" ],
+			"@stylistic/indent": [ "error", "tab", {"ObjectExpression": "first"} ],
+			"@stylistic/object-curly-spacing": [ "error", "never" ],
+			"@stylistic/operator-linebreak": [ "error", "after" ],
+			"@stylistic/space-before-function-paren": [ "error", "always" ],
 
 			"unicorn/no-array-push-push": "off",
 			"unicorn/no-array-reduce": "off",

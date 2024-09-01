@@ -337,8 +337,8 @@ async function getConfig (fs, configuration, uri) {
 		const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
 		const workspaceFolderUri = getDocumentWorkspaceFolderUri(uri);
 		const useHomedir =
-			(userWorkspaceConfigMetadata.globalValue &&
-				(userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
+			// eslint-disable-next-line max-len
+			(userWorkspaceConfigMetadata.globalValue && (userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
 			(workspaceFolderUri.scheme !== schemeFile);
 		const homedir = os && os.homedir && os.homedir();
 		const workspaceFolderFsPath = posixPath(workspaceFolderUri.fsPath);

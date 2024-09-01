@@ -47,6 +47,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "9.1.1",
+		"@stylistic/eslint-plugin": "2.7.2",
 		"@types/vscode": "1.75.0",
 		"@vscode/test-electron": "2.3.9",
 		"cpy-cli": "5.0.0",
