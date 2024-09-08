@@ -86,7 +86,7 @@ function openLintEditVerifyFixAll () {
 							md019.message,
 							"MD019/no-multiple-space-atx: Multiple spaces after hash on atx style heading"
 						);
-						assert.ok(md019.range.isEqual(new vscode.Range(0, 0, 0, 4)));
+						assert.ok(md019.range.isEqual(new vscode.Range(0, 2, 0, 3)));
 						assert.equal(md019.severity, vscode.DiagnosticSeverity.Warning);
 						assert.equal(md019.source, "markdownlint");
 						// @ts-ignore

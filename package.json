@@ -42,7 +42,7 @@
 	"browser": "./bundle.web",
 	"dependencies": {
 		"ignore": "5.3.1",
-		"markdownlint-cli2": "0.13.0",
+		"markdownlint-cli2": "0.14.0",
 		"picomatch": "4.0.2"
 	},
 	"devDependencies": {
@@ -242,7 +242,7 @@
 					"description": "markdownlint config object",
 					"scope": "resource",
 					"type": "object",
-					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.34.0/schema/markdownlint-config-schema.json",
+					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.35.0/schema/markdownlint-config-schema.json",
 					"default": {}
 				}
 			}
