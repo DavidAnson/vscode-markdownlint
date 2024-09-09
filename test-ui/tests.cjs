@@ -1,3 +1,5 @@
+// @ts-check
+
 "use strict";
 
 // This must be CommonJS or the VS Code host fails with:
@@ -231,49 +233,29 @@ function openEditDiffRevert () {
 	});
 }
 
-// Open README.md, update settings, verify diagnostics
+// Open README.md, add custom rule, verify diagnostics, remove
 function dynamicWorkspaceSettingsChange () {
 	return testWrapper((resolve, reject, disposables) => {
+		const configuration = vscode.workspace.getConfiguration("markdownlint");
 		let editedSettings = false;
 		let validated = false;
 		disposables.push(
-			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
-				// eslint-disable-next-line consistent-return
-				callbackWrapper(reject, () => {
-					if (textEditor) {
-						assert.ok(textEditor.document.uri.path.endsWith("/README.md"));
-						return textEditor.edit((editBuilder) => {
-							editBuilder.insert(new vscode.Position(2, 0), "---\n\n***\n\n");
-						})
-							.then(
-								() => {
-									editedSettings = true;
-									return vscode.workspace.getConfiguration("markdownlint")
-										.update("ignore", undefined, vscode.ConfigurationTarget.Workspace);
-								}
-							);
-					}
-				});
-			}),
 			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
 				callbackWrapper(reject, () => {
 					const diagnostics = getDiagnostics(diagnosticChangeEvent, "/README.md");
-					if ((diagnostics.length > 0) && !editedSettings) {
-						reject(new Error("Unexpected diagnostics for ignored file"));
+					if ((diagnostics.length === 0) && !editedSettings) {
+						editedSettings = true;
+						configuration.update("customRules", [ "./test-ui/first-line.cjs" ], vscode.ConfigurationTarget.Workspace);
 					} else if ((diagnostics.length > 0) && editedSettings) {
 						validated = true;
-						vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor")
-							.then(noop, reject);
+						configuration.update("customRules", undefined, vscode.ConfigurationTarget.Workspace);
 					} else if ((diagnostics.length === 0) && validated) {
-						// Make sure diagonstics are clean for next test
 						resolve();
 					}
 				});
 			})
 		);
-		vscode.workspace.getConfiguration("markdownlint")
-			.update("ignore", [ "README.md" ], vscode.ConfigurationTarget.Workspace)
-			.then(() => vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md"))))
+		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")))
 			.then(noop, reject);
 	});
 }

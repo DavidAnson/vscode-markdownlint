@@ -23,7 +23,7 @@
 		"ci": "npm test && npm run test-ui",
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
-		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js *.cjs test-ui/*.cjs eslint.config.mjs && markdownlint-cli2 *.md",
+		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js *.js test-ui/*.cjs eslint.config.mjs && markdownlint-cli2 *.md",
 		"schema": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
 		"test": "node --test --experimental-test-coverage && npm run lint && npm run compile && npm run schema && git diff --exit-code",
 		"test-ui": "node ./test-ui/run-tests.mjs",
@@ -41,9 +41,7 @@
 	"main": "./bundle",
 	"browser": "./bundle.web",
 	"dependencies": {
-		"ignore": "5.3.1",
-		"markdownlint-cli2": "0.14.0",
-		"picomatch": "4.0.2"
+		"markdownlint-cli2": "0.14.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "9.1.1",
@@ -83,14 +81,6 @@
 		}
 	},
 	"contributes": {
-		"languages": [
-			{
-				"id": "ignore",
-				"filenames": [
-					".markdownlintignore"
-				]
-			}
-		],
 		"commands": [
 			{
 				"command": "markdownlint.fixAll",
@@ -199,19 +189,6 @@
 						"integer"
 					],
 					"default": false
-				},
-				"markdownlint.ignore": {
-					"description": "Array or file of glob expressions to ignore when linting",
-					"deprecationMessage": "Deprecated, use .markdownlint-cli2.{jsonc,yaml,cjs,mjs} and set 'gitignore' or 'ignores'",
-					"scope": "resource",
-					"type": [
-						"array",
-						"string"
-					],
-					"items": {
-						"type": "string"
-					},
-					"default": ".markdownlintignore"
 				},
 				"markdownlint.lintWorkspaceGlobs": {
 					"description": "Array of glob expressions to include or ignore when linting the workspace",

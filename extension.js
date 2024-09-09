@@ -27,7 +27,6 @@ const configFileNames = [
 	".markdownlint.yml",
 	".markdownlint.cjs"
 ];
-const ignoreFileName = ".markdownlintignore";
 const markdownLanguageId = "markdown";
 // Untitled/unsaved document
 const schemeUntitled = "untitled";
@@ -81,7 +80,6 @@ const openCommand = "vscode.open";
 const sectionConfig = "config";
 const sectionCustomRules = "customRules";
 const sectionFocusMode = "focusMode";
-const sectionIgnore = "ignore";
 const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
 const sectionRun = "run";
 const applicationConfigurationSections = [ sectionFocusMode ];
@@ -98,8 +96,6 @@ const applicationConfiguration = {};
 const ruleNameToInformationUri = {};
 /** @type {Map<string, Array<vscode.Disposable>>} */
 const workspaceFolderUriToDisposables = new Map();
-/** @type {Map<string, Array<(string)=>boolean>>} */
-const workspaceFolderUriToIgnores = new Map();
 let outputChannel = null;
 let outputChannelShown = false;
 let diagnosticCollection = null;
@@ -366,58 +362,6 @@ async function getConfig (fs, configuration, uri) {
 	};
 }
 
-// Returns ignore configuration for user/workspace
-function getIgnores (document) {
-	const workspaceFolderUri = getDocumentWorkspaceFolderUri(document.uri);
-	const workspaceFolderUriString = workspaceFolderUri.toString();
-	if (!workspaceFolderUriToIgnores.has(workspaceFolderUriString)) {
-		const ignores = [];
-		workspaceFolderUriToIgnores.set(workspaceFolderUriString, ignores);
-		let ignoreFile = ignoreFileName;
-		// Handle "ignore" configuration
-		const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-		const ignoreValue = configuration.get(sectionIgnore);
-		if (Array.isArray(ignoreValue)) {
-			const convertIgnores = require("./convert-ignores.cjs");
-			for (const ignore of convertIgnores(ignoreValue)) {
-				ignores.push(ignore);
-			}
-		} else if (typeof ignoreValue === "string") {
-			ignoreFile = ignoreValue;
-		}
-		// Handle .markdownlintignore
-		const ignoreFileUri = vscode.Uri.joinPath(
-			workspaceFolderUri,
-			ignoreFile
-		);
-		vscode.workspace.fs.stat(ignoreFileUri).then(
-			() => vscode.workspace.fs.readFile(ignoreFileUri).then(
-				(ignoreBytes) => {
-					const ignoreString = new TextDecoder().decode(ignoreBytes);
-					const ignore = require("ignore").default;
-					const ignoreInstance = ignore().add(ignoreString);
-					ignores.push((file) => ignoreInstance.ignores(file));
-					clearDiagnosticsAndLintVisibleFiles();
-				}
-			),
-			() => null
-		);
-	}
-	return workspaceFolderUriToIgnores.get(workspaceFolderUriString);
-}
-
-// Clears the ignore list
-function clearIgnores (eventUri) {
-	const source = eventUri ?
-		`"${eventUri.fsPath}"` :
-		"setting";
-	outputLine(`Resetting ignore cache due to ${source} change.`);
-	workspaceFolderUriToIgnores.clear();
-	if (eventUri) {
-		clearDiagnosticsAndLintVisibleFiles();
-	}
-}
-
 // Returns custom rule configuration for user/workspace
 function getCustomRules (configuration) {
 	const customRulesPaths = configuration.get(sectionCustomRules);
@@ -583,65 +527,59 @@ function lint (document) {
 		return;
 	}
 	const diagnostics = [];
-	let task = Promise.resolve();
 	const targetGeneration = diagnosticGeneration;
-	// Check ignore list
-	const relativePath = vscode.workspace.asRelativePath(document.uri, false);
-	const normalizedPath = relativePath.split(path.sep).join("/");
-	if (getIgnores(document).every((ignoreTest) => !ignoreTest(normalizedPath))) {
-		// Lint
-		task = markdownlintWrapper(document)
-			.then((results) => {
-				const { activeTextEditor } = vscode.window;
-				for (const result of results) {
-					// Create Diagnostics
-					const lineNumber = result.lineNumber;
-					const focusMode = applicationConfiguration[sectionFocusMode];
-					const focusModeRange = (!Number.isInteger(focusMode) || (focusMode < 0)) ?
-						0 :
-						focusMode;
-					if (
-						(applicationConfiguration[sectionFocusMode] === false) ||
-						!activeTextEditor ||
-						(activeTextEditor.document !== document) ||
-						(activeTextEditor.selection.active.line < (lineNumber - focusModeRange - 1)) ||
-						(activeTextEditor.selection.active.line > (lineNumber + focusModeRange - 1))
-					) {
-						const ruleName = result.ruleNames[0];
-						const ruleDescription = result.ruleDescription;
-						const ruleInformationUri = result.ruleInformation && vscode.Uri.parse(result.ruleInformation);
-						ruleNameToInformationUri[ruleName] = ruleInformationUri;
-						let message = result.ruleNames.join("/") + ": " + ruleDescription;
-						if (result.errorDetail) {
-							message += " [" + result.errorDetail + "]";
-						}
-						let range = document.lineAt(lineNumber - 1).range;
-						if (result.errorRange) {
-							const start = result.errorRange[0] - 1;
-							const end = start + result.errorRange[1];
-							range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
-						}
-						const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-						diagnostic.code = ruleInformationUri ?
-							{
-								"value": ruleName,
-								"target": ruleInformationUri
-							} :
-							ruleName;
-						diagnostic.source = extensionDisplayName;
-						// @ts-ignore
-						diagnostic.fixInfo = result.fixInfo;
-						diagnostics.push(diagnostic);
+	// Lint
+	markdownlintWrapper(document)
+		.then((results) => {
+			const { activeTextEditor } = vscode.window;
+			for (const result of results) {
+				// Create Diagnostics
+				const lineNumber = result.lineNumber;
+				const focusMode = applicationConfiguration[sectionFocusMode];
+				const focusModeRange = (!Number.isInteger(focusMode) || (focusMode < 0)) ?
+					0 :
+					focusMode;
+				if (
+					(applicationConfiguration[sectionFocusMode] === false) ||
+					!activeTextEditor ||
+					(activeTextEditor.document !== document) ||
+					(activeTextEditor.selection.active.line < (lineNumber - focusModeRange - 1)) ||
+					(activeTextEditor.selection.active.line > (lineNumber + focusModeRange - 1))
+				) {
+					const ruleName = result.ruleNames[0];
+					const ruleDescription = result.ruleDescription;
+					const ruleInformationUri = result.ruleInformation && vscode.Uri.parse(result.ruleInformation);
+					ruleNameToInformationUri[ruleName] = ruleInformationUri;
+					let message = result.ruleNames.join("/") + ": " + ruleDescription;
+					if (result.errorDetail) {
+						message += " [" + result.errorDetail + "]";
 					}
+					let range = document.lineAt(lineNumber - 1).range;
+					if (result.errorRange) {
+						const start = result.errorRange[0] - 1;
+						const end = start + result.errorRange[1];
+						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
+					}
+					const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+					diagnostic.code = ruleInformationUri ?
+						{
+							"value": ruleName,
+							"target": ruleInformationUri
+						} :
+						ruleName;
+					diagnostic.source = extensionDisplayName;
+					// @ts-ignore
+					diagnostic.fixInfo = result.fixInfo;
+					diagnostics.push(diagnostic);
 				}
-			});
-	}
-	// Publish
-	task.then(() => {
-		if (targetGeneration === diagnosticGeneration) {
-			diagnosticCollection.set(document.uri, diagnostics);
-		}
-	});
+			}
+		})
+		// Publish
+		.then(() => {
+			if (targetGeneration === diagnosticGeneration) {
+				diagnosticCollection.set(document.uri, diagnostics);
+			}
+		});
 }
 
 // Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
@@ -984,7 +922,6 @@ function didChangeConfiguration (change) {
 		outputLine("Resetting configuration cache due to setting change.");
 		getApplicationConfiguration();
 		clearRunMap();
-		clearIgnores();
 		clearDiagnosticsAndLintVisibleFiles();
 	}
 }
@@ -1001,8 +938,6 @@ function createFileSystemWatchers (workspaceFolderUri) {
 	const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
 	const relativeOptionsFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + optionsFileGlob);
 	const optionsWatcher = vscode.workspace.createFileSystemWatcher(relativeOptionsFileGlob);
-	const relativeIgnoreFilePath = new vscode.RelativePattern(workspaceFolderUri, ignoreFileName);
-	const ignoreWatcher = vscode.workspace.createFileSystemWatcher(relativeIgnoreFilePath);
 	const workspaceFolderUriString = workspaceFolderUri.toString();
 	workspaceFolderUriToDisposables.set(
 		workspaceFolderUriString,
@@ -1014,11 +949,7 @@ function createFileSystemWatchers (workspaceFolderUri) {
 			optionsWatcher,
 			optionsWatcher.onDidCreate(clearDiagnosticsAndLintVisibleFiles),
 			optionsWatcher.onDidChange(clearDiagnosticsAndLintVisibleFiles),
-			optionsWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles),
-			ignoreWatcher,
-			ignoreWatcher.onDidCreate(clearIgnores),
-			ignoreWatcher.onDidChange(clearIgnores),
-			ignoreWatcher.onDidDelete(clearIgnores)
+			optionsWatcher.onDidDelete(clearDiagnosticsAndLintVisibleFiles)
 		]
 	);
 }

@@ -1,3 +1,5 @@
+// @ts-check
+
 "use strict";
 
 // This must be CommonJS or the VS Code host fails with:

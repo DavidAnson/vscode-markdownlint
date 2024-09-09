@@ -1,3 +1,5 @@
+// @ts-check
+
 import { runTests } from "@vscode/test-electron";
 
 // @ts-ignore
