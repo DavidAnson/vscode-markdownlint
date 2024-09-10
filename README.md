@@ -168,7 +168,7 @@ To temporarily disable linting of Markdown documents, run the `markdownlint.togg
 
 ### markdownlint.config
 
-The default rule configuration disables [`MD013`/`line-length`](https://github.com/DavidAnson/markdownlint/blob/v0.35.0/doc/md013.md) because many files include lines longer than the conventional 80 character limit:
+By default (i.e., without customizing anything), all rules are enabled *except* [`MD013`/`line-length`](https://github.com/DavidAnson/markdownlint/blob/v0.35.0/doc/md013.md) because many files include lines longer than the conventional 80 character limit:
 
 ```json
 {
