@@ -122,6 +122,7 @@ The following rules can be automatically fixed by moving the cursor to a rule vi
 * MD051 *link-fragments*
 * MD053 *link-image-reference-definitions*
 * MD054 *link-image-style*
+* MD058 *blanks-around-tables*
 
 ## Commands
 
