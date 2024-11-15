@@ -66,11 +66,11 @@ const config = [
 		},
 		"plugins": [
 			...baseConfig.plugins,
-			// Intercept "node:stream/promises" lacking a browserify entry
+			// Intercept "node:stream/consumers" and "node:stream/promises" lacking a browserify entry
 			new webpack.NormalModuleReplacementPlugin(
-				/^stream\/promises$/u,
+				/^stream\/(?:consumers|promises)$/u,
 				(resource) => {
-					resource.request = require.resolve("./webworker/stream-promises.js");
+					resource.request = require.resolve("./webworker/module-empty.js");
 				}
 			),
 			// Intercept existing "unicorn-magic" package to provide missing import
@@ -93,7 +93,7 @@ const config = [
 				"process": require.resolve("./webworker/process-stub.js"),
 				"process-wrapper": require.resolve("./webworker/process-stub.js"),
 				"stream": require.resolve("stream-browserify"),
-				"url": require.resolve("./webworker/url-stub.js"),
+				"url": require.resolve("./webworker/module-empty.js"),
 				"util": require.resolve("util")
 			}
 		}

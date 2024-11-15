@@ -9,8 +9,9 @@ const path = require("node:path");
 const { promisify } = require("node:util");
 const { "main": markdownlintCli2 } = require("markdownlint-cli2");
 const { readConfig } = require("markdownlint-cli2/markdownlint").promises;
+const { applyFix, applyFixes } = require("markdownlint-cli2/markdownlint");
 // eslint-disable-next-line unicorn/no-keyword-prefix
-const { applyFix, applyFixes, expandTildePath, newLineRe } = require("markdownlint-cli2/markdownlint/helpers");
+const { expandTildePath, newLineRe } = require("markdownlint-cli2/markdownlint/helpers");
 
 // Constants
 const extensionDisplayName = "markdownlint";
