@@ -199,10 +199,11 @@
 					},
 					"default": [
 						"**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
+						"!**/*.code-search",
 						"!**/bower_components",
 						"!**/node_modules",
-						"!**/vendor",
-						"!**/.git"
+						"!**/.git",
+						"!**/vendor"
 					]
 				},
 				"markdownlint.run": {

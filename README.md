@@ -312,21 +312,23 @@ For information about authoring custom rules, see [the `markdownlint` documentat
 
 ### markdownlint.lintWorkspaceGlobs
 
-The standard globs used when linting a workspace should match VS Code's default concept of "Markdown files that matter":
+The globs used when linting a workspace with the `markdownlint.lintWorkspace` command match VS Code's concept of "Markdown files that matter":
 
 ```jsonc
 [
     // Source: https://github.com/microsoft/vscode/blob/main/extensions/markdown-basics/package.json
     "**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
     // Source: https://github.com/microsoft/vscode/blob/main/src/vs/workbench/contrib/search/browser/search.contribution.ts
-    "!**/node_modules",
+    "!**/*.code-search",
     "!**/bower_components",
+    "!**/node_modules",
     // Additional exclusions
-    "!**/.git"
+    "!**/.git",
+    "!**/vendor"
 ]
 ```
 
-This list can be customized at workspace or user scope to include and exclude additional files and directories.
+This list can be customized at workspace and user scope to include or exclude additional files and directories.
 For more information about syntax, see the ["Command Line" section of the markdownlint-cli2 documentation](https://github.com/DavidAnson/markdownlint-cli2#command-line).
 
 ## Suppress
