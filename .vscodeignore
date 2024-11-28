@@ -10,7 +10,7 @@ webworker
 .vscodeignore
 CONTRIBUTING.md
 eslint.config.mjs
-extension.js
+extension.mjs
 generate-config-schema.js
 jsconfig.json
 webpack.config.js

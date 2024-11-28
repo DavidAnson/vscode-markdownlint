@@ -10,14 +10,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const nodeModulePrefixRe = /^node:/u;
 const baseConfig = {
 	"target": "node",
-	"entry": "./extension.js",
-	"module": {
-		"rules": [
-			{
-				"test": /markdownlint-cli2.js$/
-			}
-		]
-	},
+	"entry": "./extension.mjs",
 	"output": {
 		"asyncChunks": false,
 		"path": __dirname,
@@ -88,6 +81,7 @@ const config = [
 		"resolve": {
 			"fallback": {
 				"fs": false,
+				"module": require.resolve("./webworker/module-stub.js"),
 				"os": require.resolve("./webworker/os-stub.js"),
 				"path": require.resolve("path-browserify"),
 				"process": require.resolve("./webworker/process-stub.js"),
