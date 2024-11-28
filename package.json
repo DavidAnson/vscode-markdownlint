@@ -41,7 +41,7 @@
 	"main": "./bundle",
 	"browser": "./bundle.web",
 	"dependencies": {
-		"markdownlint-cli2": "0.15.0"
+		"markdownlint-cli2": "0.17.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "9.14.0",
@@ -220,7 +220,7 @@
 					"description": "markdownlint config object",
 					"scope": "resource",
 					"type": "object",
-					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.36.1/schema/markdownlint-config-schema.json",
+					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.37.2/schema/markdownlint-config-schema.json",
 					"default": {}
 				}
 			}
