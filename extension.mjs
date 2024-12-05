@@ -8,9 +8,8 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import { "main" as markdownlintCli2 } from "markdownlint-cli2";
-import markdownlint from "markdownlint-cli2/markdownlint";
-const { applyFix, applyFixes, promises } = markdownlint;
-const { readConfig } = promises;
+import { applyFix, applyFixes } from "markdownlint-cli2/markdownlint";
+import { readConfig } from "markdownlint-cli2/markdownlint/promise";
 // eslint-disable-next-line unicorn/no-keyword-prefix
 import helpers from "markdownlint-cli2/markdownlint/helpers";
 const { expandTildePath, newLineRe } = helpers;
