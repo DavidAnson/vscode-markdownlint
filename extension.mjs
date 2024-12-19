@@ -403,8 +403,8 @@ function getOptionsOverride () {
 	};
 }
 
-// Gets the value of the noRequire parameter to markdownlint-cli2
-function getNoRequire (scheme) {
+// Gets the value of the noImport parameter to markdownlint-cli2
+function getNoImport (scheme) {
 	const isTrusted = vscode.workspace.isTrusted;
 	const isSchemeFile = (scheme === schemeFile);
 	const isDesktop = Boolean(os && os.platform && os.platform());
@@ -445,7 +445,7 @@ async function markdownlintWrapper (document) {
 			[name]: document.getText()
 		},
 		"noGlobs": true,
-		"noRequire": getNoRequire(scheme),
+		"noImport": getNoImport(scheme),
 		"optionsDefault": await getOptionsDefault(fs, configuration, config),
 		"optionsOverride": {
 			...getOptionsOverride(),
@@ -497,7 +497,7 @@ function lintWorkspace (logString) {
 						"directory": posixPath(workspaceFolderUri.fsPath),
 						"logMessage": logString,
 						"logError": logString,
-						"noRequire": getNoRequire(workspaceFolderUri.scheme),
+						"noImport": getNoImport(workspaceFolderUri.scheme),
 						optionsDefault,
 						"optionsOverride": getOptionsOverride()
 					};

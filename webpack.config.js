@@ -79,6 +79,7 @@ const config = [
 			})
 		],
 		"resolve": {
+			"conditionNames": [ "markdownlint-imports-node", "..." ],
 			"fallback": {
 				"fs": false,
 				"module": require.resolve("./webworker/module-stub.js"),
