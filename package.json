@@ -44,21 +44,21 @@
 		"markdownlint-cli2": "0.17.0"
 	},
 	"devDependencies": {
-		"@eslint/js": "9.14.0",
-		"@stylistic/eslint-plugin": "2.10.1",
+		"@eslint/js": "9.17.0",
+		"@stylistic/eslint-plugin": "2.12.1",
 		"@types/vscode": "1.75.0",
 		"@vscode/test-electron": "2.4.1",
 		"cpy-cli": "5.0.0",
-		"eslint": "9.14.0",
-		"eslint-plugin-n": "17.13.2",
-		"eslint-plugin-unicorn": "56.0.0",
+		"eslint": "9.17.0",
+		"eslint-plugin-n": "17.15.1",
+		"eslint-plugin-unicorn": "56.0.1",
 		"path-browserify": "1.0.1",
 		"stream-browserify": "3.0.0",
-		"terser-webpack-plugin": "5.3.10",
+		"terser-webpack-plugin": "5.3.11",
 		"util": "0.12.5",
 		"vsce": "2.15.0",
-		"webpack": "5.96.1",
-		"webpack-cli": "5.1.4"
+		"webpack": "5.97.1",
+		"webpack-cli": "6.0.1"
 	},
 	"keywords": [
 		"markdown",
