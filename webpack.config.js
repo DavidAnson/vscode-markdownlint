@@ -82,7 +82,6 @@ const config = [
 			"conditionNames": [ "markdownlint-imports-node", "..." ],
 			"fallback": {
 				"fs": false,
-				"module": require.resolve("./webworker/module-stub.js"),
 				"os": require.resolve("./webworker/os-stub.js"),
 				"path": require.resolve("path-browserify"),
 				"process": require.resolve("./webworker/process-stub.js"),
