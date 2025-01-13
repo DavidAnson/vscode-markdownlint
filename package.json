@@ -48,6 +48,7 @@
 		"@stylistic/eslint-plugin": "2.12.1",
 		"@types/vscode": "1.75.0",
 		"@vscode/test-electron": "2.4.1",
+		"@vscode/vsce": "3.2.1",
 		"cpy-cli": "5.0.0",
 		"eslint": "9.17.0",
 		"eslint-plugin-n": "17.15.1",
@@ -56,7 +57,6 @@
 		"stream-browserify": "3.0.0",
 		"terser-webpack-plugin": "5.3.11",
 		"util": "0.12.5",
-		"vsce": "2.15.0",
 		"webpack": "5.97.1",
 		"webpack-cli": "6.0.1"
 	},
