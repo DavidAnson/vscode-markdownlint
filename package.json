@@ -44,13 +44,13 @@
 		"markdownlint-cli2": "0.17.2"
 	},
 	"devDependencies": {
-		"@eslint/js": "9.17.0",
-		"@stylistic/eslint-plugin": "2.12.1",
+		"@eslint/js": "9.18.0",
+		"@stylistic/eslint-plugin": "2.13.0",
 		"@types/vscode": "1.75.0",
 		"@vscode/test-electron": "2.4.1",
 		"@vscode/vsce": "3.2.1",
 		"cpy-cli": "5.0.0",
-		"eslint": "9.17.0",
+		"eslint": "9.18.0",
 		"eslint-plugin-n": "17.15.1",
 		"eslint-plugin-unicorn": "56.0.1",
 		"path-browserify": "1.0.1",
