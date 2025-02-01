@@ -976,15 +976,9 @@ function didChangeWorkspaceFolders (changes) {
 }
 
 export function activate (context) {
-	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
-	let configLanguages = configuration.get(sectionLanguages);
-	if (!vscode.workspace.textDocuments.some(doc => configLanguages.includes(doc.languageId))) {
-		return;
-	}
 	// Create OutputChannel
 	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
 	context.subscriptions.push(outputChannel);
-	outputChannel.appendLine(extensionDisplayName + " activated with languages: " + configLanguages.join(", ") + ".");
 
 	// Get application-level configuration
 	getApplicationConfiguration();
@@ -1002,6 +996,13 @@ export function activate (context) {
 		vscode.workspace.onDidGrantWorkspaceTrust(didGrantWorkspaceTrust),
 		vscode.workspace.onDidChangeWorkspaceFolders(didChangeWorkspaceFolders)
 	);
+
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
+	let configLanguages = configuration.get(sectionLanguages);
+	if (!vscode.workspace.textDocuments.some(doc => configLanguages.includes(doc.languageId))) {
+		return;
+	}
+	outputChannel.appendLine(extensionDisplayName + " activated with languages: " + configLanguages.join(", ") + ".");
 
 	// Register CodeActionsProvider
 	const documentSelector = configLanguages.map(language => ({ language }));
