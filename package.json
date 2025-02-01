@@ -68,6 +68,7 @@
 		"multi-root ready"
 	],
 	"activationEvents": [
+		"onLanguage:markdown",
 		"onStartupFinished"
 	],
 	"capabilities": {
