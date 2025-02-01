@@ -68,8 +68,7 @@
 		"multi-root ready"
 	],
 	"activationEvents": [
-		"onLanguage:markdown",
-		"onStartupFinished"
+		"onLanguage:markdown"
 	],
 	"capabilities": {
 		"untrustedWorkspaces": {

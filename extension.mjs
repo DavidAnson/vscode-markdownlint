@@ -998,12 +998,7 @@ export function activate (context) {
 	);
 
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
-	let configLanguages = configuration.get(sectionLanguages);
-	if (!vscode.workspace.textDocuments.some(doc => configLanguages.includes(doc.languageId))) {
-		return;
-	}
-	outputChannel.appendLine(extensionDisplayName + " activated with languages: " + configLanguages.join(", ") + ".");
-
+	const configLanguages = configuration.get(sectionLanguages);
 	// Register CodeActionsProvider
 	const documentSelector = configLanguages.map(language => ({ language }));
 	const codeActionProvider = {
