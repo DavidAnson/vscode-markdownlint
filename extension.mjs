@@ -467,11 +467,14 @@ function isMarkdownDocument (document) {
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
 	const configLanguages = configuration.get(sectionLanguages);
 	return (
-		// Document with supported language and URI scheme
+		// Markdown document with supported URI scheme
+		// (Filters out problematic custom schemes like "comment" and "svn")
 		configLanguages.includes(document.languageId) &&
 		schemeSupported.has(document.uri.scheme) &&
 		(
 			// Non-virtual document or document authority matches an open workspace
+			// (Filters out problematic scenarios like source control where vscode
+			// .workspace.fs says documents of any name exist with content "")
 			(document.uri.scheme !== schemeVscodeVfs) ||
 			vscode.workspace.workspaceFolders
 				.filter((folder) => folder.uri.scheme === document.uri.scheme)
