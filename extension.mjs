@@ -984,7 +984,6 @@ export function activate (context) {
 	// Create OutputChannel
 	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
 	context.subscriptions.push(outputChannel);
-	console.log(extensionDisplayName + " activated with languages: " + configLanguages.join(", ") + ".");
 	outputChannel.appendLine(extensionDisplayName + " activated with languages: " + configLanguages.join(", ") + ".");
 
 	// Get application-level configuration
