@@ -68,7 +68,7 @@
 		"multi-root ready"
 	],
 	"activationEvents": [
-		"onLanguage:markdown"
+		"onStartupFinished"
 	],
 	"capabilities": {
 		"untrustedWorkspaces": {
@@ -222,6 +222,17 @@
 					"type": "object",
 					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.37.4/schema/markdownlint-config-schema.json",
 					"default": {}
+				},
+				"markdownlint.languages": {
+					"description": "Array of language identifiers to lint",
+					"scope": "resource",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						"markdown"
+					]
 				}
 			}
 		}

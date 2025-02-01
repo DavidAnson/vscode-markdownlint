@@ -30,7 +30,6 @@ const configFileNames = [
 	".markdownlint.yml",
 	".markdownlint.cjs"
 ];
-const markdownLanguageId = "markdown";
 // Untitled/unsaved document
 const schemeUntitled = "untitled";
 // Standard file system workspace
@@ -81,6 +80,7 @@ const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#
 const errorExceptionPrefix = "Exception while linting with markdownlint-cli2:\n";
 const openCommand = "vscode.open";
 const sectionConfig = "config";
+const sectionLanguages = "languages";
 const sectionCustomRules = "customRules";
 const sectionFocusMode = "focusMode";
 const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
@@ -464,15 +464,14 @@ async function markdownlintWrapper (document) {
 
 // Returns if the document is Markdown
 function isMarkdownDocument (document) {
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
+	const configLanguages = configuration.get(sectionLanguages);
 	return (
-		// Markdown document with supported URI scheme
-		// (Filters out problematic custom schemes like "comment" and "svn")
-		(document.languageId === markdownLanguageId) &&
+		// Document with supported language and URI scheme
+		configLanguages.includes(document.languageId) &&
 		schemeSupported.has(document.uri.scheme) &&
 		(
 			// Non-virtual document or document authority matches an open workspace
-			// (Filters out problematic scenarios like source control where vscode
-			// .workspace.fs says documents of any name exist with content "")
 			(document.uri.scheme !== schemeVscodeVfs) ||
 			vscode.workspace.workspaceFolders
 				.filter((folder) => folder.uri.scheme === document.uri.scheme)
@@ -977,9 +976,16 @@ function didChangeWorkspaceFolders (changes) {
 }
 
 export function activate (context) {
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
+	let configLanguages = configuration.get(sectionLanguages);
+	if (!vscode.workspace.textDocuments.some(doc => configLanguages.includes(doc.languageId))) {
+		return;
+	}
 	// Create OutputChannel
 	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
 	context.subscriptions.push(outputChannel);
+	console.log(extensionDisplayName + " activated with languages: " + configLanguages.join(", ") + ".");
+	outputChannel.appendLine(extensionDisplayName + " activated with languages: " + configLanguages.join(", ") + ".");
 
 	// Get application-level configuration
 	getApplicationConfiguration();
@@ -999,7 +1005,7 @@ export function activate (context) {
 	);
 
 	// Register CodeActionsProvider
-	const documentSelector = { "language": markdownLanguageId };
+	const documentSelector = configLanguages.map(language => ({ language }));
 	const codeActionProvider = {
 		provideCodeActions
 	};
