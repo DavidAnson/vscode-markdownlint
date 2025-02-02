@@ -224,7 +224,7 @@
 					"default": {}
 				},
 				"markdownlint.languages": {
-					"description": "Array of language identifiers to lint",
+					"description": "Array of language identifiers for linting. Due to a VSCode limitation, only the 'markdown' language activates the extension.",
 					"scope": "resource",
 					"type": "array",
 					"items": {
