@@ -81,6 +81,7 @@ const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#
 const errorExceptionPrefix = "Exception while linting with markdownlint-cli2:\n";
 const openCommand = "vscode.open";
 const sectionConfig = "config";
+const sectionConfigFile = "configFile";
 const sectionCustomRules = "customRules";
 const sectionFocusMode = "focusMode";
 const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
@@ -364,6 +365,14 @@ async function getConfig (fs, configuration, uri) {
 	};
 }
 
+// Returns an array of args entries for the config path for the user/workspace
+function getConfigFileArgs (configuration) {
+	const configFile = configuration.get(sectionConfigFile);
+	/** @type {string[]} */
+	const configFileArgs = (configFile?.length > 0) ? [ "--config", expandTildePath(configFile, os) ] : [];
+	return configFileArgs;
+}
+
 // Returns custom rule configuration for user/workspace
 function getCustomRules (configuration) {
 	const customRulesPaths = configuration.get(sectionCustomRules);
@@ -429,6 +438,7 @@ async function markdownlintWrapper (document) {
 	const argv = independentDocument ?
 		[] :
 		[ `:${name}` ];
+	argv.push(...getConfigFileArgs(configuration));
 	const contents = independentDocument ?
 		"nonFileContents" :
 		"fileContents";

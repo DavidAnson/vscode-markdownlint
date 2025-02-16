@@ -63,6 +63,7 @@
 			"### Disable",
 			"## Configure",
 			"### markdownlint.config",
+			"### markdownlint.configFile",
 			"### markdownlint.focusMode",
 			"### markdownlint.run",
 			"### markdownlint.customRules",

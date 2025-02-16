@@ -172,6 +172,19 @@
 			"title": "markdownlint",
 			"type": "object",
 			"properties": {
+				"markdownlint.config": {
+					"description": "markdownlint configuration object",
+					"scope": "resource",
+					"type": "object",
+					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.37.4/schema/markdownlint-config-schema.json",
+					"default": {}
+				},
+				"markdownlint.configFile": {
+					"description": "Path to a configuration file that defines the base configuration",
+					"scope": "resource",
+					"type": "string",
+					"default": null
+				},
 				"markdownlint.customRules": {
 					"description": "Array of paths for custom rules to include when linting",
 					"scope": "resource",
@@ -215,13 +228,6 @@
 						"onType"
 					],
 					"default": "onType"
-				},
-				"markdownlint.config": {
-					"description": "markdownlint config object",
-					"scope": "resource",
-					"type": "object",
-					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.37.4/schema/markdownlint-config-schema.json",
-					"default": {}
 				}
 			}
 		}
