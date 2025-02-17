@@ -44,20 +44,20 @@
 		"markdownlint-cli2": "0.17.2"
 	},
 	"devDependencies": {
-		"@eslint/js": "9.18.0",
-		"@stylistic/eslint-plugin": "2.13.0",
+		"@eslint/js": "9.20.0",
+		"@stylistic/eslint-plugin": "3.1.0",
 		"@types/vscode": "1.75.0",
 		"@vscode/test-electron": "2.4.1",
-		"@vscode/vsce": "3.2.1",
+		"@vscode/vsce": "3.2.2",
 		"cpy-cli": "5.0.0",
-		"eslint": "9.18.0",
+		"eslint": "9.20.1",
 		"eslint-plugin-n": "17.15.1",
 		"eslint-plugin-unicorn": "56.0.1",
 		"path-browserify": "1.0.1",
 		"stream-browserify": "3.0.0",
 		"terser-webpack-plugin": "5.3.11",
 		"util": "0.12.5",
-		"webpack": "5.97.1",
+		"webpack": "5.98.0",
 		"webpack-cli": "6.0.1"
 	},
 	"keywords": [
