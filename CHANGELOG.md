@@ -1,5 +1,6 @@
 # Changes
 
+* 0.59.0 - Add `configFile` setting
 * 0.58.0 - Convert to ECMAScript, use import (not require)
 * 0.57.0 - Improved rules
 * 0.56.0 - Improved rules, removed `markdownlint.ignore`
@@ -16,7 +17,7 @@
 * 0.45.0 - Add linting for workspace
 * 0.44.0 - Support virtual file systems
 * 0.43.0 - Web worker support
-* 0.42.0 - Add "focus mode" setting
+* 0.42.0 - Add `focusMode` setting
 * 0.41.0 - Workspace trust, virtual workspaces
 * 0.40.0 - Switched to `markdownlint-cli2` (see below)
 * 0.39.0 - Improved rules, new fix
