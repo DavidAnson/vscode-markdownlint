@@ -437,8 +437,7 @@ async function markdownlintWrapper (document) {
 		posixPath(workspaceFolderUri.fsPath);
 	const argv = independentDocument ?
 		[] :
-		[ `:${name}` ];
-	argv.push(...getConfigFileArgs(configuration));
+		[ `:${name}`, ...getConfigFileArgs(configuration) ];
 	const contents = independentDocument ?
 		"nonFileContents" :
 		"fileContents";
