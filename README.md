@@ -140,7 +140,7 @@ To automatically format when saving or pasting into a Markdown document, [config
 },
 ```
 
-`markdownlint` also contributes the `markdownlint.fixAll` command which fixes a document's violations in one step and can be run from the Command Palette or by [binding the command to a keyboard shortcut](https://code.visualstudio.com/docs/getstarted/keybindings).
+`markdownlint` also contributes the `markdownlint.fixAll` command which fixes a document's violations in one step and can be run from the Command Palette or by [binding the command to a keyboard shortcut](https://code.visualstudio.com/Docs/editor/keybindings).
 To automatically fix violations when saving a Markdown document, configure Visual Studio Code's `editor.codeActionsOnSave` setting like so:
 
 ```json
@@ -241,7 +241,7 @@ When using `extends` in this context:
 * When running VS Code locally:
   * File paths referenced by `extends` from user settings are resolved relative to the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux).
   * File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder.
-  * VS Code's [predefined variables](https://code.visualstudio.com/docs/editor/variables-reference) `${userHome}` and `${workspaceFolder}` can be used within an `extends` path from user or workspace settings to override the default behavior.
+  * VS Code's [predefined variables](https://code.visualstudio.com/docs/reference/variables-reference) `${userHome}` and `${workspaceFolder}` can be used within an `extends` path from user or workspace settings to override the default behavior.
 
 ### markdownlint.configFile
 
