@@ -7,11 +7,11 @@ const newlineRe = /\r\n?|\n/g;
 
 /**
  * Converts a string to an array of indented lines.
- * @param {String} str String to convert.
+ * @param {String} string String to convert.
  * @returns {String[]} Array of indented lines.
  */
-function toIndentedLines (str) {
-	return str.split(newlineRe).map((s) => ` ${s}`);
+function toIndentedLines (string) {
+	return string.split(newlineRe).map((line) => ` ${line}`);
 }
 
 /**
@@ -34,13 +34,13 @@ function stringifyError (error) {
 		result.push(` ${frame.trim()}`);
 	}
 	if (cause) {
-		result.push("cause:")
-		result.push(...toIndentedLines(stringifyError(cause)))
+		result.push("cause:");
+		result.push(...toIndentedLines(stringifyError(cause)));
 	}
 	if (errors.length > 0) {
-		result.push("errors:")
-		for (const err of errors) {
-			result.push(...toIndentedLines(stringifyError(err)))
+		result.push("errors:");
+		for (const subError of errors) {
+			result.push(...toIndentedLines(stringifyError(subError)));
 		}
 	}
 	return result.join("\n");

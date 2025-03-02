@@ -1,8 +1,7 @@
 // @ts-check
 
-"use strict";
-
 // Minimal imports (requires that may not be needed are inlined to reduce startup cost)
+// eslint-disable-next-line n/no-missing-import
 import vscode from "vscode";
 import os from "node:os";
 import path from "node:path";
@@ -10,8 +9,8 @@ import { promisify } from "node:util";
 import { "main" as markdownlintCli2 } from "markdownlint-cli2";
 import { applyFix, applyFixes } from "markdownlint-cli2/markdownlint";
 import { readConfig } from "markdownlint-cli2/markdownlint/promise";
-// eslint-disable-next-line unicorn/no-keyword-prefix
 import helpers from "markdownlint-cli2/markdownlint/helpers";
+// eslint-disable-next-line unicorn/no-keyword-prefix
 const { expandTildePath, newLineRe } = helpers;
 import parsers from "markdownlint-cli2/parsers";
 
@@ -366,11 +365,11 @@ async function getConfig (fs, configuration, uri) {
 }
 
 // Returns an array of args entries for the config path for the user/workspace
-function getConfigFileArgs (configuration) {
+function getConfigFileArguments (configuration) {
 	const configFile = configuration.get(sectionConfigFile);
 	/** @type {string[]} */
-	const configFileArgs = (configFile?.length > 0) ? [ "--config", expandTildePath(configFile, os) ] : [];
-	return configFileArgs;
+	const configFileArguments = (configFile?.length > 0) ? [ "--config", expandTildePath(configFile, os) ] : [];
+	return configFileArguments;
 }
 
 // Returns custom rule configuration for user/workspace
@@ -437,7 +436,7 @@ async function markdownlintWrapper (document) {
 		posixPath(workspaceFolderUri.fsPath);
 	const argv = independentDocument ?
 		[] :
-		[ `:${name}`, ...getConfigFileArgs(configuration) ];
+		[ `:${name}`, ...getConfigFileArguments(configuration) ];
 	const contents = independentDocument ?
 		"nonFileContents" :
 		"fileContents";
