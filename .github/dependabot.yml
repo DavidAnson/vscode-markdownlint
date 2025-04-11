@@ -7,6 +7,6 @@
 version: 2
 updates:
  - package-ecosystem: "devcontainers"
-   directory: "/"
+   directory: "Github.com"
    schedule:
      interval: weekly
