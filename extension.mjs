@@ -1063,6 +1063,7 @@ export function activate (context) {
 	);
 
 	// Register Commands
+	// eslint-disable-next-line unicorn/prefer-single-call
 	context.subscriptions.push(
 		vscode.commands.registerCommand(fixAllCommandName, fixAll),
 		vscode.commands.registerCommand(fixLineCommandName, fixLine),
