@@ -397,9 +397,12 @@ function getCustomRules (configuration) {
 }
 
 // Gets the value of the optionsDefault parameter to markdownlint-cli2
-async function getOptionsDefault (fs, workspaceConfiguration, config) {
+async function getOptionsDefault (fs, workspaceConfiguration, options = {}) {
+	const { config, uri } = options;
 	return {
-		"config": config || await getConfig(fs, workspaceConfiguration),
+		"config": (config === undefined) ?
+			await getConfig(fs, workspaceConfiguration, uri) :
+			config,
 		"customRules": getCustomRules(workspaceConfiguration)
 	};
 }
@@ -454,7 +457,11 @@ async function markdownlintWrapper (document) {
 		},
 		"noGlobs": true,
 		"noImport": getNoImport(scheme),
-		"optionsDefault": await getOptionsDefault(fs, configuration, config),
+		"optionsDefault": await getOptionsDefault(
+			fs,
+			configuration,
+			{ config, "uri": document.uri }
+		),
 		"optionsOverride": {
 			...getOptionsOverride(),
 			"outputFormatters": [ [ captureResultsFormatter ] ]
@@ -497,7 +504,11 @@ function lintWorkspace (logString) {
 			logString(`Linting workspace folder "${workspaceFolderUri.toString()}"...`);
 			const fs = new FsWrapper(workspaceFolderUri);
 			const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
-			return getOptionsDefault(fs, configuration)
+			return getOptionsDefault(
+				fs,
+				configuration,
+				{ "uri": workspaceFolderUri }
+			)
 				.then((optionsDefault) => {
 					const parameters = {
 						fs,
