@@ -259,8 +259,10 @@ class FsWrapper {
 		this.lstat = this.stat;
 		this.promises = {};
 		this.promises.access = promisify(this.fwAccess).bind(this);
+		this.promises.readdir = promisify(this.fwReaddir).bind(this);
 		this.promises.readFile = promisify(this.fwReadFile).bind(this);
 		this.promises.stat = promisify(this.fwStat).bind(this);
+		this.promises.lstat = this.promises.stat;
 	}
 }
 
@@ -282,8 +284,10 @@ class FsNull {
 		this.lstat = this.access;
 		this.promises = {};
 		this.promises.access = promisify(FsNull.fnError);
+		this.promises.readdir = this.promises.access;
 		this.promises.readFile = this.promises.access;
 		this.promises.stat = this.promises.access;
+		this.promises.lstat = this.promises.stat;
 	}
 }
 
