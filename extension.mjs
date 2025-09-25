@@ -177,8 +177,18 @@ class FsWrapper {
 
 	// Implements fs.readdir via vscode.workspace.fs
 	fwReaddir (pathSegment, options, callback) {
-		// eslint-disable-next-line no-param-reassign
-		callback ||= options;
+		let readdirOptions = options;
+		let readdirCallback = callback;
+		if (typeof readdirOptions === "function") {
+			readdirCallback = readdirOptions;
+			readdirOptions = {};
+		} else if (typeof readdirOptions === "string") {
+			readdirOptions = { "encoding": readdirOptions };
+		} else if (!readdirOptions) {
+			readdirOptions = {};
+		}
+		const { encoding = "utf8", withFileTypes = false } = readdirOptions;
+		readdirCallback ||= options;
 		vscode.workspace.fs.readDirectory(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
@@ -189,7 +199,12 @@ class FsWrapper {
 							name,
 							fileType
 						] = nameAndType;
-						return options.withFileTypes ?
+						const bufferName = Buffer.from(name);
+						const nameOrBuffer =
+							encoding === "buffer" ?
+								bufferName :
+								bufferName.toString(encoding);
+						return withFileTypes ?
 							{
 								/* eslint-disable no-bitwise */
 								"isBlockDevice": FsWrapper.fwFalse,
@@ -201,14 +216,14 @@ class FsWrapper {
 								"isSymbolicLink":
 									(fileType & vscode.FileType.SymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
 								/* eslint-enable no-bitwise */
-								name
+								"name": nameOrBuffer
 							} :
-							name;
+							nameOrBuffer;
 					}
 				);
-				callback(null, namesOrDirents);
+				readdirCallback(null, namesOrDirents);
 			},
-			callback
+			readdirCallback
 		);
 	}
 
