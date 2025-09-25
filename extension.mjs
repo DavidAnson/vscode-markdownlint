@@ -184,10 +184,12 @@ class FsWrapper {
 			readdirOptions = {};
 		} else if (typeof readdirOptions === "string") {
 			readdirOptions = { "encoding": readdirOptions };
-		} else if (!readdirOptions) {
+		} else if ((readdirOptions === undefined) || (readdirOptions === null)) {
 			readdirOptions = {};
 		}
 		const { encoding = "utf8", withFileTypes = false } = readdirOptions;
+		const bufferSupported = typeof Buffer !== "undefined";
+		const textEncoder = (typeof TextEncoder === "undefined") ? null : new TextEncoder();
 		readdirCallback ||= options;
 		vscode.workspace.fs.readDirectory(
 			this.fwFolderUriWithPathSegment(pathSegment)
@@ -199,11 +201,24 @@ class FsWrapper {
 							name,
 							fileType
 						] = nameAndType;
-						const bufferName = Buffer.from(name);
-						const nameOrBuffer =
-							encoding === "buffer" ?
-								bufferName :
-								bufferName.toString(encoding);
+						const bufferName = bufferSupported ? Buffer.from(name) : null;
+						const nameOrBuffer = (() => {
+							if (encoding === "buffer") {
+								if (bufferSupported) {
+									return bufferName;
+								}
+								if (textEncoder) {
+									return textEncoder.encode(name);
+								}
+								return name;
+							}
+							if (bufferSupported) {
+								return encoding === "utf8" ?
+									bufferName.toString() :
+									bufferName.toString(encoding);
+							}
+							return name;
+						})();
 						return withFileTypes ?
 							{
 								/* eslint-disable no-bitwise */
