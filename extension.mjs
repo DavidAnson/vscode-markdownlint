@@ -188,8 +188,27 @@ class FsWrapper {
 			readdirOptions = {};
 		}
 		const { encoding = "utf8", withFileTypes = false } = readdirOptions;
+		const effectiveEncoding = (encoding === null) ? "utf8" : encoding;
+		const encodingIsString = typeof effectiveEncoding === "string";
 		const bufferSupported = typeof Buffer !== "undefined";
 		const textEncoder = (typeof TextEncoder === "undefined") ? null : new TextEncoder();
+		const encodingLower = encodingIsString ? effectiveEncoding.toLowerCase() : effectiveEncoding;
+		const normalizedEncoding = encodingIsString ? encodingLower.replace(/-/gu, "") : encodingLower;
+		const encodingIsBuffer = normalizedEncoding === "buffer";
+		const encodingIsUtf8 = encodingIsString && (normalizedEncoding === "utf8");
+		const encodingIsValid = encodingIsBuffer || (
+			encodingIsString && (
+				bufferSupported ? Buffer.isEncoding(effectiveEncoding) : encodingIsUtf8
+			)
+		);
+		if (!encodingIsValid) {
+			const received = encodingIsString ? `'${effectiveEncoding}'` : String(effectiveEncoding);
+			const error = new TypeError(
+				`The argument 'encoding' is invalid encoding. Received ${received}`
+			);
+			error.code = "ERR_INVALID_ARG_VALUE";
+			throw error;
+		}
 		readdirCallback ||= options;
 		vscode.workspace.fs.readDirectory(
 			this.fwFolderUriWithPathSegment(pathSegment)
@@ -203,7 +222,7 @@ class FsWrapper {
 						] = nameAndType;
 						const bufferName = bufferSupported ? Buffer.from(name) : null;
 						const nameOrBuffer = (() => {
-							if (encoding === "buffer") {
+							if (effectiveEncoding === "buffer") {
 								if (bufferSupported) {
 									return bufferName;
 								}
@@ -213,9 +232,9 @@ class FsWrapper {
 								return name;
 							}
 							if (bufferSupported) {
-								return encoding === "utf8" ?
+								return encodingIsUtf8 ?
 									bufferName.toString() :
-									bufferName.toString(encoding);
+									bufferName.toString(effectiveEncoding);
 							}
 							return name;
 						})();
