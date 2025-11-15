@@ -15,11 +15,8 @@ jobs:
     - uses: actions/checkout@v4
     - uses: JustinBeckwith/linkinator-action@v1.11.0
       with:
-        linksToSkip: '^https://github.com/ ^https://thisdavej.com/'
+        linksToSkip: '^https://github.com/ ^https://thisdavej.com/ ^https://www\.npmjs\.com'
         paths: '*.md'
-        exclude: |
-          https://www.npmjs.com
-          https://www.npmjs.com/search?q=keywords:*
 
   spellcheck:
     runs-on: ubuntu-latest
