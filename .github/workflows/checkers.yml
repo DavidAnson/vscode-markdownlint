@@ -17,6 +17,9 @@ jobs:
       with:
         linksToSkip: '^https://github.com/ ^https://thisdavej.com/'
         paths: '*.md'
+        exclude: |
+          https://www.npmjs.com
+          https://www.npmjs.com/search?q=keywords:*
 
   spellcheck:
     runs-on: ubuntu-latest
