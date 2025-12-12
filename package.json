@@ -153,12 +153,13 @@
 				"owner": "markdownlint",
 				"fileLocation": "relative",
 				"pattern": {
-					"regexp": "^([^:]+):(\\d+)(?::(\\d+))?\\s(\\S+)\\s(.+)$",
+					"regexp": "^([^:]+):(\\d+)(?::(\\d+))?\\s(\\S+)\\s(\\S+)\\s(.+)$",
 					"file": 1,
 					"line": 2,
 					"column": 3,
-					"message": 5,
-					"code": 4
+					"severity": 4,
+					"code": 5,
+					"message": 6
 				}
 			}
 		],

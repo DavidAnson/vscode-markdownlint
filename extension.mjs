@@ -441,10 +441,6 @@ async function markdownlintWrapper (document) {
 		"nonFileContents" :
 		"fileContents";
 	let results = [];
-	// eslint-disable-next-line func-style
-	const captureResultsFormatter = (options) => {
-		results = options.results;
-	};
 	const parameters = {
 		fs,
 		directory,
@@ -457,9 +453,14 @@ async function markdownlintWrapper (document) {
 		"optionsDefault": await getOptionsDefault(fs, configuration, config),
 		"optionsOverride": {
 			...getOptionsOverride(),
-			"outputFormatters": [ [ captureResultsFormatter ] ]
+			"outputFormatters": []
 		}
 	};
+	// eslint-disable-next-line func-style
+	const captureResultsFormatter = (options) => {
+		results = options.results;
+	};
+	parameters.optionsOverride.outputFormatters = [ [ captureResultsFormatter ] ];
 	// Invoke markdownlint-cli2
 	return markdownlintCli2(parameters)
 		.catch((error) => import("./stringify-error.mjs").then(
@@ -570,7 +571,10 @@ function lint (document) {
 						const end = start + result.errorRange[1];
 						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
 					}
-					const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+					const severity = (result.severity === "warning") ?
+						vscode.DiagnosticSeverity.Information :
+						vscode.DiagnosticSeverity.Warning;
+					const diagnostic = new vscode.Diagnostic(range, message, severity);
 					diagnostic.code = ruleInformationUri ?
 						{
 							"value": ruleName,
