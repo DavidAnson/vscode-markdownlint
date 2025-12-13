@@ -35,8 +35,7 @@
 		"Formatters"
 	],
 	"engines": {
-		"node": ">=16",
-		"vscode": "^1.75.0"
+		"vscode": "^1.97.0"
 	},
 	"main": "./bundle",
 	"browser": "./bundle.web",
@@ -46,7 +45,7 @@
 	"devDependencies": {
 		"@eslint/js": "9.39.1",
 		"@stylistic/eslint-plugin": "5.6.1",
-		"@types/vscode": "1.75.0",
+		"@types/vscode": "1.97.0",
 		"@vscode/test-electron": "2.5.2",
 		"@vscode/vsce": "3.7.1",
 		"cpy-cli": "6.0.0",
