@@ -228,6 +228,32 @@
 						"onType"
 					],
 					"default": "onType"
+				},
+				"markdownlint.severityForError": {
+					"description": "VS Code diagnostic level to use for issues with severity \"error\"",
+					"scope": "resource",
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint",
+						"Ignore"
+					],
+					"default": "Warning"
+				},
+				"markdownlint.severityForWarning": {
+					"description": "VS Code diagnostic level to use for issues with severity \"warning\"",
+					"scope": "resource",
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint",
+						"Ignore"
+					],
+					"default": "Information"
 				}
 			}
 		}

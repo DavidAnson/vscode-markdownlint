@@ -66,6 +66,8 @@
 			"### markdownlint.configFile",
 			"### markdownlint.focusMode",
 			"### markdownlint.run",
+			"### markdownlint.severityForError",
+			"### markdownlint.severityForWarning",
 			"### markdownlint.customRules",
 			"### markdownlint.lintWorkspaceGlobs",
 			"## Suppress",
@@ -76,6 +78,9 @@
 	},
 	"strong-style": {
 		"style": "asterisk"
+	},
+	"table-column-style": {
+		"style": "aligned"
 	},
 	"table-pipe-style": {
 		"style": "leading_and_trailing"

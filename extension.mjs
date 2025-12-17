@@ -62,6 +62,18 @@ const codeActionKindSourceFixAllExtension = codeActionKindSourceFixAll.append(ex
 const defaultConfig = {
 	"MD013": false
 };
+const diagnosticSeverityError = "Error";
+const diagnosticSeverityHint = "Hint";
+const diagnosticSeverityIgnore = "Ignore";
+const diagnosticSeverityInformation = "Information";
+const diagnosticSeverityWarning = "Warning";
+const diagnosticSeverities = new Set([
+	diagnosticSeverityError,
+	diagnosticSeverityHint,
+	diagnosticSeverityIgnore,
+	diagnosticSeverityInformation,
+	diagnosticSeverityWarning
+]);
 
 const clickForInfo = "More information about ";
 const clickToFixThis = "Fix this violation of ";
@@ -85,6 +97,8 @@ const sectionCustomRules = "customRules";
 const sectionFocusMode = "focusMode";
 const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
 const sectionRun = "run";
+const sectionSeverityForError = "severityForError";
+const sectionSeverityForWarning = "severityForWarning";
 const applicationConfigurationSections = [ sectionFocusMode ];
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
@@ -328,6 +342,14 @@ function outputLine (message, isError) {
 	}
 }
 
+function getDiagnosticSeverity (configuration, section, fallback) {
+	let value = configuration.get(section);
+	if (!diagnosticSeverities.has(value)) {
+		value = fallback;
+	}
+	return vscode.DiagnosticSeverity[value] ?? null;
+}
+
 // Returns rule configuration from user/workspace configuration
 async function getConfig (fs, configuration, uri) {
 	let userWorkspaceConfig = configuration.get(sectionConfig);
@@ -430,6 +452,8 @@ async function markdownlintWrapper (document) {
 		new FsNull() :
 		new FsWrapper(workspaceFolderUri);
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
+	const errorSeverity = getDiagnosticSeverity(configuration, sectionSeverityForError, diagnosticSeverityWarning);
+	const warningSeverity = getDiagnosticSeverity(configuration, sectionSeverityForWarning, diagnosticSeverityInformation);
 	const config = await getConfig(fs, configuration, document.uri);
 	const directory = independentDocument ?
 		null :
@@ -466,7 +490,11 @@ async function markdownlintWrapper (document) {
 		.catch((error) => import("./stringify-error.mjs").then(
 			(stringifyError) => outputLine(errorExceptionPrefix + stringifyError.default(error), true)
 		))
-		.then(() => results);
+		.then(() => ({
+			results,
+			errorSeverity,
+			warningSeverity
+		}));
 	// If necessary some day to filter results by matching file name...
 	// .then(() => results.filter((result) => isSchemeUntitled || (result.fileName === path.posix.relative(directory, name))))
 }
@@ -541,7 +569,7 @@ function lint (document) {
 	const targetGeneration = diagnosticGeneration;
 	// Lint
 	markdownlintWrapper(document)
-		.then((results) => {
+		.then(({ results, errorSeverity, warningSeverity }) => {
 			const { activeTextEditor } = vscode.window;
 			for (const result of results) {
 				// Create Diagnostics
@@ -550,12 +578,15 @@ function lint (document) {
 				const focusModeRange = (!Number.isInteger(focusMode) || (focusMode < 0)) ?
 					0 :
 					focusMode;
+				const severity = (result.severity === "warning") ? warningSeverity : errorSeverity;
 				if (
-					(applicationConfiguration[sectionFocusMode] === false) ||
-					!activeTextEditor ||
-					(activeTextEditor.document !== document) ||
-					(activeTextEditor.selection.active.line < (lineNumber - focusModeRange - 1)) ||
-					(activeTextEditor.selection.active.line > (lineNumber + focusModeRange - 1))
+					(severity !== null) && (
+						(applicationConfiguration[sectionFocusMode] === false) ||
+						!activeTextEditor ||
+						(activeTextEditor.document !== document) ||
+						(activeTextEditor.selection.active.line < (lineNumber - focusModeRange - 1)) ||
+						(activeTextEditor.selection.active.line > (lineNumber + focusModeRange - 1))
+					)
 				) {
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;
@@ -571,9 +602,7 @@ function lint (document) {
 						const end = start + result.errorRange[1];
 						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
 					}
-					const severity = (result.severity === "warning") ?
-						vscode.DiagnosticSeverity.Information :
-						vscode.DiagnosticSeverity.Warning;
+					// @ts-ignore
 					const diagnostic = new vscode.Diagnostic(range, message, severity);
 					diagnostic.code = ruleInformationUri ?
 						{
@@ -723,10 +752,10 @@ function fixAll (ruleNameFilter) {
 			const document = editor.document;
 			if (isMarkdownDocument(document)) {
 				return markdownlintWrapper(document)
-					.then((errors) => {
+					.then(({ results }) => {
 						const text = document.getText();
 						const errorsToFix =
-							errors.filter((error) => (!ruleNameFilter || (error.ruleNames[0] === ruleNameFilter)));
+							results.filter((error) => (!ruleNameFilter || (error.ruleNames[0] === ruleNameFilter)));
 						const fixedText = applyFixes(text, errorsToFix);
 						return (text === fixedText) ?
 							null :
@@ -748,8 +777,8 @@ function formatDocument (document, range) {
 	return new Promise((resolve, reject) => {
 		if (isMarkdownDocument(document)) {
 			return markdownlintWrapper(document)
-				.then((errors) => {
-					const rangeErrors = errors.filter((error) => {
+				.then(({ results }) => {
+					const rangeErrors = results.filter((error) => {
 						const { fixInfo } = error;
 						if (fixInfo) {
 							// eslint-disable-next-line unicorn/consistent-destructuring

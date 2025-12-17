@@ -303,6 +303,37 @@ If you find this distracting, linting can be configured to run only when the doc
 
 > **Note**: When configured to run `onSave`, the list of reported issues will become outdated while the document is edited and will update when the document is saved.
 
+### markdownlint.severityForError
+
+By default, the `markdownlint` library reports violations at severity level `error` and they are displayed in VS Code at Diagnostic Severity `Warning`.
+
+If you want to change the Diagnostic Severity shown by VS Code to something else, the `markdownlint.severityForError` configuration property can be set to any of the following values:
+
+| Value         | VS Code Definition                                              |
+| ------------- | --------------------------------------------------------------- |
+| `Error`       | Something not allowed by the rules of a language or other means |
+| `Warning`     | Something suspicious but allowed                                |
+| `Information` | Something to inform about but not a problem                     |
+| `Hint`        | Something to hint to a better way of doing it                   |
+| `Ignore`      | *Ignore the violation and do not report it*                     |
+
+For example:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.severityForError": "Information"
+}
+```
+
+### markdownlint.severityForWarning
+
+This configuration property behaves the same as `markdownlint.severityForError` (see above) and is used for violations reported by the `markdownlint` library at severity level `warning`.
+
+By default, such violations are displayed in VS Code at Diagnostic Severity `Information`.
+
+The value of `severityForWarning` can be the same as the value of `severityForError`.
+
 ### markdownlint.customRules
 
 Custom rules can be specified in VS Code's user/workspace configuration to apply additional linting beyond the default set of rules. Custom rules are specified by the path to a JavaScript file or the name of or path to an [npm](https://www.npmjs.com/) package exporting one rule or an array of rules ([examples of custom rules](https://www.npmjs.com/search?q=keywords:markdownlint-rule)).
