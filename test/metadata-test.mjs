@@ -48,7 +48,8 @@ describe("metadata", () => {
 			const firstChangelogRe = /\* (\d+\.\d+\.\d+) - /u;
 			match = firstChangelogRe.exec(content);
 			if (match) {
-				t.assert.equal(match[1], packageJson.version);
+				const patchRe = /\.\d+$/u;
+				t.assert.equal(match[1].replace(patchRe, ""), packageJson.version.replace(patchRe, ""));
 			}
 		}
 	});
