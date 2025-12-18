@@ -1,5 +1,6 @@
 # Changes
 
+* 0.61.0 - Improved rules, add warnings, add `severityForError`/`Warning`
 * 0.60.0 - Improved rules
 * 0.59.0 - Add `configFile` setting
 * 0.58.0 - Convert to ECMAScript, use import (not require)
