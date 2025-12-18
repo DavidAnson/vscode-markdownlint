@@ -37,8 +37,8 @@
 	"engines": {
 		"vscode": "^1.97.0"
 	},
-	"main": "./bundle",
-	"browser": "./bundle.web",
+	"main": "./bundle.js",
+	"browser": "./bundle.web.js",
 	"dependencies": {
 		"markdownlint-cli2": "0.20.0"
 	},
