@@ -147,7 +147,7 @@ To automatically fix violations when saving a Markdown document, configure Visua
 
 ```json
 "editor.codeActionsOnSave": {
-    "source.fixAll.markdownlint": true
+    "source.fixAll.markdownlint": "explicit"
 }
 ```
 
