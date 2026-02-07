@@ -56,7 +56,7 @@
 		"stream-browserify": "3.0.0",
 		"terser-webpack-plugin": "5.3.16",
 		"util": "0.12.5",
-		"webpack": "5.103.0",
+		"webpack": "5.104.1",
 		"webpack-cli": "6.0.1"
 	},
 	"keywords": [
