@@ -173,20 +173,20 @@
 			"type": "object",
 			"properties": {
 				"markdownlint.config": {
-					"description": "markdownlint configuration object",
+					"description": "markdownlint configuration object.",
 					"scope": "resource",
 					"type": "object",
 					"$ref": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.40.0/schema/markdownlint-config-schema.json",
 					"default": {}
 				},
 				"markdownlint.configFile": {
-					"description": "Path to a configuration file that defines the base configuration",
+					"description": "Path to a configuration file that defines the base configuration.",
 					"scope": "resource",
 					"type": "string",
 					"default": null
 				},
 				"markdownlint.customRules": {
-					"description": "Array of paths for custom rules to include when linting",
+					"description": "Array of paths for custom rules to include when linting.",
 					"scope": "resource",
 					"type": "array",
 					"items": {
@@ -195,7 +195,7 @@
 					"default": []
 				},
 				"markdownlint.focusMode": {
-					"description": "Makes it easier to focus while typing by hiding issues on or near the current line",
+					"description": "Makes it easier to focus while typing by hiding issues on or near the current line.",
 					"scope": "application",
 					"type": [
 						"boolean",
@@ -204,7 +204,7 @@
 					"default": false
 				},
 				"markdownlint.lintWorkspaceGlobs": {
-					"description": "Array of glob expressions to include or ignore when linting the workspace",
+					"description": "Array of glob expressions to include or ignore when linting a workspace with the \"lintWorkspace\" command.",
 					"scope": "resource",
 					"type": "array",
 					"items": {
@@ -220,7 +220,7 @@
 					]
 				},
 				"markdownlint.run": {
-					"description": "Run the linter on save (onSave) or on type (onType)",
+					"description": "Run the linter on save (\"onSave\") or on type (\"onType\").",
 					"scope": "resource",
 					"type": "string",
 					"enum": [
@@ -230,7 +230,7 @@
 					"default": "onType"
 				},
 				"markdownlint.severityForError": {
-					"description": "VS Code diagnostic level to use for issues with severity \"error\"",
+					"description": "VS Code diagnostic level to use for issues with severity \"error\".",
 					"scope": "resource",
 					"type": "string",
 					"enum": [
@@ -243,7 +243,7 @@
 					"default": "Warning"
 				},
 				"markdownlint.severityForWarning": {
-					"description": "VS Code diagnostic level to use for issues with severity \"warning\"",
+					"description": "VS Code diagnostic level to use for issues with severity \"warning\".",
 					"scope": "resource",
 					"type": "string",
 					"enum": [

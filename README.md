@@ -364,7 +364,12 @@ For information about authoring custom rules, see [the `markdownlint` documentat
 
 ### markdownlint.lintWorkspaceGlobs
 
-The globs used when linting a workspace with the `markdownlint.lintWorkspace` command match VS Code's concept of "Markdown files that matter":
+This property specifies the list of globs used when linting a workspace with the `markdownlint.lintWorkspace` command.
+
+> **Note**: The `lintWorkspaceGlobs` setting is only used when running the `lintWorkspace` command.
+> To customize files that are linted by the standard editing experience, refer to the [Configure](#configure) section above.
+
+The default list of globs matches VS Code's concept of "Markdown files that matter":
 
 ```jsonc
 [
