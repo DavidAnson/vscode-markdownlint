@@ -4,7 +4,6 @@ node_modules
 test
 test-ui
 webworker
-.eslintrc.json
 .gitignore
 .markdownlint.json
 .npmrc
@@ -12,6 +11,5 @@ webworker
 CONTRIBUTING.md
 eslint.config.mjs
 extension.mjs
-generate-config-schema.js
 jsconfig.json
 webpack.config.js
