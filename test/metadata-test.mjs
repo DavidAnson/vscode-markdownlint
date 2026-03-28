@@ -21,7 +21,7 @@ const markdownlintPackageJson = await importWithTypeJson(import.meta, "../node_m
 describe("metadata", () => {
 
 	test("version numbers match", async (t) => {
-		t.plan(184);
+		t.plan(183);
 		const files = [
 			"./package.json",
 			"./CHANGELOG.md",
