@@ -18,7 +18,7 @@ export default [
 		"quotes": "double",
 		"semi": true
 	}),
-	eslintPluginUnicorn.configs["flat/all"],
+	eslintPluginUnicorn.configs.all,
 	{
 		"languageOptions": {
 			"sourceType": "commonjs"
