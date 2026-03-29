@@ -11,4 +11,6 @@ const configurationSchema = require("./markdownlint-config-schema.json");
 const configurationRoot = packageJson.contributes.configuration.properties["markdownlint.config"];
 configurationRoot.properties = configurationSchema.properties;
 configurationRoot.additionalProperties = configurationSchema.additionalProperties;
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, "\t") + "\n");
+const text = JSON.stringify(packageJson, null, "\t") + "\n";
+const compressed = text.replace(/\s*\r?\n(\t{7,}|\t{6}([}\]]))/gu, " $2");
+fs.writeFileSync(packageJsonPath, compressed);
