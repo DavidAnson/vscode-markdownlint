@@ -75,7 +75,7 @@ const config = [
 			),
 			// Intercept existing "unicorn-magic" package to provide missing import
 			new webpack.NormalModuleReplacementPlugin(
-				/^unicorn-magic$/u,
+				/^unicorn-magic\/node$/u,
 				(resource) => {
 					resource.request = require.resolve("./webworker/unicorn-magic-stub.js");
 				}
