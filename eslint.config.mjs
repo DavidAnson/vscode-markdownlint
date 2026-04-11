@@ -37,12 +37,13 @@ export default [
 			"linebreak-style": "off",
 			"max-classes-per-file": "off",
 			"max-depth": [ "error", 6 ],
-			"max-len": [ "error", 130 ],
 			"max-lines": "off",
 			"max-lines-per-function": "off",
+			"max-params": "off",
 			"max-statements": "off",
 			"multiline-comment-style": [ "error", "separate-lines" ],
 			"no-extra-parens": "off",
+			"no-inline-comments": "off",
 			"no-magic-numbers": "off",
 			"no-plusplus": "off",
 			"no-promise-executor-return": "off",
@@ -71,6 +72,7 @@ export default [
 			"unicorn/no-array-push-push": "off",
 			"unicorn/no-array-reduce": "off",
 			"unicorn/no-null": "off",
+			"unicorn/no-useless-undefined": "off",
 			"unicorn/prefer-module": "off",
 			"unicorn/prefer-string-replace-all": "off"
 		}

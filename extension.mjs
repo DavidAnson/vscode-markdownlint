@@ -109,30 +109,34 @@ const firstSegmentRe = /^\/{1,2}[^/]+\//;
 // Variables
 /** @type {Object.<string, any>} */
 const applicationConfiguration = {};
-/** @type {Object.<string, vscode.Uri>} */
+/** @type {Object.<string, vscode.Uri | null>} */
 const ruleNameToInformationUri = {};
 /** @type {Map<string, Array<vscode.Disposable>>} */
 const workspaceFolderUriToDisposables = new Map();
+/** @type {import("vscode").OutputChannel | null} */
 let outputChannel = null;
 let outputChannelShown = false;
+/** @type {import("vscode").DiagnosticCollection | null} */
 let diagnosticCollection = null;
 let diagnosticGeneration = 0;
-/** @type {Object.<string, string>} */
+/** @type {Object.<string, string | undefined>} */
 let runMap = {};
 let lintingEnabled = true;
 const throttle = {
+	/** @type {import("vscode").TextDocument | null} */
 	"document": null,
+	/** @type {NodeJS.Timeout | null} */
 	"timeout": null
 };
 
 // Converts to a POSIX-style path
 // eslint-disable-next-line id-length
-function posixPath (p) {
+function posixPath (/** @type {string} */ p) {
 	return p.split(path.sep).join(path.posix.sep);
 }
 
 // Gets the workspace folder Uri for the document Uri
-function getDocumentWorkspaceFolderUri (documentUri) {
+function getDocumentWorkspaceFolderUri (/** @type {import("vscode").Uri} */ documentUri) {
 	const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
 	return workspaceFolder ?
 		workspaceFolder.uri :
@@ -152,7 +156,7 @@ class FsWrapper {
 	}
 
 	// Returns a Uri of fwFolderUri with the specified path segment
-	fwFolderUriWithPathSegment (pathSegment) {
+	fwFolderUriWithPathSegment (/** @type {string} */ pathSegment) {
 		// Fix drive letter issues on Windows
 		let posixPathSegment = posixPath(pathSegment);
 		if (driveLetterRe.test(posixPathSegment)) {
@@ -178,7 +182,8 @@ class FsWrapper {
 	}
 
 	// Implements fs.access via vscode.workspace.fs
-	fwAccess (pathSegment, mode, callback) {
+	fwAccess (/** @type {string} */ pathSegment, /** @type {number} */ mode, /** @type {(stat: import("vscode").FileStat | null) => void} */ callback) {
+		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= mode;
 		vscode.workspace.fs.stat(
@@ -190,12 +195,14 @@ class FsWrapper {
 	}
 
 	// Implements fs.readdir via vscode.workspace.fs
-	fwReaddir (pathSegment, options, callback) {
+	fwReaddir (/** @type {string} */ pathSegment, /** @type { { withFileTypes: Boolean} } */ options, /** @type {(err: null, data: any[]) => void} */ callback) {
+		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
 		vscode.workspace.fs.readDirectory(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
+			// @ts-ignore
 			(namesAndTypes) => {
 				const namesOrDirents = namesAndTypes.map(
 					(nameAndType) => {
@@ -227,25 +234,28 @@ class FsWrapper {
 	}
 
 	// Implements fs.readFile via vscode.workspace.fs
-	fwReadFile (pathSegment, options, callback) {
+	fwReadFile (/** @type {string} */ pathSegment, /** @type {{}} */ options, /** @type {(err: null, data: string) => Uint8Array<ArrayBufferLike>} */ callback) {
+		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
 		vscode.workspace.fs.readFile(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			(bytes) => callback(null, new TextDecoder().decode(bytes)),
+			// @ts-ignore
 			callback
 		);
 	}
 
 	// Implements fs.stat via vscode.workspace.fs
-	fwStat (pathSegment, options, callback) {
+	fwStat (/** @type {string} */ pathSegment, /** @type {{}} */ options, /** @type {(err: null, stat: any) => void} */ callback) {
+		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
 		vscode.workspace.fs.stat(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
-			(fileStat) => {
+			(/** @type {any} */ fileStat) => {
 				// Stub required properties for fast-glob
 				/* eslint-disable dot-notation, no-bitwise */
 				fileStat["isBlockDevice"] = FsWrapper.fwFalse;
@@ -259,29 +269,32 @@ class FsWrapper {
 				/* eslint-enable dot-notation, no-bitwise */
 				callback(null, fileStat);
 			},
+			// @ts-ignore
 			callback
 		);
 	}
 
 	// Constructs a new instance
-	constructor (folderUri) {
+	constructor (/** @type {import("vscode").Uri} */ folderUri) {
 		this.fwFolderUri = folderUri;
 		this.access = this.fwAccess.bind(this);
 		this.readdir = this.fwReaddir.bind(this);
 		this.readFile = this.fwReadFile.bind(this);
 		this.stat = this.fwStat.bind(this);
 		this.lstat = this.stat;
-		this.promises = {};
-		this.promises.access = promisify(this.fwAccess).bind(this);
-		this.promises.readFile = promisify(this.fwReadFile).bind(this);
-		this.promises.stat = promisify(this.fwStat).bind(this);
+		this.promises = {
+			"access": promisify(this.fwAccess).bind(this),
+			"readFile": promisify(this.fwReadFile).bind(this),
+			"stat": promisify(this.fwStat).bind(this)
+		};
 	}
 }
 
 // A Node-like fs object for a "null" file system
 class FsNull {
 	// Implements fs.access/readdir/readFile/stat
-	static fnError (pathSegment, modeOrOptions, callback) {
+	static fnError (/** @type {import("vscode").Uri} */ pathSegment, /** @type {{}} */ modeOrOptions, /** @type {(err: Error) => void} */ callback) {
+		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= modeOrOptions;
 		callback(new Error("FsNull.fnError"));
@@ -289,22 +302,27 @@ class FsNull {
 
 	// Constructs a new instance
 	constructor () {
-		this.access = FsNull.fnError;
-		this.readdir = this.access;
-		this.readFile = this.access;
-		this.stat = this.access;
-		this.lstat = this.access;
-		this.promises = {};
-		this.promises.access = promisify(FsNull.fnError);
-		this.promises.readFile = this.promises.access;
-		this.promises.stat = this.promises.access;
+		const error = FsNull.fnError;
+		const errorPromise = promisify(error);
+		this.access = error;
+		this.readdir = error;
+		this.readFile = error;
+		this.stat = error;
+		this.lstat = error;
+		this.promises = {
+			"access": errorPromise,
+			"readFile": errorPromise,
+			"stat": errorPromise
+		};
 	}
 }
 
 // A VS Code Pseudoterminal for linting a workspace and emitting the results
 class LintWorkspacePseudoterminal {
 	constructor () {
+		/** @type {import("vscode").EventEmitter<string>} */
 		this.writeEmitter = new vscode.EventEmitter();
+		/** @type {import("vscode").EventEmitter<void>} */
 		this.closeEmitter = new vscode.EventEmitter();
 	}
 
@@ -317,7 +335,7 @@ class LintWorkspacePseudoterminal {
 	}
 
 	open () {
-		const logString = (message) => this.writeEmitter.fire(
+		const logString = (/** @type {string} */ message) => this.writeEmitter.fire(
 			`${message.split(newLineRe).join("\r\n")}\r\n`
 		);
 		lintWorkspace(logString)
@@ -332,34 +350,36 @@ class LintWorkspacePseudoterminal {
 }
 
 // Writes time, importance, and message to the output channel
-function outputLine (message, isError) {
+function outputLine (/** @type {string} */ message, /** @type {Boolean} */ isError = false) {
 	const time = (new Date()).toLocaleTimeString();
 	const importance = isError ? "ERROR" : "INFO";
-	outputChannel.appendLine(`[${time}] ${importance}: ${message}`);
+	outputChannel?.appendLine(`[${time}] ${importance}: ${message}`);
 	if (isError && !outputChannelShown) {
 		outputChannelShown = true;
-		outputChannel.show(true);
+		outputChannel?.show(true);
 	}
 }
 
-function getDiagnosticSeverity (configuration, section, fallback) {
+function getDiagnosticSeverity (/** @type {import("vscode").WorkspaceConfiguration} */ configuration, /** @type {string} */ section, /** @type {string} */ fallback) {
 	let value = configuration.get(section);
 	if (!diagnosticSeverities.has(value)) {
 		value = fallback;
 	}
-	return vscode.DiagnosticSeverity[value] ?? null;
+	/** @type {import("vscode").DiagnosticSeverity | null} */
+	// @ts-ignore
+	const diagnosticSeverity = vscode.DiagnosticSeverity[value] ?? null;
+	return diagnosticSeverity;
 }
 
 // Returns rule configuration from user/workspace configuration
-async function getConfig (fs, configuration, uri) {
+async function getConfig (/** @type {any} */ fs, /** @type {import("vscode").WorkspaceConfiguration} */ configuration, /** @type {import("vscode").Uri} */ uri) {
 	let userWorkspaceConfig = configuration.get(sectionConfig);
 	// Bootstrap extend behavior into readConfig
 	if (userWorkspaceConfig && userWorkspaceConfig.extends) {
 		const userWorkspaceConfigMetadata = configuration.inspect(sectionConfig);
 		const workspaceFolderUri = getDocumentWorkspaceFolderUri(uri);
 		const useHomedir =
-			// eslint-disable-next-line max-len
-			(userWorkspaceConfigMetadata.globalValue && (userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
+			(userWorkspaceConfigMetadata?.globalValue && (userWorkspaceConfigMetadata.globalValue.extends === userWorkspaceConfig.extends)) ||
 			(workspaceFolderUri.scheme !== schemeFile);
 		const homedir = os && os.homedir && os.homedir();
 		const workspaceFolderFsPath = posixPath(workspaceFolderUri.fsPath);
@@ -380,14 +400,16 @@ async function getConfig (fs, configuration, uri) {
 			// Ignore error
 		}
 	}
-	return {
+	/** @type {import("markdownlint").Configuration} */
+	const config = {
 		...defaultConfig,
 		...userWorkspaceConfig
 	};
+	return config;
 }
 
 // Returns an array of args entries for the config path for the user/workspace
-function getConfigFileArguments (configuration) {
+function getConfigFileArguments (/** @type {import("vscode").WorkspaceConfiguration} */ configuration) {
 	const configFile = configuration.get(sectionConfigFile);
 	/** @type {string[]} */
 	const configFileArguments = (configFile?.length > 0) ? [ "--config", expandTildePath(configFile, os) ] : [];
@@ -395,8 +417,9 @@ function getConfigFileArguments (configuration) {
 }
 
 // Returns custom rule configuration for user/workspace
-function getCustomRules (configuration) {
-	const customRulesPaths = configuration.get(sectionCustomRules);
+function getCustomRules (/** @type {import("vscode").WorkspaceConfiguration} */ configuration) {
+	/** @type {string[]} */
+	const customRulesPaths = configuration.get(sectionCustomRules) || [];
 	const customRules = customRulesPaths.map((rulePath) => {
 		const match = customRuleExtensionPrefixRe.exec(rulePath);
 		if (match) {
@@ -419,9 +442,9 @@ function getCustomRules (configuration) {
 }
 
 // Gets the value of the optionsDefault parameter to markdownlint-cli2
-async function getOptionsDefault (fs, workspaceConfiguration, config) {
+async function getOptionsDefault (/** @type {any} */ fs, /** @type {import("vscode").WorkspaceConfiguration} */ workspaceConfiguration, /** @type {import("vscode").Uri} */ workspaceFolderUri, /** @type {import("markdownlint").Configuration | undefined} */ config) {
 	return {
-		"config": config || await getConfig(fs, workspaceConfiguration),
+		"config": config || await getConfig(fs, workspaceConfiguration, workspaceFolderUri),
 		"customRules": getCustomRules(workspaceConfiguration)
 	};
 }
@@ -434,7 +457,7 @@ function getOptionsOverride () {
 }
 
 // Gets the value of the noImport parameter to markdownlint-cli2
-function getNoImport (scheme) {
+function getNoImport (/** @type {string} */ scheme) {
 	const isTrusted = vscode.workspace.isTrusted;
 	const isSchemeFile = (scheme === schemeFile);
 	const isDesktop = Boolean(os && os.platform && os.platform());
@@ -442,7 +465,7 @@ function getNoImport (scheme) {
 }
 
 // Wraps getting options and calling into markdownlint-cli2
-async function markdownlintWrapper (document) {
+async function markdownlintWrapper (/** @type {import("vscode").TextDocument} */ document) {
 	// Prepare markdownlint-cli2 parameters
 	const scheme = document.uri.scheme;
 	const independentDocument = !schemeFileSystemLike.has(scheme);
@@ -456,7 +479,7 @@ async function markdownlintWrapper (document) {
 	const warningSeverity = getDiagnosticSeverity(configuration, sectionSeverityForWarning, diagnosticSeverityInformation);
 	const config = await getConfig(fs, configuration, document.uri);
 	const directory = independentDocument ?
-		null :
+		undefined :
 		posixPath(workspaceFolderUri.fsPath);
 	const argv = independentDocument ?
 		[] :
@@ -464,6 +487,7 @@ async function markdownlintWrapper (document) {
 	const contents = independentDocument ?
 		"nonFileContents" :
 		"fileContents";
+	/** @type {import("markdownlint-cli2").LintResult[]} */
 	let results = [];
 	const parameters = {
 		fs,
@@ -474,16 +498,17 @@ async function markdownlintWrapper (document) {
 		},
 		"noGlobs": true,
 		"noImport": getNoImport(scheme),
-		"optionsDefault": await getOptionsDefault(fs, configuration, config),
+		"optionsDefault": await getOptionsDefault(fs, configuration, workspaceFolderUri, config),
 		"optionsOverride": {
 			...getOptionsOverride(),
 			"outputFormatters": []
 		}
 	};
 	// eslint-disable-next-line func-style
-	const captureResultsFormatter = (options) => {
+	const captureResultsFormatter = (/** @type {{results: import("markdownlint-cli2").LintResult[]}} */ options) => {
 		results = options.results;
 	};
+	// @ts-ignore
 	parameters.optionsOverride.outputFormatters = [ [ captureResultsFormatter ] ];
 	// Invoke markdownlint-cli2
 	return markdownlintCli2(parameters)
@@ -500,7 +525,7 @@ async function markdownlintWrapper (document) {
 }
 
 // Returns if the document is Markdown
-function isMarkdownDocument (document) {
+function isMarkdownDocument (/** @type {import("vscode").TextDocument} */ document) {
 	return (
 		// Markdown document with supported URI scheme
 		// (Filters out problematic custom schemes like "comment" and "svn")
@@ -512,21 +537,21 @@ function isMarkdownDocument (document) {
 			// .workspace.fs says documents of any name exist with content "")
 			(document.uri.scheme !== schemeVscodeVfs) ||
 			vscode.workspace.workspaceFolders
-				.filter((folder) => folder.uri.scheme === document.uri.scheme)
+				?.filter((folder) => folder.uri.scheme === document.uri.scheme)
 				.some((folder) => folder.uri.authority === document.uri.authority)
 		)
 	);
 }
 
 // Lints Markdown files in the workspace folder tree
-function lintWorkspace (logString) {
+function lintWorkspace (/** @type {(s: string) => void} */ logString) {
 	const workspaceFolderUris = (vscode.workspace.workspaceFolders || []).map((folder) => folder.uri);
 	return workspaceFolderUris.reduce(
 		(previousPromise, workspaceFolderUri) => previousPromise.then(() => {
 			logString(`Linting workspace folder "${workspaceFolderUri.toString()}"...`);
 			const fs = new FsWrapper(workspaceFolderUri);
 			const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
-			return getOptionsDefault(fs, configuration)
+			return getOptionsDefault(fs, configuration, workspaceFolderUri, undefined)
 				.then((optionsDefault) => {
 					const parameters = {
 						fs,
@@ -561,10 +586,11 @@ function lintWorkspaceViaTask () {
 }
 
 // Lints a Markdown document
-function lint (document) {
+function lint (/** @type {import("vscode").TextDocument} */ document) {
 	if (!lintingEnabled || !isMarkdownDocument(document)) {
 		return;
 	}
+	/** @type {import("vscode").Diagnostic[]} */
 	const diagnostics = [];
 	const targetGeneration = diagnosticGeneration;
 	// Lint
@@ -590,7 +616,7 @@ function lint (document) {
 				) {
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;
-					const ruleInformationUri = result.ruleInformation && vscode.Uri.parse(result.ruleInformation);
+					const ruleInformationUri = result.ruleInformation ? vscode.Uri.parse(result.ruleInformation) : null;
 					ruleNameToInformationUri[ruleName] = ruleInformationUri;
 					let message = result.ruleNames.join("/") + ": " + ruleDescription;
 					if (result.errorDetail) {
@@ -602,7 +628,6 @@ function lint (document) {
 						const end = start + result.errorRange[1];
 						range = range.with(range.start.with(undefined, start), range.end.with(undefined, end));
 					}
-					// @ts-ignore
 					const diagnostic = new vscode.Diagnostic(range, message, severity);
 					diagnostic.code = ruleInformationUri ?
 						{
@@ -620,26 +645,31 @@ function lint (document) {
 		// Publish
 		.then(() => {
 			if (targetGeneration === diagnosticGeneration) {
-				diagnosticCollection.set(document.uri, diagnostics);
+				diagnosticCollection?.set(document.uri, diagnostics);
 			}
 		});
 }
 
 // Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
-function provideCodeActions (document, range, codeActionContext) {
+function provideCodeActions (/** @type {import("vscode").TextDocument} */ document, /** @type {import("vscode").Range} */ range, /** @type {import("vscode").CodeActionContext} */ codeActionContext) {
+	/** @type {import("vscode").CodeAction[]} */
 	const codeActions = [];
 	// eslint-disable-next-line func-style
-	const addToCodeActions = (action) => {
-		if (!codeActionContext.only || codeActionContext.only.contains(action.kind)) {
+	const addToCodeActions = (/** @type {import("vscode").CodeAction} */ action) => {
+		if (!action.kind || !codeActionContext.only || codeActionContext.only.contains(action.kind)) {
 			codeActions.push(action);
 		}
 	};
 	const diagnostics = codeActionContext.diagnostics || [];
-	const extensionDiagnostics = diagnostics.filter((diagnostic) => diagnostic.source === extensionDisplayName);
+	const extensionDiagnostics = diagnostics.filter((/** @type {import("vscode").Diagnostic} */ diagnostic) => diagnostic.source === extensionDisplayName);
 	for (const diagnostic of extensionDiagnostics) {
-		const ruleName = diagnostic.code.value || diagnostic.code;
+		// @ts-ignore
+		const ruleName = diagnostic.code?.value || diagnostic.code;
 		const ruleNameAlias = diagnostic.message.split(":")[0];
-		if (diagnostic.fixInfo) {
+		/** @type {import("markdownlint").RuleOnErrorFixInfo} */
+		// @ts-ignore
+		const diagnosticFixInfo = diagnostic.fixInfo;
+		if (diagnosticFixInfo) {
 			// Provide code action to fix the violation
 			const fixTitle = clickToFixThis + ruleNameAlias;
 			const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
@@ -648,7 +678,7 @@ function provideCodeActions (document, range, codeActionContext) {
 				"command": fixLineCommandName,
 				"arguments": [
 					diagnostic.range.start.line,
-					diagnostic.fixInfo
+					diagnosticFixInfo
 				]
 			};
 			fixAction.diagnostics = [ diagnostic ];
@@ -667,7 +697,7 @@ function provideCodeActions (document, range, codeActionContext) {
 			};
 			addToCodeActions(infoAction);
 		}
-		if (diagnostic.fixInfo) {
+		if (diagnosticFixInfo) {
 			// Provide code action to fix all similar violations
 			const fixTitle = clickToFixRulePrefix + ruleNameAlias + inTheDocument;
 			const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
@@ -681,7 +711,7 @@ function provideCodeActions (document, range, codeActionContext) {
 	}
 	if (extensionDiagnostics.length > 0) {
 		// eslint-disable-next-line func-style
-		const registerFixAllCodeAction = (codeActionKind) => {
+		const registerFixAllCodeAction = (/** @type {import("vscode").CodeActionKind} */ codeActionKind) => {
 			// Provide code action for fixing all violations
 			const sourceFixAllAction = new vscode.CodeAction(
 				fixAllCommandTitle,
@@ -708,7 +738,7 @@ function provideCodeActions (document, range, codeActionContext) {
 }
 
 // Fixes violations of a rule on a line
-function fixLine (lineIndex, fixInfo) {
+function fixLine (/** @type {Number} */ lineIndex, /** @type {import("markdownlint").RuleOnErrorFixInfo} */ fixInfo) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor && fixInfo) {
@@ -740,12 +770,12 @@ function fixLine (lineIndex, fixInfo) {
 				})
 				.then(resolve, reject);
 		}
-		return resolve();
+		return resolve(undefined);
 	});
 }
 
 // Fixes all violations in the active document
-function fixAll (ruleNameFilter) {
+function fixAll (/** @type {string} */ ruleNameFilter) {
 	return new Promise((resolve, reject) => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
@@ -768,12 +798,12 @@ function fixAll (ruleNameFilter) {
 					.then(resolve, reject);
 			}
 		}
-		return resolve();
+		return resolve(undefined);
 	});
 }
 
 // Formats a range of the document (applying fixes)
-function formatDocument (document, range) {
+function formatDocument (/** @type {import("vscode").TextDocument} */ document, /** @type {import("vscode").Range} */ range) {
 	return new Promise((resolve, reject) => {
 		if (isMarkdownDocument(document)) {
 			return markdownlintWrapper(document)
@@ -797,7 +827,7 @@ function formatDocument (document, range) {
 				})
 				.then(resolve, reject);
 		}
-		return resolve();
+		return resolve(undefined);
 	});
 }
 
@@ -842,11 +872,11 @@ function toggleLinting () {
 }
 
 // Clears diagnostics and lints all visible files
-function clearDiagnosticsAndLintVisibleFiles (eventUri) {
+function clearDiagnosticsAndLintVisibleFiles (/** @type {import("vscode").Uri | undefined} */ eventUri = undefined) {
 	if (eventUri) {
 		outputLine(`Re-linting due to "${eventUri.fsPath}" change.`);
 	}
-	diagnosticCollection.clear();
+	diagnosticCollection?.clear();
 	diagnosticGeneration++;
 	outputChannelShown = false;
 	lintVisibleFiles();
@@ -858,7 +888,7 @@ function lintVisibleFiles () {
 }
 
 // Returns the run setting for the document
-function getRun (document) {
+function getRun (/** @type {import("vscode").TextDocument} */ document) {
 	const name = document.uri.toString();
 	// Use cached configuration if present for file
 	if (runMap[name]) {
@@ -877,7 +907,7 @@ function clearRunMap () {
 }
 
 // Suppresses a pending lint for the specified document
-function suppressLint (document) {
+function suppressLint (/** @type {import("vscode").TextDocument | null} */ document) {
 	if (throttle.timeout && (document === throttle.document)) {
 		clearTimeout(throttle.timeout);
 		throttle.document = null;
@@ -886,7 +916,7 @@ function suppressLint (document) {
 }
 
 // Requests a lint of the specified document
-function requestLint (document) {
+function requestLint (/** @type {import("vscode").TextDocument} */ document) {
 	suppressLint(document);
 	throttle.document = document;
 	throttle.timeout = setTimeout(() => {
@@ -912,7 +942,7 @@ function didChangeActiveTextEditor () {
 }
 
 // Handles the onDidChangeTextEditorSelection event
-function didChangeTextEditorSelection (change) {
+function didChangeTextEditorSelection (/** @type {import("vscode").TextEditorSelectionChangeEvent} */ change) {
 	const document = change.textEditor.document;
 	if (
 		isMarkdownDocument(document) &&
@@ -923,14 +953,14 @@ function didChangeTextEditorSelection (change) {
 }
 
 // Handles the onDidChangeVisibleTextEditors event
-function didChangeVisibleTextEditors (textEditors) {
+function didChangeVisibleTextEditors (/** @type {readonly import("vscode").TextEditor[]} */ textEditors) {
 	for (const textEditor of textEditors) {
 		lint(textEditor.document);
 	}
 }
 
 // Handles the onDidOpenTextDocument event
-function didOpenTextDocument (document) {
+function didOpenTextDocument (/** @type {import("vscode").TextDocument} */ document) {
 	if (isMarkdownDocument(document)) {
 		lint(document);
 		suppressLint(document);
@@ -938,7 +968,7 @@ function didOpenTextDocument (document) {
 }
 
 // Handles the onDidChangeTextDocument event
-function didChangeTextDocument (change) {
+function didChangeTextDocument (/** @type {import("vscode").TextDocumentChangeEvent} */ change) {
 	const document = change.document;
 	if (isMarkdownDocument(document) && (getRun(document) === "onType")) {
 		requestLint(document);
@@ -946,7 +976,7 @@ function didChangeTextDocument (change) {
 }
 
 // Handles the onDidSaveTextDocument event
-function didSaveTextDocument (document) {
+function didSaveTextDocument (/** @type {import("vscode").TextDocument} */ document) {
 	if (isMarkdownDocument(document) && (getRun(document) === "onSave")) {
 		lint(document);
 		suppressLint(document);
@@ -954,13 +984,13 @@ function didSaveTextDocument (document) {
 }
 
 // Handles the onDidCloseTextDocument event
-function didCloseTextDocument (document) {
+function didCloseTextDocument (/** @type {import("vscode").TextDocument} */ document) {
 	suppressLint(document);
-	diagnosticCollection.delete(document.uri);
+	diagnosticCollection?.delete(document.uri);
 }
 
 // Handles the onDidChangeConfiguration event
-function didChangeConfiguration (change) {
+function didChangeConfiguration (/** @type {import("vscode").ConfigurationChangeEvent | undefined} */ change = undefined) {
 	if (!change || change.affectsConfiguration(extensionDisplayName)) {
 		outputLine("Resetting configuration cache due to setting change.");
 		getApplicationConfiguration();
@@ -975,7 +1005,7 @@ function didGrantWorkspaceTrust () {
 }
 
 // Creates all file system watchers for the specified workspace folder Uri
-function createFileSystemWatchers (workspaceFolderUri) {
+function createFileSystemWatchers (/** @type {import("vscode").Uri} */ workspaceFolderUri) {
 	disposeFileSystemWatchers(workspaceFolderUri);
 	const relativeConfigFileGlob = new vscode.RelativePattern(workspaceFolderUri, "**/" + configFileGlob);
 	const configWatcher = vscode.workspace.createFileSystemWatcher(relativeConfigFileGlob);
@@ -998,7 +1028,7 @@ function createFileSystemWatchers (workspaceFolderUri) {
 }
 
 // Disposes of all file system watchers for the specified workspace folder Uri
-function disposeFileSystemWatchers (workspaceFolderUri) {
+function disposeFileSystemWatchers (/** @type {import("vscode").Uri} */ workspaceFolderUri) {
 	const workspaceFolderUriString = workspaceFolderUri.toString();
 	const disposables = workspaceFolderUriToDisposables.get(workspaceFolderUriString) || [];
 	for (const disposable of disposables) {
@@ -1008,7 +1038,7 @@ function disposeFileSystemWatchers (workspaceFolderUri) {
 }
 
 // Handles the onDidChangeWorkspaceFolders event
-function didChangeWorkspaceFolders (changes) {
+function didChangeWorkspaceFolders (/** @type {import("vscode").WorkspaceFoldersChangeEvent} */ changes) {
 	for (const workspaceFolderUri of changes.removed.map((folder) => folder.uri)) {
 		disposeFileSystemWatchers(workspaceFolderUri);
 	}
@@ -1017,7 +1047,7 @@ function didChangeWorkspaceFolders (changes) {
 	}
 }
 
-export function activate (context) {
+export function activate (/** @type {import("vscode").ExtensionContext} */ context) {
 	// Create OutputChannel
 	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
 	context.subscriptions.push(outputChannel);
@@ -1089,7 +1119,6 @@ export function activate (context) {
 			extensionDisplayName,
 			{
 				"provideTasks": () => [ lintWorkspaceTask ],
-				// eslint-disable-next-line unicorn/no-useless-undefined
 				"resolveTask": () => undefined
 			}
 		)
