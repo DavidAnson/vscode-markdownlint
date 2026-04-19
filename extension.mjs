@@ -93,6 +93,7 @@ const errorExceptionPrefix = "Exception while linting with markdownlint-cli2:\n"
 const openCommand = "vscode.open";
 const sectionConfig = "config";
 const sectionConfigFile = "configFile";
+const sectionConfigPointer = "configPointer";
 const sectionCustomRules = "customRules";
 const sectionFocusMode = "focusMode";
 const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
@@ -410,9 +411,16 @@ async function getConfig (/** @type {any} */ fs, /** @type {import("vscode").Wor
 
 // Returns an array of args entries for the config path for the user/workspace
 function getConfigFileArguments (/** @type {import("vscode").WorkspaceConfiguration} */ configuration) {
-	const configFile = configuration.get(sectionConfigFile);
 	/** @type {string[]} */
-	const configFileArguments = (configFile?.length > 0) ? [ "--config", expandTildePath(configFile, os) ] : [];
+	const configFileArguments = [];
+	const configFile = configuration.get(sectionConfigFile);
+	if (configFile?.length > 0) {
+		configFileArguments.push("--config", expandTildePath(configFile, os));
+		const configPointer = configuration.get(sectionConfigPointer);
+		if (configPointer?.length > 0) {
+			configFileArguments.push("--configPointer", configPointer);
+		}
+	}
 	return configFileArguments;
 }
 

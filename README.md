@@ -203,6 +203,7 @@ To extend another configuration file, use the `extends` property to provide a re
 ```
 
 Files referenced via `extends` do not need to be part of the current project (but usually are).
+These files can be authored in the formats described above as well as the [TOML](https://wikipedia.org/wiki/TOML) format popular in some communities.
 
 Configuration sources have the following precedence (in decreasing order):
 
@@ -249,7 +250,7 @@ When using `extends` in this context:
 
 The default behavior of storing configuration files in the root of a project works well most of the time.
 However, projects that need to store configuration files in a different location can set `configFile` to the project-relative path of that file.
-All [`markdownlint-cli2` configuration files used with `--config`](https://github.com/DavidAnson/markdownlint-cli2?tab=readme-ov-file#command-line) are supported.
+All [`markdownlint-cli2` configuration files used with `--config`](https://github.com/DavidAnson/markdownlint-cli2?tab=readme-ov-file#command-line) are supported (including TOML files).
 
 This looks like the following in VS Code's user settings:
 
@@ -261,6 +262,39 @@ This looks like the following in VS Code's user settings:
 ```
 
 If [markdownlint.config](#markdownlintconfig) is also set, the settings from `configFile` take precedence.
+
+### markdownlint.configPointer
+
+When `configFile` (above) is set, the configuration object is assumed to be the object represented by that file.
+The `configPointer` property can be used to identify a sub-object - typically in cases where a configuration file is shared by multiple tools.
+
+For example, a `package.json` file with an embedded configuration object like this:
+
+```json
+{
+  "...": "...",
+  "markdownlint-config": {
+    "no-multiple-blanks": false
+  }
+}
+```
+
+Could be used by setting `configFile` to `package.json` and `configPointer` to `/markdownlint-config`.
+
+Similarly, a `pyproject.toml` file like this:
+
+```toml
+[project]
+# ...
+
+[tool.markdownlint-cli2]
+noProgress = true
+
+[tool.markdownlint-cli2.config]
+no-multiple-blanks = false
+```
+
+Could be used by setting `configFile` to `pyproject.toml` and `configPointer` to `/tool/markdownlint-cli2`.
 
 ### markdownlint.focusMode
 

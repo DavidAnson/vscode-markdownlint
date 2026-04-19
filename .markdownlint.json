@@ -13,7 +13,8 @@
 			"ini",
 			"json",
 			"jsonc",
-			"markdown"
+			"markdown",
+			"toml"
 		],
 		"language_only": true
 	},
@@ -64,6 +65,7 @@
 			"## Configure",
 			"### markdownlint.config",
 			"### markdownlint.configFile",
+			"### markdownlint.configPointer",
 			"### markdownlint.focusMode",
 			"### markdownlint.run",
 			"### markdownlint.severityForError",
