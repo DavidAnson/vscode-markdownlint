@@ -497,6 +497,12 @@ async function markdownlintWrapper (/** @type {import("vscode").TextDocument} */
 		"fileContents";
 	/** @type {import("markdownlint-cli2").LintResult[]} */
 	let results = [];
+	/** @type {import("markdownlint-cli2").OutputFormatter} */
+	// eslint-disable-next-line func-style
+	const captureResultsFormatter = (options) => {
+		results = options.results;
+	};
+	/** @type {import("markdownlint-cli2").Parameters} */
 	const parameters = {
 		fs,
 		directory,
@@ -509,15 +515,9 @@ async function markdownlintWrapper (/** @type {import("vscode").TextDocument} */
 		"optionsDefault": await getOptionsDefault(fs, configuration, workspaceFolderUri, config),
 		"optionsOverride": {
 			...getOptionsOverride(),
-			"outputFormatters": []
+			"outputFormatters": [ [ captureResultsFormatter ] ]
 		}
 	};
-	// eslint-disable-next-line func-style
-	const captureResultsFormatter = (/** @type {{results: import("markdownlint-cli2").LintResult[]}} */ options) => {
-		results = options.results;
-	};
-	// @ts-ignore
-	parameters.optionsOverride.outputFormatters = [ [ captureResultsFormatter ] ];
 	// Invoke markdownlint-cli2
 	return markdownlintCli2(parameters)
 		.catch((error) => import("./stringify-error.mjs").then(
