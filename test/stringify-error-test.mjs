@@ -175,7 +175,7 @@ describe("stringify-error", () => {
 		t.assert.equal(actual, expected);
 	});
 
-	function generalize (output) {
+	function generalize (/** @type {string} */ output) {
 		return output.
 			split("\n").
 			filter((s) => !s.includes("at ") || s.includes("stringify-error-test")).

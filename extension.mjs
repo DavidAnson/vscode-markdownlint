@@ -13,6 +13,7 @@ import helpers from "markdownlint-cli2/markdownlint/helpers";
 // eslint-disable-next-line unicorn/no-keyword-prefix
 const { expandTildePath, newLineRe } = helpers;
 import parsers from "markdownlint-cli2/parsers";
+import replaceVariables from "./replace-variables.mjs";
 
 // Constants
 const extensionDisplayName = "markdownlint";
@@ -385,11 +386,7 @@ async function getConfig (/** @type {any} */ fs, /** @type {import("vscode").Wor
 		const homedir = os && os.homedir && os.homedir();
 		const workspaceFolderFsPath = posixPath(workspaceFolderUri.fsPath);
 		const extendBase = ((useHomedir && homedir) ? homedir : workspaceFolderFsPath) || "";
-		let expanded = expandTildePath(userWorkspaceConfig.extends, os);
-		if (homedir) {
-			expanded = expanded.replace(/\${userHome}/g, homedir);
-		}
-		expanded = expanded.replace(/\${workspaceFolder}/g, workspaceFolderFsPath);
+		const expanded = replaceVariables(expandTildePath(userWorkspaceConfig.extends, os), uri, vscode, os);
 		const extendPath = path.resolve(extendBase, expanded);
 		try {
 			const extendConfig = await readConfig(extendPath, parsers, fs);
@@ -410,12 +407,12 @@ async function getConfig (/** @type {any} */ fs, /** @type {import("vscode").Wor
 }
 
 // Returns an array of args entries for the config path for the user/workspace
-function getConfigFileArguments (/** @type {import("vscode").WorkspaceConfiguration} */ configuration) {
+function getConfigFileArguments (/** @type {import("vscode").WorkspaceConfiguration} */ configuration, /** @type {import("vscode").Uri} */ uri) {
 	/** @type {string[]} */
 	const configFileArguments = [];
 	const configFile = configuration.get(sectionConfigFile);
 	if (configFile?.length > 0) {
-		configFileArguments.push("--config", expandTildePath(configFile, os));
+		configFileArguments.push("--config", replaceVariables(expandTildePath(configFile, os), uri, vscode, os));
 		const configPointer = configuration.get(sectionConfigPointer);
 		if (configPointer?.length > 0) {
 			configFileArguments.push("--configPointer", configPointer);
@@ -450,10 +447,10 @@ function getCustomRules (/** @type {import("vscode").WorkspaceConfiguration} */ 
 }
 
 // Gets the value of the optionsDefault parameter to markdownlint-cli2
-async function getOptionsDefault (/** @type {any} */ fs, /** @type {import("vscode").WorkspaceConfiguration} */ workspaceConfiguration, /** @type {import("vscode").Uri} */ workspaceFolderUri, /** @type {import("markdownlint").Configuration | undefined} */ config) {
+async function getOptionsDefault (/** @type {any} */ fs, /** @type {import("vscode").WorkspaceConfiguration} */ configuration, /** @type {import("vscode").Uri} */ uri, /** @type {import("markdownlint").Configuration | undefined} */ config) {
 	return {
-		"config": config || await getConfig(fs, workspaceConfiguration, workspaceFolderUri),
-		"customRules": getCustomRules(workspaceConfiguration)
+		"config": config || await getConfig(fs, configuration, uri),
+		"customRules": getCustomRules(configuration)
 	};
 }
 
@@ -491,7 +488,7 @@ async function markdownlintWrapper (/** @type {import("vscode").TextDocument} */
 		posixPath(workspaceFolderUri.fsPath);
 	const argv = independentDocument ?
 		[] :
-		[ `:${name}`, ...getConfigFileArguments(configuration) ];
+		[ `:${name}`, ...getConfigFileArguments(configuration, document.uri) ];
 	const contents = independentDocument ?
 		"nonFileContents" :
 		"fileContents";

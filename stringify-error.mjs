@@ -16,7 +16,7 @@ function toIndentedLines (string) {
 
 /**
  * String-ifies an Error (or AggregateError) object.
- * @param {Error} error Error object to string-ify.
+ * @param {Error | null | undefined} error Error object to string-ify.
  * @returns {String} Error details.
  */
 function stringifyError (error) {
