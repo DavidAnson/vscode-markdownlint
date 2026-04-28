@@ -1,7 +1,15 @@
 // @ts-check
 
 import { describe, test } from "node:test";
-import { default as stringifyError } from "../stringify-error.mjs";
+import stringifyError from "../stringify-error.mjs";
+
+function generalize (/** @type {string} */ output) {
+	return output
+		.split("\n")
+		.filter((s) => !s.includes("at ") || s.includes("stringify-error-test"))
+		.map((s) => s.replace(/^(\s*at ).*(stringify-error-test).*$/, "$1$2"))
+		.join("\n");
+}
 
 describe("stringify-error", () => {
 
@@ -159,12 +167,12 @@ describe("stringify-error", () => {
 					"message": "message",
 					"cause": {
 						"name": "Name",
-						"message": "Message",
+						"message": "Message"
 					},
 					"errors": [
 						{
 							"name": "NaMe",
-							"message": "MeSsAgE",
+							"message": "MeSsAgE"
 						}
 					]
 				}
@@ -175,18 +183,10 @@ describe("stringify-error", () => {
 		t.assert.equal(actual, expected);
 	});
 
-	function generalize (/** @type {string} */ output) {
-		return output.
-			split("\n").
-			filter((s) => !s.includes("at ") || s.includes("stringify-error-test")).
-			map((s) => s.replace(/^(\s*at ).*(stringify-error-test).*$/, "$1$2")).
-			join("\n");
-	}
-
 	test("Error, cause", (t) => {
 		t.plan(1);
 		// @ts-ignore
-		const error = new Error("MESSAGE0", { "cause": new Error("MESSAGE1") } );
+		const error = new Error("MESSAGE0", { "cause": new Error("MESSAGE1") });
 		const actual = generalize(stringifyError(error));
 		const expected = "Error: MESSAGE0\nstack:\n at stringify-error-test\ncause:\n Error: MESSAGE1\n stack:\n  at stringify-error-test";
 		t.assert.equal(actual, expected);

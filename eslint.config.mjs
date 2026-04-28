@@ -84,5 +84,18 @@ export default [
 		"languageOptions": {
 			"sourceType": "module"
 		}
+	},
+	{
+		"files": [
+			"test/*.mjs"
+		],
+		"rules": {
+			"id-length": "off",
+
+			"n/no-unsupported-features/es-syntax": [ "error", { "ignores": [ "error-cause" ] } ],
+			"n/no-unsupported-features/node-builtins": [ "error", { "ignores": [ "test", "test.describe", "test.test" ] } ],
+
+			"@stylistic/padded-blocks": "off"
+		}
 	}
 ];

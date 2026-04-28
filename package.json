@@ -23,7 +23,7 @@
 		"ci": "npm test && npm run test-ui",
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
-		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js --no-warn-ignored *.cjs *.mjs *.js test-ui/*.cjs eslint.config.mjs && markdownlint-cli2 *.md",
+		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js --no-warn-ignored *.cjs *.mjs *.js test/*.mjs test-ui/*.cjs eslint.config.mjs && markdownlint-cli2 *.md",
 		"schema-copy": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
 		"schema-embed": "node ./embed-schema.cjs",
 		"schema-update": "replace-in-files --regex='\"\\$ref\": \"https://raw\\.githubusercontent\\.com/DavidAnson/markdownlint/v\\d+\\.\\d+\\.\\d+/schema/markdownlint-config-schema\\.json\"' --replacement='\"$ref\": \"./markdownlint-config-schema.json\"' ./markdownlint-cli2-config-schema.json",
