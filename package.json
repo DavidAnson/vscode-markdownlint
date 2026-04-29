@@ -26,7 +26,7 @@
 		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js --no-warn-ignored *.cjs *.mjs *.js test/*.mjs test-ui/*.cjs eslint.config.mjs && markdownlint-cli2 *.md",
 		"schema-copy": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
 		"schema-embed": "node ./embed-schema.cjs",
-		"schema-update": "replace-in-files --regex='\"\\$ref\": \"https://raw\\.githubusercontent\\.com/DavidAnson/markdownlint/v\\d+\\.\\d+\\.\\d+/schema/markdownlint-config-schema\\.json\"' --replacement='\"$ref\": \"./markdownlint-config-schema.json\"' ./markdownlint-cli2-config-schema.json",
+		"schema-update": "replace-in-files --regex='https://raw\\.githubusercontent\\.com/DavidAnson/markdownlint/v\\d+\\.\\d+\\.\\d+/schema/markdownlint-config-schema\\.json' --replacement='./markdownlint-config-schema.json' ./markdownlint-cli2-config-schema.json",
 		"test": "node --test --experimental-test-coverage && npm run lint && npm run compile && npm run schema-copy && npm run schema-embed && npm run schema-update && git diff --exit-code",
 		"test-ui": "node ./test-ui/run-tests.mjs",
 		"test-web": "npm install --no-save @vscode/test-web && sed -i '.bak' -e 's/\\/{{uuid}}\\./\\//' node_modules/@vscode/test-web/out/server/workbench.js && vscode-test-web --browser=none --verbose --extensionDevelopmentPath=. ."
