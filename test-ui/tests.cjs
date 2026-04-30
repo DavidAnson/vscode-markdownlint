@@ -12,11 +12,17 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 const vscode = require("vscode");
 
+/** @typedef {(value?: any) => void} PromiseResolve */
+/** @typedef {(reason: Error) => void} PromiseReject */
+/** @typedef {import("vscode").Disposable[]} Disposables */
+/** @typedef {(resolve: PromiseResolve, reject: PromiseReject, disposables: Disposables) => void} Test */
+
 // eslint-disable-next-line no-empty-function
 function noop () {}
 
-function testWrapper (test) {
+function testWrapper (/** @type {Test} */ test) {
 	return new Promise((resolve, reject) => {
+		/** @type {Disposables} */
 		const disposables = [];
 		// eslint-disable-next-line no-use-before-define
 		const timeout = setTimeout(() => rejectWrapper(new Error("TEST TIMEOUT")), 10_000);
@@ -31,21 +37,21 @@ function testWrapper (test) {
 					return fs.access(workspaceSettingsJson).then(() => fs.rm(workspaceSettingsJson), noop);
 				});
 		};
-		const resolveWrapper = (value) => {
+		const resolveWrapper = (/** @type {any} */ value) => {
 			cleanup().then(() => resolve(value), reject);
 		};
-		const rejectWrapper = (reason) => {
+		const rejectWrapper = (/** @type {Error} */ reason) => {
 			cleanup().then(() => reject(reason?.stack || reason), reject);
 		};
 		Promise.resolve().then(() => test(resolveWrapper, rejectWrapper, disposables)).catch(rejectWrapper);
 	});
 }
 
-function callbackWrapper (reject, callback) {
+function callbackWrapper (/** @type {PromiseReject} */ reject, /** @type {() => void} */ callback) {
 	Promise.resolve().then(callback).catch(reject);
 }
 
-function getDiagnostics (diagnosticChangeEvent, pathEndsWith) {
+function getDiagnostics (/** @type {import("vscode").DiagnosticChangeEvent} */ diagnosticChangeEvent, /** @type {string} */ pathEndsWith) {
 	const uris = diagnosticChangeEvent.uris.filter(
 		(uri) => (uri.scheme === "file") && (uri.path.endsWith(pathEndsWith))
 	);
@@ -63,8 +69,8 @@ function openLintEditVerifyFixAll () {
 		disposables.push(
 			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
 				callbackWrapper(reject, () => {
-					assert.ok(textEditor.document.uri.path.endsWith("/README.md"));
-					return textEditor.edit((editBuilder) => {
+					assert.ok(textEditor?.document.uri.path.endsWith("/README.md"));
+					return textEditor?.edit((editBuilder) => {
 						// MD019
 						editBuilder.insert(new vscode.Position(0, 1), " ");
 						// MD012
@@ -193,19 +199,21 @@ function addNonDefaultViolation () {
 function openEditDiffRevert () {
 	return testWrapper((resolve, reject, disposables) => {
 		let runOnce = false;
-		let intervalId = null;
+		/** @type {NodeJS.Timeout | undefined} */
+		// eslint-disable-next-line no-undef-init
+		let intervalId = undefined;
 		disposables.push(
 			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
 				// eslint-disable-next-line consistent-return
 				callbackWrapper(reject, () => {
 					if (!runOnce) {
 						runOnce = true;
-						assert.ok(textEditor.document.uri.path.endsWith("/CHANGELOG.md"));
-						return textEditor.edit((editBuilder) => {
+						assert.ok(textEditor?.document.uri.path.endsWith("/CHANGELOG.md"));
+						return textEditor?.edit((editBuilder) => {
 							editBuilder.insert(new vscode.Position(0, 1), " ");
 							editBuilder.insert(new vscode.Position(1, 0), "\n");
 						}).then(
-							() => textEditor.document.save()
+							() => textEditor?.document.save()
 						);
 					}
 				});
