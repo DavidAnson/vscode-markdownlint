@@ -1,6 +1,9 @@
 import * as vscode from "vscode";
 import stringifyError from "./stringify-error";
 import { FsWrapper, FsNull } from "./fs-wrapper";
+import { markdownlintWrapper } from "./lint-runner";
+import { resultsToDiagnostics } from "./diagnostics";
+import { openConfigFile, toggleLinting } from "./commands";
 
 const extensionDisplayName = "markdownlint";
 
@@ -37,11 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register a lint workspace command
   context.subscriptions.push(vscode.commands.registerCommand("markdownlint.lintWorkspace", () => lintWorkspace()));
-
-  // Add a toggle command (no-op simplified)
-  context.subscriptions.push(vscode.commands.registerCommand("markdownlint.toggleLinting", () => {
-    outputLine("Toggled linting (simplified)");
-  }));
+  context.subscriptions.push(vscode.commands.registerCommand("markdownlint.openConfigFile", () => openConfigFile()));
+  context.subscriptions.push(vscode.commands.registerCommand("markdownlint.toggleLinting", () => toggleLinting()));
 
   // Provide a basic code action provider placeholder to keep extension surface
   const provider: vscode.CodeActionProvider = {
@@ -55,8 +55,11 @@ export function activate(context: vscode.ExtensionContext) {
   setTimeout(() => {
     for (const editor of vscode.window.visibleTextEditors) {
       if (editor.document.languageId === "markdown") {
-        // placeholder: in full rewrite we'd call an async lint per document
-        outputLine(`Would lint: ${editor.document.uri.toString()}`);
+        // Invoke lint runner (non-blocking)
+        markdownlintWrapper(editor.document).then(({ results }) => {
+          const diagnostics = resultsToDiagnostics(results, editor.document);
+          diagnosticCollection?.set(editor.document.uri, diagnostics);
+        }).catch((err) => outputLine(stringifyError(err), true));
       }
     }
   }, 500);
