@@ -105,13 +105,59 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.commands.registerCommand("markdownlint.openConfigFile", () => openConfigFile()));
   context.subscriptions.push(vscode.commands.registerCommand("markdownlint.toggleLinting", () => toggleLinting()));
 
-  // Provide a basic code action provider placeholder to keep extension surface
-  const provider: vscode.CodeActionProvider = {
-    provideCodeActions() {
-      return [];
-    }
-  };
-  context.subscriptions.push(vscode.languages.registerCodeActionsProvider({ language: "markdown" }, provider));
+    // Register CodeActionsProvider
+    const documentSelector = { language: "markdown" };
+    const codeActionProvider = {
+      provideCodeActions(document: vscode.TextDocument, range: vscode.Range, context: vscode.CodeActionContext) {
+        const codeActions: vscode.CodeAction[] = [];
+        const addToCodeActions = (action: vscode.CodeAction) => {
+          if (!context.only || context.only.contains(action.kind)) {
+            codeActions.push(action);
+          }
+        };
+        const extensionDiagnostics = context.diagnostics.filter((d) => d.source === extensionDisplayName);
+        for (const diagnostic of extensionDiagnostics) {
+          // @ts-ignore
+          const fixInfo = diagnostic.fixInfo;
+          const ruleName = typeof diagnostic.code === "object" ? diagnostic.code.value : diagnostic.code;
+          const ruleNameAlias = diagnostic.message.split(":")[0];
+          if (fixInfo) {
+            const fixTitle = clickToFixThis + ruleNameAlias;
+            const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
+            fixAction.command = { title: fixTitle, command: "markdownlint.fixLine", arguments: [ diagnostic.range.start.line, fixInfo ] };
+            fixAction.diagnostics = [diagnostic];
+            fixAction.isPreferred = true;
+            addToCodeActions(fixAction);
+          }
+          const ruleInformationUri = ruleNameToInformationUri[ruleName as string];
+          if (ruleInformationUri) {
+            const infoTitle = clickForInfo + ruleNameAlias;
+            const infoAction = new vscode.CodeAction(infoTitle, codeActionKindQuickFix);
+            infoAction.command = { title: infoTitle, command: openCommand, arguments: [ruleInformationUri] };
+            addToCodeActions(infoAction);
+          }
+          if (fixInfo) {
+            const fixTitle = clickToFixRulePrefix + ruleNameAlias + inTheDocument;
+            const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
+            fixAction.command = { title: fixTitle, command: "markdownlint.fixAll", arguments: [ ruleName ] };
+            addToCodeActions(fixAction);
+          }
+        }
+        if (extensionDiagnostics.length > 0) {
+          const sourceFixAllAction = new vscode.CodeAction(fixAllCommandTitle, codeActionKindSourceFixAllExtension);
+          sourceFixAllAction.command = { title: fixAllCommandTitle, command: fixAllCommandName };
+          addToCodeActions(sourceFixAllAction);
+          const configureInfoAction = new vscode.CodeAction(clickForConfigureInfo, codeActionKindQuickFix);
+          configureInfoAction.command = { title: clickForConfigureInfo, command: openCommand, arguments: [ vscode.Uri.parse(clickForConfigureUrl) ] };
+          addToCodeActions(configureInfoAction);
+        }
+        return codeActions;
+      }
+    };
+    const codeActionProviderMetadata = {
+      providedCodeActionKinds: [ codeActionKindQuickFix, codeActionKindSourceFixAllExtension ]
+    };
+    context.subscriptions.push(vscode.languages.registerCodeActionsProvider(documentSelector, codeActionProvider, codeActionProviderMetadata));
 
   // Initial lint of visible editors
   setTimeout(() => {
