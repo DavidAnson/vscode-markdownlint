@@ -1,4 +1,4 @@
-# markdownlint
+# markdownlints
 
 > Markdown/CommonMark linting and style checking for Visual Studio Code
 
