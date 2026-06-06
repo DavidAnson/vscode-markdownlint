@@ -3,7 +3,7 @@ import stringifyError from "./stringify-error";
 import { FsWrapper, FsNull } from "./fs-wrapper";
 import { markdownlintWrapper } from "./lint-runner";
 import { resultsToDiagnostics } from "./diagnostics";
-import { openConfigFile, toggleLinting } from "./commands";
+import { openConfigFile } from "./commands";
 
 const extensionDisplayName = "markdownlint";
 
@@ -103,6 +103,16 @@ function getRun(document: vscode.TextDocument) {
 
 function clearRunMap() { runMap = {}; }
 
+function toggleLintingInternal() {
+  lintingEnabled = !lintingEnabled;
+  if (!lintingEnabled) {
+    diagnosticCollection?.clear();
+  } else {
+    lintVisibleFiles();
+  }
+  vscode.window.showInformationMessage(`markdownlint linting ${lintingEnabled ? "enabled" : "disabled"}.`);
+}
+
 async function lint(document: vscode.TextDocument) {
   if (!lintingEnabled || !isMarkdownDocument(document)) return;
   const targetGeneration = diagnosticGeneration;
@@ -129,7 +139,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Register a lint workspace command
   context.subscriptions.push(vscode.commands.registerCommand("markdownlint.lintWorkspace", () => lintWorkspace()));
   context.subscriptions.push(vscode.commands.registerCommand("markdownlint.openConfigFile", () => openConfigFile()));
-  context.subscriptions.push(vscode.commands.registerCommand("markdownlint.toggleLinting", () => toggleLinting()));
+  context.subscriptions.push(vscode.commands.registerCommand("markdownlint.toggleLinting", () => toggleLintingInternal()));
 
   context.subscriptions.push(vscode.window.onDidChangeVisibleTextEditors(didChangeVisibleTextEditors));
   context.subscriptions.push(vscode.workspace.onDidChangeTextDocument((event) => {
@@ -198,11 +208,18 @@ export function activate(context: vscode.ExtensionContext) {
     };
     context.subscriptions.push(vscode.languages.registerCodeActionsProvider(documentSelector, codeActionProvider, codeActionProviderMetadata));
 
-    // Register fix commands by dynamically importing fixes module
-    import("./fixes").then(({ fixAll, fixLine }) => {
+    // Register fix commands and formatting provider by dynamically importing fixes module
+    import("./fixes").then(({ fixAll, fixLine, formatDocument }) => {
       context.subscriptions.push(
         vscode.commands.registerCommand(fixAllCommandName, (ruleName?: string) => fixAll(ruleName)),
-        vscode.commands.registerCommand("markdownlint.fixLine", (line: number, fixInfo: any) => fixLine(line, fixInfo))
+        vscode.commands.registerCommand("markdownlint.fixLine", (line: number, fixInfo: any) => fixLine(line, fixInfo)),
+        vscode.languages.registerDocumentFormattingEditProvider(documentSelector, {
+          provideDocumentFormattingEdits(document: vscode.TextDocument) {
+            const fullText = document.getText();
+            const fullRange = new vscode.Range(document.positionAt(0), document.positionAt(fullText.length));
+            return formatDocument(document, fullRange);
+          }
+        })
       );
     }).catch((err) => outputLine(stringifyError(err), true));
 
