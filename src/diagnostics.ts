@@ -11,6 +11,9 @@ export function resultsToDiagnostics(results: any[], document: vscode.TextDocume
     const severity = (result.severity === "warning") ? vscode.DiagnosticSeverity.Information : vscode.DiagnosticSeverity.Warning;
     const diagnostic = new vscode.Diagnostic(range, message, severity);
     diagnostic.source = "markdownlint";
+    // Set code to the rule name so code actions can identify the rule
+    // vscode.Diagnostic.code can be a string or object with a `value` property
+    diagnostic.code = ruleName;
     // Attach fix info if present
     // @ts-ignore
     if (result.fixInfo) diagnostic.fixInfo = result.fixInfo;
