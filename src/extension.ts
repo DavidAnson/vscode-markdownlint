@@ -9,6 +9,10 @@ const extensionDisplayName = "markdownlint";
 
 let outputChannel: vscode.OutputChannel | null = null;
 let diagnosticCollection: vscode.DiagnosticCollection | null = null;
+let diagnosticGeneration = 0;
+let runMap: Record<string, any> = {};
+let lintingEnabled = true;
+const throttle = { document: null as vscode.TextDocument | null, timeout: null as any };
 
 function outputLine(message: string, isError = false) {
   if (!outputChannel) return;
@@ -29,6 +33,64 @@ async function lintWorkspace() {
     // In the full rewrite, invoke markdownlint-cli2 with FsWrapper
   }
   outputLine("Lint workspace (simplified) -> complete");
+}
+
+function isMarkdownDocument(document: vscode.TextDocument) {
+  const schemeSupported = new Set(["untitled", "file", "vscode-vfs", "vscode-test-web", "gist"]);
+  return (document.languageId === "markdown") && schemeSupported.has(document.uri.scheme);
+}
+
+function suppressLint(document: vscode.TextDocument | null) {
+  if (throttle.timeout && document && throttle.document === document) {
+    clearTimeout(throttle.timeout);
+    throttle.document = null;
+    throttle.timeout = null;
+  }
+}
+
+function requestLint(document: vscode.TextDocument) {
+  suppressLint(document);
+  throttle.document = document;
+  throttle.timeout = setTimeout(() => {
+    lint(document);
+    suppressLint(document);
+  }, 500);
+}
+
+function clearDiagnosticsAndLintVisibleFiles(eventUri?: vscode.Uri) {
+  if (eventUri) outputLine(`Re-linting due to "${eventUri.fsPath}" change.`);
+  diagnosticCollection?.clear();
+  diagnosticGeneration++;
+  lintVisibleFiles();
+}
+
+function lintVisibleFiles() {
+  didChangeVisibleTextEditors(vscode.window.visibleTextEditors);
+}
+
+function getRun(document: vscode.TextDocument) {
+  const name = document.uri.toString();
+  if (runMap[name]) return runMap[name];
+  const configuration = vscode.workspace.getConfiguration("markdownlint", document.uri);
+  runMap[name] = configuration.get("run");
+  outputLine(`Linting for "${name}" will be run "${runMap[name]}".`);
+  return runMap[name];
+}
+
+function clearRunMap() { runMap = {}; }
+
+async function lint(document: vscode.TextDocument) {
+  if (!lintingEnabled || !isMarkdownDocument(document)) return;
+  const targetGeneration = diagnosticGeneration;
+  try {
+    const { results } = await markdownlintWrapper(document);
+    if (targetGeneration === diagnosticGeneration) {
+      const diagnostics = resultsToDiagnostics(results, document);
+      diagnosticCollection?.set(document.uri, diagnostics);
+    }
+  } catch (err) {
+    outputLine(stringifyError(err), true);
+  }
 }
 
 export function activate(context: vscode.ExtensionContext) {
