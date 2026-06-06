@@ -177,6 +177,14 @@ export function activate(context: vscode.ExtensionContext) {
     };
     context.subscriptions.push(vscode.languages.registerCodeActionsProvider(documentSelector, codeActionProvider, codeActionProviderMetadata));
 
+    // Register fix commands by dynamically importing fixes module
+    import("./fixes").then(({ fixAll, fixLine }) => {
+      context.subscriptions.push(
+        vscode.commands.registerCommand(fixAllCommandName, (ruleName?: string) => fixAll(ruleName)),
+        vscode.commands.registerCommand("markdownlint.fixLine", (line: number, fixInfo: any) => fixLine(line, fixInfo))
+      );
+    }).catch((err) => outputLine(stringifyError(err), true));
+
   // Initial lint of visible editors
   setTimeout(() => {
     for (const editor of vscode.window.visibleTextEditors) {
