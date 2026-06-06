@@ -7,6 +7,22 @@ import { openConfigFile, toggleLinting } from "./commands";
 
 const extensionDisplayName = "markdownlint";
 
+const clickForInfo = "More information about ";
+const clickToFixThis = "Fix this violation of ";
+const clickToFixRulePrefix = "Fix all violations of ";
+const inTheDocument = " in the document";
+const fixAllCommandTitle = `Fix all supported markdownlint violations in the document`;
+const fixAllCommandName = "markdownlint.fixAll";
+const openCommand = "vscode.open";
+const clickForConfigureInfo = `Details about configuring markdownlint rules`;
+const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
+
+const codeActionKindQuickFix = vscode.CodeActionKind.QuickFix;
+const codeActionKindSourceFixAllExtension = vscode.CodeActionKind.SourceFixAll.append(extensionDisplayName);
+
+/** @type {Record<string, vscode.Uri | undefined>} */
+const ruleNameToInformationUri: Record<string, vscode.Uri | undefined> = {};
+
 let outputChannel: vscode.OutputChannel | null = null;
 let diagnosticCollection: vscode.DiagnosticCollection | null = null;
 let diagnosticGeneration = 0;
@@ -85,7 +101,9 @@ async function lint(document: vscode.TextDocument) {
   try {
     const { results } = await markdownlintWrapper(document);
     if (targetGeneration === diagnosticGeneration) {
-      const diagnostics = resultsToDiagnostics(results, document);
+      const { diagnostics, ruleNameToInformationUri: mapping } = resultsToDiagnostics(results, document);
+      // Merge mapping
+      Object.assign(ruleNameToInformationUri, mapping);
       diagnosticCollection?.set(document.uri, diagnostics);
     }
   } catch (err) {
@@ -165,7 +183,8 @@ export function activate(context: vscode.ExtensionContext) {
       if (editor.document.languageId === "markdown") {
         // Invoke lint runner (non-blocking)
         markdownlintWrapper(editor.document).then(({ results }) => {
-          const diagnostics = resultsToDiagnostics(results, editor.document);
+          const { diagnostics, ruleNameToInformationUri: mapping } = resultsToDiagnostics(results, editor.document);
+          Object.assign(ruleNameToInformationUri, mapping);
           diagnosticCollection?.set(editor.document.uri, diagnostics);
         }).catch((err) => outputLine(stringifyError(err), true));
       }
