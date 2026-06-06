@@ -84,6 +84,14 @@ function lintVisibleFiles() {
   didChangeVisibleTextEditors(vscode.window.visibleTextEditors);
 }
 
+function didChangeVisibleTextEditors(editors: vscode.TextEditor[]) {
+  for (const editor of editors) {
+    if (isMarkdownDocument(editor.document)) {
+      lint(editor.document);
+    }
+  }
+}
+
 function getRun(document: vscode.TextDocument) {
   const name = document.uri.toString();
   if (runMap[name]) return runMap[name];
@@ -122,6 +130,19 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.commands.registerCommand("markdownlint.lintWorkspace", () => lintWorkspace()));
   context.subscriptions.push(vscode.commands.registerCommand("markdownlint.openConfigFile", () => openConfigFile()));
   context.subscriptions.push(vscode.commands.registerCommand("markdownlint.toggleLinting", () => toggleLinting()));
+
+  context.subscriptions.push(vscode.window.onDidChangeVisibleTextEditors(didChangeVisibleTextEditors));
+  context.subscriptions.push(vscode.workspace.onDidChangeTextDocument((event) => {
+    if (isMarkdownDocument(event.document)) {
+      requestLint(event.document);
+    }
+  }));
+  context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration("markdownlint")) {
+      clearRunMap();
+      clearDiagnosticsAndLintVisibleFiles();
+    }
+  }));
 
     // Register CodeActionsProvider
     const documentSelector = { language: "markdown" };
