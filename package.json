@@ -22,6 +22,8 @@
 	"scripts": {
 		"ci": "npm test && npm run test-ui",
 		"compile": "webpack --mode production",
+		"build:ts": "tsc -p tsconfig.json",
+		"build": "npm run build:ts && npm run compile",
 		"compile-debug": "webpack --mode none",
 		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js --no-warn-ignored *.cjs *.mjs *.js test-ui/*.cjs eslint.config.mjs && markdownlint-cli2 *.md",
 		"schema-copy": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
@@ -59,7 +61,10 @@
 		"terser-webpack-plugin": "5.3.16",
 		"util": "0.12.5",
 		"webpack": "5.104.1",
-		"webpack-cli": "6.0.1"
+		"webpack-cli": "6.0.1",
+		"typescript": "5.4.2",
+		"ts-loader": "9.4.2",
+		"@types/node": "20.5.2"
 	},
 	"keywords": [
 		"markdown",

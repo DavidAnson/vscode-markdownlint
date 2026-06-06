@@ -10,7 +10,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const nodeModulePrefixRe = /^node:/u;
 const baseConfig = {
 	"target": "node",
-	"entry": "./extension.mjs",
+	"entry": "./dist/extension.js",
 	"output": {
 		"asyncChunks": false,
 		"path": __dirname,
