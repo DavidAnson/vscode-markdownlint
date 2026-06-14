@@ -84,20 +84,24 @@
 	"contributes": {
 		"commands": [
 			{
+				"category": "markdownlint",
 				"command": "markdownlint.fixAll",
-				"title": "Fix all supported markdownlint violations in the document"
+				"title": "Fix all supported violations in the document"
 			},
 			{
+				"category": "markdownlint",
 				"command": "markdownlint.lintWorkspace",
-				"title": "Lint all Markdown files in the workspace with markdownlint"
+				"title": "Lint all Markdown files in the workspace"
 			},
 			{
+				"category": "markdownlint",
 				"command": "markdownlint.openConfigFile",
-				"title": "Create or open the markdownlint configuration file for the workspace"
+				"title": "Create or open the configuration file for the workspace"
 			},
 			{
+				"category": "markdownlint",
 				"command": "markdownlint.toggleLinting",
-				"title": "Toggle linting by markdownlint on/off (temporarily)"
+				"title": "Toggle linting on/off (temporarily)"
 			}
 		],
 		"menus": {
