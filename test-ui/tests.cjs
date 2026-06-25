@@ -260,6 +260,63 @@ function dynamicWorkspaceSettingsChange () {
 	});
 }
 
+// Exclude a rule from fixAll; verify it is left unfixed while another rule is fixed
+function fixAllExcludeRule () {
+	return testWrapper((resolve, reject, disposables) => {
+		const configuration = vscode.workspace.getConfiguration("markdownlint");
+		let started = false;
+		let fixedAll = false;
+		let done = false;
+		disposables.push(
+			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
+				// eslint-disable-next-line consistent-return
+				callbackWrapper(reject, () => {
+					if (textEditor && !started) {
+						started = true;
+						assert.ok(textEditor.document.uri.path.endsWith("/README.md"));
+						return textEditor.edit((editBuilder) => {
+							// MD019
+							editBuilder.insert(new vscode.Position(0, 1), " ");
+							// MD012
+							editBuilder.insert(new vscode.Position(1, 0), "\n");
+						});
+					}
+				});
+			}),
+			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
+				callbackWrapper(reject, () => {
+					const diagnostics = getDiagnostics(diagnosticChangeEvent, "/README.md");
+					const codes = diagnostics.map((diagnostic) => (diagnostic.code && diagnostic.code.value) || diagnostic.code);
+					if ((codes.length === 2) && !fixedAll) {
+						assert.deepEqual(codes, [ "MD019", "MD012" ]);
+						fixedAll = true;
+						const uri = vscode.Uri.file(path.join(__dirname, "..", "README.md"));
+						vscode.commands.executeCommand("vscode.executeCodeActionProvider", uri, diagnostics[0].range)
+							.then((codeActions) => {
+								const titles = new Set(codeActions.map((codeAction) => codeAction.title));
+								// The excluded rule can still be fixed individually...
+								assert.ok(titles.has("Fix this violation of MD019/no-multiple-space-atx"));
+								// ...but is not offered as a per-rule "Fix all"
+								assert.ok(!titles.has("Fix all violations of MD019/no-multiple-space-atx in the document"));
+								return vscode.commands.executeCommand("markdownlint.fixAll");
+							})
+							.then(noop, reject);
+					} else if ((codes.length === 1) && fixedAll && !done) {
+						// MD012 is fixed; MD019 is excluded from "Fix all" so it remains
+						done = true;
+						assert.deepEqual(codes, [ "MD019" ]);
+						configuration.update("fixAllExcludeRules", undefined, vscode.ConfigurationTarget.Workspace)
+							.then(() => resolve(), reject);
+					}
+				});
+			})
+		);
+		configuration.update("fixAllExcludeRules", [ "MD019" ], vscode.ConfigurationTarget.Workspace)
+			.then(() => vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md"))))
+			.then(noop, reject);
+	});
+}
+
 // Run lintWorkspace command
 function lintWorkspace () {
 	return testWrapper((resolve, reject, disposables) => {
@@ -286,6 +343,7 @@ if (vscode.workspace.workspaceFolders) {
 	tests.push(
 		openEditDiffRevert,
 		dynamicWorkspaceSettingsChange,
+		fixAllExcludeRule,
 		// Run this last because its diagnostics persist after test completion
 		lintWorkspace
 	);

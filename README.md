@@ -362,6 +362,22 @@ For information about authoring custom rules, see [the `markdownlint` documentat
 > In `markdownlint-cli2` configuration files, the `modulePaths` property can be used in conjunction to specify one or more additional paths for resolving module references.
 > This can be used to work around the VS Code limitation that globally-installed Node modules are unavailable by setting `modulePaths` to the location of the global module path (typically `/usr/local/lib` on macOS/Linux or `~/AppData/Roaming/npm` on Windows).
 
+### markdownlint.fixAllExcludeRules
+
+This property lists rule names or aliases to exclude from "Fix all" operations: the `markdownlint.fixAll` command, fix-on-save (via `editor.codeActionsOnSave`), and document/selection formatting (see [Fix](#fix) above). Excluded rules are still reported as diagnostics and can still be fixed individually via the light bulb (`Ctrl+.`/`Ctrl+.`/`⌘.`).
+
+This is useful for rules whose automatic fix can remove content that is still being worked on. For example, `MD053`/`link-image-reference-definitions` removes unused link and image reference definitions, which is undesirable while a document is being edited and reference definitions are being added before the links that use them:
+
+```json
+{
+    "markdownlint.fixAllExcludeRules": [
+        "MD053"
+    ]
+}
+```
+
+Both rule names (such as `MD053`) and aliases (such as `link-image-reference-definitions`) are accepted.
+
 ### markdownlint.lintWorkspaceGlobs
 
 This property specifies the list of globs used when linting a workspace with the `markdownlint.lintWorkspace` command.

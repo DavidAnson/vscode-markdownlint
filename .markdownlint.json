@@ -69,6 +69,7 @@
 			"### markdownlint.severityForError",
 			"### markdownlint.severityForWarning",
 			"### markdownlint.customRules",
+			"### markdownlint.fixAllExcludeRules",
 			"### markdownlint.lintWorkspaceGlobs",
 			"## Suppress",
 			"## Snippets",

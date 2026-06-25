@@ -3,7 +3,7 @@
 	"displayName": "markdownlint",
 	"description": "Markdown linting and style checking for Visual Studio Code",
 	"icon": "images/markdownlint-128.png",
-	"version": "0.61.2",
+	"version": "0.62.0",
 	"author": "David Anson (https://dlaa.me/)",
 	"publisher": "DavidAnson",
 	"sponsor": {
@@ -328,6 +328,15 @@
 				},
 				"markdownlint.customRules": {
 					"description": "Array of paths for custom rules to include when linting.",
+					"scope": "resource",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": []
+				},
+				"markdownlint.fixAllExcludeRules": {
+					"description": "Array of rule names or aliases to exclude from \"Fix all\" operations (the \"fixAll\" command, fix-on-save, and document formatting). Excluded rules are still reported and can be fixed individually.",
 					"scope": "resource",
 					"type": "array",
 					"items": {

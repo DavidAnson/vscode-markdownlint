@@ -94,6 +94,7 @@ const openCommand = "vscode.open";
 const sectionConfig = "config";
 const sectionConfigFile = "configFile";
 const sectionCustomRules = "customRules";
+const sectionFixAllExcludeRules = "fixAllExcludeRules";
 const sectionFocusMode = "focusMode";
 const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
 const sectionRun = "run";
@@ -418,6 +419,18 @@ function getCustomRules (configuration) {
 	return customRules;
 }
 
+// Returns a Set of lower-case rule names to exclude from "Fix all" operations for the document
+function getFixAllExcludeRules (document) {
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
+	const excludeRules = configuration.get(sectionFixAllExcludeRules) || [];
+	return new Set(excludeRules.map((ruleName) => ruleName.toLowerCase()));
+}
+
+// Returns whether any of the rule names is in the set of excluded (lower-case) rule names
+function isRuleExcluded (ruleNames, excludeRules) {
+	return ruleNames.some((ruleName) => excludeRules.has(ruleName.toLowerCase()));
+}
+
 // Gets the value of the optionsDefault parameter to markdownlint-cli2
 async function getOptionsDefault (fs, workspaceConfiguration, config) {
 	return {
@@ -636,9 +649,11 @@ function provideCodeActions (document, range, codeActionContext) {
 	};
 	const diagnostics = codeActionContext.diagnostics || [];
 	const extensionDiagnostics = diagnostics.filter((diagnostic) => diagnostic.source === extensionDisplayName);
+	const excludeRules = getFixAllExcludeRules(document);
 	for (const diagnostic of extensionDiagnostics) {
 		const ruleName = diagnostic.code.value || diagnostic.code;
 		const ruleNameAlias = diagnostic.message.split(":")[0];
+		const excluded = isRuleExcluded(ruleNameAlias.split("/"), excludeRules);
 		if (diagnostic.fixInfo) {
 			// Provide code action to fix the violation
 			const fixTitle = clickToFixThis + ruleNameAlias;
@@ -667,8 +682,8 @@ function provideCodeActions (document, range, codeActionContext) {
 			};
 			addToCodeActions(infoAction);
 		}
-		if (diagnostic.fixInfo) {
-			// Provide code action to fix all similar violations
+		if (diagnostic.fixInfo && !excluded) {
+			// Provide code action to fix all similar violations (unless the rule is excluded from "Fix all")
 			const fixTitle = clickToFixRulePrefix + ruleNameAlias + inTheDocument;
 			const fixAction = new vscode.CodeAction(fixTitle, codeActionKindQuickFix);
 			fixAction.command = {
@@ -754,8 +769,10 @@ function fixAll (ruleNameFilter) {
 				return markdownlintWrapper(document)
 					.then(({ results }) => {
 						const text = document.getText();
-						const errorsToFix =
-							results.filter((error) => (!ruleNameFilter || (error.ruleNames[0] === ruleNameFilter)));
+						const excludeRules = getFixAllExcludeRules(document);
+						const errorsToFix = results.filter((error) =>
+							(!ruleNameFilter || (error.ruleNames[0] === ruleNameFilter)) &&
+							!isRuleExcluded(error.ruleNames, excludeRules));
 						const fixedText = applyFixes(text, errorsToFix);
 						return (text === fixedText) ?
 							null :
@@ -778,9 +795,10 @@ function formatDocument (document, range) {
 		if (isMarkdownDocument(document)) {
 			return markdownlintWrapper(document)
 				.then(({ results }) => {
+					const excludeRules = getFixAllExcludeRules(document);
 					const rangeErrors = results.filter((error) => {
-						const { fixInfo } = error;
-						if (fixInfo) {
+						const { fixInfo, ruleNames } = error;
+						if (fixInfo && !isRuleExcluded(ruleNames, excludeRules)) {
 							// eslint-disable-next-line unicorn/consistent-destructuring
 							const line = error.lineNumber - 1;
 							return ((range.start.line <= line) && (line <= range.end.line));
