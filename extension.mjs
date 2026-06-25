@@ -95,6 +95,7 @@ const sectionConfig = "config";
 const sectionConfigFile = "configFile";
 const sectionCustomRules = "customRules";
 const sectionFocusMode = "focusMode";
+const sectionLintOutsideWorkspace = "lintOutsideWorkspace";
 const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
 const sectionRun = "run";
 const sectionSeverityForError = "severityForError";
@@ -560,9 +561,21 @@ function lintWorkspaceViaTask () {
 		});
 }
 
+// Returns whether the document's location should be linted (honors lintOutsideWorkspace)
+function shouldLintDocumentLocation (document) {
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
+	if (configuration.get(sectionLintOutsideWorkspace)) {
+		return true;
+	}
+	// Setting is off: only lint files that are inside an open workspace folder
+	// (non-file documents like untitled or virtual are always allowed)
+	return (document.uri.scheme !== schemeFile) ||
+		Boolean(vscode.workspace.getWorkspaceFolder(document.uri));
+}
+
 // Lints a Markdown document
 function lint (document) {
-	if (!lintingEnabled || !isMarkdownDocument(document)) {
+	if (!lintingEnabled || !isMarkdownDocument(document) || !shouldLintDocumentLocation(document)) {
 		return;
 	}
 	const diagnostics = [];
@@ -1015,6 +1028,8 @@ function didChangeWorkspaceFolders (changes) {
 	for (const workspaceFolderUri of changes.added.map((folder) => folder.uri)) {
 		createFileSystemWatchers(workspaceFolderUri);
 	}
+	// Re-lint because workspace membership can affect linting (see "lintOutsideWorkspace")
+	clearDiagnosticsAndLintVisibleFiles();
 }
 
 export function activate (context) {

@@ -362,6 +362,18 @@ For information about authoring custom rules, see [the `markdownlint` documentat
 > In `markdownlint-cli2` configuration files, the `modulePaths` property can be used in conjunction to specify one or more additional paths for resolving module references.
 > This can be used to work around the VS Code limitation that globally-installed Node modules are unavailable by setting `modulePaths` to the location of the global module path (typically `/usr/local/lib` on macOS/Linux or `~/AppData/Roaming/npm` on Windows).
 
+### markdownlint.lintOutsideWorkspace
+
+By default, `markdownlint` lints every open Markdown document, including files that are not part of the current workspace. Setting this property to `false` restricts linting to files inside an open workspace folder, so Markdown files opened from elsewhere on the file system are not linted:
+
+```json
+{
+    "markdownlint.lintOutsideWorkspace": false
+}
+```
+
+> **Note**: Documents that are not stored on disk (such as untitled documents) are always linted. Explicit actions such as the `markdownlint.fixAll` command and document formatting continue to work regardless of this setting.
+
 ### markdownlint.lintWorkspaceGlobs
 
 This property specifies the list of globs used when linting a workspace with the `markdownlint.lintWorkspace` command.

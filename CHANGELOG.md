@@ -1,5 +1,6 @@
 # Changes
 
+* 0.62.0 - Add `lintOutsideWorkspace` setting to limit linting to workspace files
 * 0.61.0 - Improved rules, add warnings, add `severityForError`/`Warning`
 * 0.60.0 - Improved rules
 * 0.59.0 - Add `configFile` setting

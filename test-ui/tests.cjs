@@ -9,6 +9,7 @@
 
 const assert = require("node:assert");
 const fs = require("node:fs/promises");
+const os = require("node:os");
 const path = require("node:path");
 const vscode = require("vscode");
 
@@ -260,6 +261,49 @@ function dynamicWorkspaceSettingsChange () {
 	});
 }
 
+// Verify lintOutsideWorkspace=false stops linting a file outside the workspace
+function lintOutsideWorkspaceSetting () {
+	return testWrapper((resolve, reject, disposables) => {
+		const configuration = vscode.workspace.getConfiguration("markdownlint");
+		const outsideName = "/markdownlint-outside.md";
+		let fileUri = null;
+		let disabled = false;
+		let done = false;
+		disposables.push(
+			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
+				callbackWrapper(reject, () => {
+					if (!fileUri) {
+						return;
+					}
+					const diagnostics = getDiagnostics(diagnosticChangeEvent, outsideName);
+					const codes = diagnostics.map((diagnostic) => (diagnostic.code && diagnostic.code.value) || diagnostic.code);
+					if ((codes.length > 0) && !disabled) {
+						// By default the outside file is linted
+						assert.ok(codes.includes("MD019"));
+						disabled = true;
+						configuration.update("lintOutsideWorkspace", false, vscode.ConfigurationTarget.Workspace)
+							.then(noop, reject);
+					} else if ((codes.length === 0) && disabled && !done) {
+						// With lintOutsideWorkspace=false the outside file is no longer linted
+						done = true;
+						configuration.update("lintOutsideWorkspace", undefined, vscode.ConfigurationTarget.Workspace)
+							.then(() => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+							.then(() => fs.rm(fileUri.fsPath, { "force": true }))
+							.then(() => resolve(), reject);
+					}
+				});
+			})
+		);
+		fs.mkdtemp(path.join(os.tmpdir(), "mdl-"))
+			.then((directory) => {
+				fileUri = vscode.Uri.file(path.join(directory, outsideName));
+				return fs.writeFile(fileUri.fsPath, "#  Heading\n");
+			})
+			.then(() => vscode.window.showTextDocument(fileUri))
+			.then(noop, reject);
+	});
+}
+
 // Run lintWorkspace command
 function lintWorkspace () {
 	return testWrapper((resolve, reject, disposables) => {
@@ -286,6 +330,7 @@ if (vscode.workspace.workspaceFolders) {
 	tests.push(
 		openEditDiffRevert,
 		dynamicWorkspaceSettingsChange,
+		lintOutsideWorkspaceSetting,
 		// Run this last because its diagnostics persist after test completion
 		lintWorkspace
 	);

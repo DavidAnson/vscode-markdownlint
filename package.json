@@ -3,7 +3,7 @@
 	"displayName": "markdownlint",
 	"description": "Markdown linting and style checking for Visual Studio Code",
 	"icon": "images/markdownlint-128.png",
-	"version": "0.61.2",
+	"version": "0.62.0",
 	"author": "David Anson (https://dlaa.me/)",
 	"publisher": "DavidAnson",
 	"sponsor": {
@@ -343,6 +343,12 @@
 						"integer"
 					],
 					"default": false
+				},
+				"markdownlint.lintOutsideWorkspace": {
+					"description": "Whether to lint Markdown files that are open but not part of the current workspace. Set to false to only lint files within the workspace.",
+					"scope": "resource",
+					"type": "boolean",
+					"default": true
 				},
 				"markdownlint.lintWorkspaceGlobs": {
 					"description": "Array of glob expressions to include or ignore when linting a workspace with the \"lintWorkspace\" command.",
