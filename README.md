@@ -167,6 +167,15 @@ To temporarily disable linting of Markdown documents, run the `markdownlint.togg
 
 > **Note**: The effects of the `markdownlint.toggleLinting` command are reset when a new workspace is opened; linting defaults to enabled.
 
+To disable a specific rule from the editor, place the cursor on a rule violation and open the quick fix dialog (click the light bulb icon or press `Ctrl+.`/`Ctrl+.`/`⌘.`). Alongside any available fix, the dialog offers four ways to disable the rule:
+
+* `Disable [rule] for this line` inserts a `markdownlint-disable-line` comment at the end of the line
+* `Disable [rule] for this file` inserts a `markdownlint-disable-file` comment near the top of the file (after any front matter)
+* `Disable [rule] in this workspace` adds the rule to the [markdownlint.config](#markdownlintconfig) setting at workspace scope
+* `Disable [rule] in all workspaces` adds the rule to the [markdownlint.config](#markdownlintconfig) setting at user scope
+
+> **Note**: The "in this workspace" and "in all workspaces" options update the `markdownlint.config` setting, which configuration files take [precedence](#configure) over; a configuration file that re-enables the rule overrides them. In a multi-root workspace, "in this workspace" applies to all folders. The comment-based "for this line" and "for this file" options (see [Suppress](#suppress)) are not affected.
+
 ## Configure
 
 By default (i.e., without customizing anything), all rules are enabled *except* [`MD013`/`line-length`](https://github.com/DavidAnson/markdownlint/blob/v0.40.0/doc/md013.md) because many files include lines longer than the conventional 80 character limit:

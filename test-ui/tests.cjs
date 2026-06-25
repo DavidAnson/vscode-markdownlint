@@ -260,6 +260,76 @@ function dynamicWorkspaceSettingsChange () {
 	});
 }
 
+// Open README.md, create a violation, verify the four "Disable" quick fixes and the "for this line" edit
+function disableRuleForLineQuickFix () {
+	return testWrapper((resolve, reject, disposables) => {
+		let handled = false;
+		disposables.push(
+			vscode.window.onDidChangeActiveTextEditor((textEditor) => {
+				// eslint-disable-next-line consistent-return
+				callbackWrapper(reject, () => {
+					if (textEditor) {
+						assert.ok(textEditor.document.uri.path.endsWith("/README.md"));
+						return textEditor.edit((editBuilder) => {
+							// MD019
+							editBuilder.insert(new vscode.Position(0, 1), " ");
+						});
+					}
+				});
+			}),
+			vscode.languages.onDidChangeDiagnostics((diagnosticChangeEvent) => {
+				callbackWrapper(reject, () => {
+					const diagnostics = getDiagnostics(diagnosticChangeEvent, "/README.md");
+					if ((diagnostics.length > 0) && !handled) {
+						handled = true;
+						const [ diagnostic ] = diagnostics;
+						// @ts-ignore
+						assert.equal(diagnostic.code.value, "MD019");
+						const uri = vscode.Uri.file(path.join(__dirname, "..", "README.md"));
+						vscode.commands.executeCommand("vscode.executeCodeActionProvider", uri, diagnostic.range)
+							.then((codeActions) => {
+								const titles = new Set(codeActions.map((candidate) => candidate.title));
+								assert.ok(titles.has("Disable MD019/no-multiple-space-atx for this line"));
+								assert.ok(titles.has("Disable MD019/no-multiple-space-atx for this file"));
+								assert.ok(titles.has("Disable MD019/no-multiple-space-atx in this workspace"));
+								assert.ok(titles.has("Disable MD019/no-multiple-space-atx in all workspaces"));
+								const action = codeActions.find((candidate) => candidate.title.endsWith(" for this line"));
+								assert.ok(action);
+								// Verify the edit content without applying it (keeps the fixture clean)
+								const textEdits = action.edit.entries().flatMap((entry) => entry[1]);
+								assert.ok(textEdits.some(
+									(textEdit) => textEdit.newText.endsWith("<!-- markdownlint-disable-line MD019 -->")
+								));
+								resolve();
+							})
+							.then(noop, reject);
+					}
+				});
+			})
+		);
+		vscode.window.showTextDocument(vscode.Uri.file(path.join(__dirname, "..", "README.md")))
+			.then(noop, reject);
+	});
+}
+
+// Open README.md and verify "in this workspace" writes markdownlint.config at workspace scope
+function disableRuleInWorkspace () {
+	return testWrapper((resolve, reject) => {
+		const uri = vscode.Uri.file(path.join(__dirname, "..", "README.md"));
+		vscode.window.showTextDocument(uri)
+			.then(() => vscode.commands.executeCommand("markdownlint.disableRule", "MD019", "workspace"))
+			.then(() => {
+				const inspected = vscode.workspace.getConfiguration("markdownlint").inspect("config");
+				// @ts-ignore
+				assert.equal(inspected.workspaceValue.MD019, false);
+				return vscode.workspace.getConfiguration("markdownlint")
+					.update("config", undefined, vscode.ConfigurationTarget.Workspace);
+			})
+			.then(() => resolve())
+			.then(noop, reject);
+	});
+}
+
 // Run lintWorkspace command
 function lintWorkspace () {
 	return testWrapper((resolve, reject, disposables) => {
@@ -286,6 +356,8 @@ if (vscode.workspace.workspaceFolders) {
 	tests.push(
 		openEditDiffRevert,
 		dynamicWorkspaceSettingsChange,
+		disableRuleForLineQuickFix,
+		disableRuleInWorkspace,
 		// Run this last because its diagnostics persist after test completion
 		lintWorkspace
 	);

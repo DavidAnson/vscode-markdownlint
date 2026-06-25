@@ -89,6 +89,15 @@ const lintAllTaskName = `Lint all Markdown files in the workspace with ${extensi
 const problemMatcherName = `$${extensionDisplayName}`;
 const clickForConfigureInfo = `Details about configuring ${extensionDisplayName} rules`;
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
+const disableRuleCommandName = "markdownlint.disableRule";
+const disableRuleTitlePrefix = "Disable ";
+const disableRuleForLineSuffix = " for this line";
+const disableRuleForFileSuffix = " for this file";
+const disableRuleInWorkspaceSuffix = " in this workspace";
+const disableRuleInUserSuffix = " in all workspaces";
+const disableRuleTargetWorkspace = "workspace";
+const disableRuleTargetUser = "user";
+const frontMatterRe = /^(?<delimiter>-{3,}|\+{3,})$/u;
 const errorExceptionPrefix = "Exception while linting with markdownlint-cli2:\n";
 const openCommand = "vscode.open";
 const sectionConfig = "config";
@@ -625,9 +634,32 @@ function lint (document) {
 		});
 }
 
+// Builds an edit that inserts a disable-file comment, after leading front matter if present
+function buildDisableFileEdit (document, ruleName) {
+	const comment = `<!-- markdownlint-disable-file ${ruleName} -->`;
+	const edit = new vscode.WorkspaceEdit();
+	const firstLineText = (document.lineCount > 0) ? document.lineAt(0).text : "";
+	const match = frontMatterRe.exec(firstLineText);
+	if (match) {
+		const { delimiter } = match.groups;
+		for (let lineIndex = 1; lineIndex < document.lineCount; lineIndex++) {
+			if (document.lineAt(lineIndex).text === delimiter) {
+				// Insert on a new line just after the closing front matter delimiter
+				edit.insert(document.uri, document.lineAt(lineIndex).range.end, `\n${comment}`);
+				return edit;
+			}
+		}
+	}
+	// No front matter (or no closing delimiter): insert at the top of the document
+	edit.insert(document.uri, new vscode.Position(0, 0), `${comment}\n`);
+	return edit;
+}
+
 // Implements CodeActionsProvider.provideCodeActions to provide information and fix rule violations
 function provideCodeActions (document, range, codeActionContext) {
 	const codeActions = [];
+	const disabledRuleNames = new Set();
+	const hasWorkspaceFolders = (vscode.workspace.workspaceFolders || []).length > 0;
 	// eslint-disable-next-line func-style
 	const addToCodeActions = (action) => {
 		if (!codeActionContext.only || codeActionContext.only.contains(action.kind)) {
@@ -677,6 +709,46 @@ function provideCodeActions (document, range, codeActionContext) {
 				"arguments": [ ruleName ]
 			};
 			addToCodeActions(fixAction);
+		}
+		// Provide code actions to disable the rule (inline comment or configuration)
+		if (!disabledRuleNames.has(ruleName)) {
+			disabledRuleNames.add(ruleName);
+			// Disable the rule for this line via an inline comment
+			const disableLineTitle = disableRuleTitlePrefix + ruleNameAlias + disableRuleForLineSuffix;
+			const disableLineAction = new vscode.CodeAction(disableLineTitle, codeActionKindQuickFix);
+			const disableLineEdit = new vscode.WorkspaceEdit();
+			disableLineEdit.insert(
+				document.uri,
+				document.lineAt(diagnostic.range.start.line).range.end,
+				` <!-- markdownlint-disable-line ${ruleName} -->`
+			);
+			disableLineAction.edit = disableLineEdit;
+			addToCodeActions(disableLineAction);
+			// Disable the rule for this file via an inline comment
+			const disableFileTitle = disableRuleTitlePrefix + ruleNameAlias + disableRuleForFileSuffix;
+			const disableFileAction = new vscode.CodeAction(disableFileTitle, codeActionKindQuickFix);
+			disableFileAction.edit = buildDisableFileEdit(document, ruleName);
+			addToCodeActions(disableFileAction);
+			// Disable the rule in the workspace configuration
+			if (hasWorkspaceFolders) {
+				const disableWorkspaceTitle = disableRuleTitlePrefix + ruleNameAlias + disableRuleInWorkspaceSuffix;
+				const disableWorkspaceAction = new vscode.CodeAction(disableWorkspaceTitle, codeActionKindQuickFix);
+				disableWorkspaceAction.command = {
+					"title": disableWorkspaceTitle,
+					"command": disableRuleCommandName,
+					"arguments": [ ruleName, disableRuleTargetWorkspace ]
+				};
+				addToCodeActions(disableWorkspaceAction);
+			}
+			// Disable the rule in the user configuration
+			const disableUserTitle = disableRuleTitlePrefix + ruleNameAlias + disableRuleInUserSuffix;
+			const disableUserAction = new vscode.CodeAction(disableUserTitle, codeActionKindQuickFix);
+			disableUserAction.command = {
+				"title": disableUserTitle,
+				"command": disableRuleCommandName,
+				"arguments": [ ruleName, disableRuleTargetUser ]
+			};
+			addToCodeActions(disableUserAction);
 		}
 	}
 	if (extensionDiagnostics.length > 0) {
@@ -839,6 +911,32 @@ function openConfigFile () {
 function toggleLinting () {
 	lintingEnabled = !lintingEnabled;
 	clearDiagnosticsAndLintVisibleFiles();
+}
+
+// Disables a rule by writing it to the markdownlint.config setting (workspace or user scope)
+async function disableRule (ruleName, target) {
+	const editor = vscode.window.activeTextEditor;
+	const uri = editor && editor.document && editor.document.uri;
+	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, uri);
+	const configurationTarget = (target === disableRuleTargetWorkspace) ?
+		vscode.ConfigurationTarget.Workspace :
+		vscode.ConfigurationTarget.Global;
+	const inspected = configuration.inspect(sectionConfig);
+	const existing = ((configurationTarget === vscode.ConfigurationTarget.Workspace) ?
+		inspected.workspaceValue :
+		inspected.globalValue) || {};
+	try {
+		await configuration.update(
+			sectionConfig,
+			{
+				...existing,
+				[ruleName]: false
+			},
+			configurationTarget
+		);
+	} catch (error) {
+		vscode.window.showErrorMessage(`Unable to disable ${ruleName}: ${error?.message ?? error}`);
+	}
 }
 
 // Clears diagnostics and lints all visible files
@@ -1098,6 +1196,7 @@ export function activate (context) {
 	// Register Commands
 	// eslint-disable-next-line unicorn/prefer-single-call
 	context.subscriptions.push(
+		vscode.commands.registerCommand(disableRuleCommandName, disableRule),
 		vscode.commands.registerCommand(fixAllCommandName, fixAll),
 		vscode.commands.registerCommand(fixLineCommandName, fixLine),
 		vscode.commands.registerCommand(lintWorkspaceCommandName, lintWorkspaceViaTask),
