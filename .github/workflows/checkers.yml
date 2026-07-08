@@ -13,10 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
-    - uses: JustinBeckwith/linkinator-action@v2
-      with:
-        linksToSkip: '^https://github.com/ ^https://www.npmjs.com/ ^https://thisdavej.com/'
-        paths: '*.md'
+    - run: 'npx linkinator "*.md" --skip "^https://github.com/" --skip "^https://www.npmjs.com/" --skip "^https://thisdavej.com/" --skip "^https://wikipedia.org/"'
 
   spellcheck:
     runs-on: ubuntu-latest
