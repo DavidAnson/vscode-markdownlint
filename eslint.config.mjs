@@ -69,12 +69,24 @@ export default [
 			"@stylistic/operator-linebreak": [ "error", "after" ],
 			"@stylistic/space-before-function-paren": [ "error", "always" ],
 
+			"unicorn/comment-content": "off",
+			"unicorn/consistent-boolean-name": "off",
+			"unicorn/consistent-class-member-order": "off",
+			"unicorn/default-export-style": "off",
+			"unicorn/max-nested-calls": "off",
+			"unicorn/name-replacements": "off",
 			"unicorn/no-array-push-push": "off",
 			"unicorn/no-array-reduce": "off",
+			"unicorn/no-asterisk-prefix-in-documentation-comments": "off",
 			"unicorn/no-null": "off",
+			"unicorn/no-unreadable-for-of-expression": "off",
+			"unicorn/no-unreadable-new-expression": "off",
 			"unicorn/no-useless-undefined": "off",
+			"unicorn/prefer-await": "off",
+			"unicorn/prefer-early-return": "off",
 			"unicorn/prefer-module": "off",
-			"unicorn/prefer-string-replace-all": "off"
+			"unicorn/prefer-string-replace-all": "off",
+			"unicorn/prefer-temporal": "off"
 		}
 	},
 	{

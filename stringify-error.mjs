@@ -35,6 +35,7 @@ function stringifyError (error) {
 	}
 	if (cause) {
 		result.push("cause:");
+		// @ts-ignore
 		// eslint-disable-next-line unicorn/prefer-single-call
 		result.push(...toIndentedLines(stringifyError(cause)));
 	}

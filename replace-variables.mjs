@@ -34,6 +34,7 @@ function replaceVariables (input, uri, vscode, os) {
 		}
 		return match;
 	};
+	// eslint-disable-next-line unicorn/no-unsafe-string-replacement
 	return (input || "").replace(/\${[A-Za-z]+}/g, replacer);
 }
 

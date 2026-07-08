@@ -1,22 +1,10 @@
 import fs from "node:fs/promises";
-import path from "node:path";
 import { describe, test } from "node:test";
-import { fileURLToPath } from "node:url";
 
-/**
- * Imports a file as JSON.
- * Avoids "ExperimentalWarning: Importing JSON modules is an experimental feature and might change at any time".
- * @param {ImportMeta} meta ESM import.meta object.
- * @param {string} file JSON file to import.
- * @returns {Promise<any>} JSON object.
- */
-async function importWithTypeJson (meta, file) {
-	// @ts-ignore
-	return JSON.parse(await fs.readFile(path.resolve(path.dirname(fileURLToPath(meta.url)), file)));
-}
-
-const packageJson = await importWithTypeJson(import.meta, "../package.json");
-const markdownlintPackageJson = await importWithTypeJson(import.meta, "../node_modules/markdownlint/package.json");
+// eslint-disable-next-line @stylistic/quote-props
+import packageJson from "../package.json" with { type: "json" };
+// eslint-disable-next-line @stylistic/quote-props, n/no-unpublished-import
+import markdownlintPackageJson from "../node_modules/markdownlint/package.json" with { type: "json" };
 
 describe("metadata", () => {
 
@@ -29,6 +17,7 @@ describe("metadata", () => {
 			"./markdownlint-cli2-config-schema.json",
 			"./markdownlint-config-schema.json"
 		];
+		/** @type {[string, RegExp][]} */
 		const packages = [
 			[ packageJson.dependencies["markdownlint-cli2"], /(?:DavidAnson\/markdownlint-cli2|markdownlint-cli2\/blob)\/v(\d+\.\d+\.\d+)/gu ],
 			[ markdownlintPackageJson.version, /(?:DavidAnson\/markdownlint|markdownlint\/blob)\/v(\d+\.\d+\.\d+)/gu ]

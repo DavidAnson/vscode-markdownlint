@@ -43,11 +43,13 @@ function testWrapper (/** @type {Test} */ test) {
 		const rejectWrapper = (/** @type {Error} */ reason) => {
 			cleanup().then(() => reject(reason?.stack || reason), reject);
 		};
+		// eslint-disable-next-line unicorn/prefer-promise-try
 		Promise.resolve().then(() => test(resolveWrapper, rejectWrapper, disposables)).catch(rejectWrapper);
 	});
 }
 
 function callbackWrapper (/** @type {PromiseReject} */ reject, /** @type {() => void} */ callback) {
+	// eslint-disable-next-line unicorn/prefer-promise-try
 	Promise.resolve().then(callback).catch(reject);
 }
 

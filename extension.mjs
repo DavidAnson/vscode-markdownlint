@@ -6,7 +6,7 @@ import vscode from "vscode";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import { "main" as markdownlintCli2 } from "markdownlint-cli2";
+import { main as markdownlintCli2 } from "markdownlint-cli2";
 import { applyFix, applyFixes } from "markdownlint-cli2/markdownlint";
 import { readConfig } from "markdownlint-cli2/markdownlint/promise";
 import helpers from "markdownlint-cli2/markdownlint/helpers";
@@ -357,6 +357,7 @@ function outputLine (/** @type {string} */ message, /** @type {Boolean} */ isErr
 	const importance = isError ? "ERROR" : "INFO";
 	outputChannel?.appendLine(`[${time}] ${importance}: ${message}`);
 	if (isError && !outputChannelShown) {
+		// eslint-disable-next-line unicorn/no-top-level-assignment-in-function
 		outputChannelShown = true;
 		outputChannel?.show(true);
 	}
@@ -606,7 +607,7 @@ function lint (/** @type {import("vscode").TextDocument} */ document) {
 				// Create Diagnostics
 				const lineNumber = result.lineNumber;
 				const focusMode = applicationConfiguration[sectionFocusMode];
-				const focusModeRange = (!Number.isInteger(focusMode) || (focusMode < 0)) ?
+				const focusModeRange = (!Number.isSafeInteger(focusMode) || (focusMode < 0)) ?
 					0 :
 					focusMode;
 				const severity = (result.severity === "warning") ? warningSeverity : errorSeverity;
@@ -670,6 +671,7 @@ function provideCodeActions (/** @type {import("vscode").TextDocument} */ docume
 	for (const diagnostic of extensionDiagnostics) {
 		// @ts-ignore
 		const ruleName = diagnostic.code?.value || diagnostic.code;
+		// eslint-disable-next-line unicorn/prefer-split-limit
 		const ruleNameAlias = diagnostic.message.split(":")[0];
 		/** @type {import("markdownlint").RuleOnErrorFixInfo} */
 		// @ts-ignore
@@ -753,6 +755,7 @@ function fixLine (/** @type {Number} */ lineIndex, /** @type {import("markdownli
 			const fixedText = applyFix(text, fixInfo, "\n");
 			return editor.edit((editBuilder) => {
 				if (typeof fixedText === "string") {
+					// eslint-disable-next-line unicorn/no-unsafe-string-replacement
 					editBuilder.replace(range, fixedText);
 				} else {
 					let deleteRange = range;
@@ -797,6 +800,7 @@ function fixAll (/** @type {string} */ ruleNameFilter) {
 							editor.edit((editBuilder) => {
 								const start = document.lineAt(0).range.start;
 								const end = document.lineAt(document.lineCount - 1).range.end;
+								// eslint-disable-next-line unicorn/no-unsafe-string-replacement
 								editBuilder.replace(new vscode.Range(start, end), fixedText);
 							});
 					})
@@ -816,7 +820,6 @@ function formatDocument (/** @type {import("vscode").TextDocument} */ document, 
 					const rangeErrors = results.filter((error) => {
 						const { fixInfo } = error;
 						if (fixInfo) {
-							// eslint-disable-next-line unicorn/consistent-destructuring
 							const line = error.lineNumber - 1;
 							return ((range.start.line <= line) && (line <= range.end.line));
 						}
@@ -828,6 +831,7 @@ function formatDocument (/** @type {import("vscode").TextDocument} */ document, 
 					const end = document.lineAt(document.lineCount - 1).range.end;
 					return (text === fixedText) ?
 						[] :
+						// eslint-disable-next-line unicorn/no-unsafe-string-replacement
 						[ vscode.TextEdit.replace(new vscode.Range(start, end), fixedText) ];
 				})
 				.then(resolve, reject);
@@ -872,6 +876,7 @@ function openConfigFile () {
 
 // Toggles linting on/off
 function toggleLinting () {
+	// eslint-disable-next-line unicorn/no-top-level-assignment-in-function
 	lintingEnabled = !lintingEnabled;
 	clearDiagnosticsAndLintVisibleFiles();
 }
@@ -882,7 +887,9 @@ function clearDiagnosticsAndLintVisibleFiles (/** @type {import("vscode").Uri | 
 		outputLine(`Re-linting due to "${eventUri.fsPath}" change.`);
 	}
 	diagnosticCollection?.clear();
+	// eslint-disable-next-line unicorn/no-top-level-assignment-in-function
 	diagnosticGeneration++;
+	// eslint-disable-next-line unicorn/no-top-level-assignment-in-function
 	outputChannelShown = false;
 	lintVisibleFiles();
 }
@@ -896,6 +903,7 @@ function lintVisibleFiles () {
 function getRun (/** @type {import("vscode").TextDocument} */ document) {
 	const name = document.uri.toString();
 	// Use cached configuration if present for file
+	// eslint-disable-next-line unicorn/no-computed-property-existence-check
 	if (runMap[name]) {
 		return runMap[name];
 	}
@@ -908,6 +916,7 @@ function getRun (/** @type {import("vscode").TextDocument} */ document) {
 
 // Clears the map of run settings
 function clearRunMap () {
+	// eslint-disable-next-line unicorn/no-top-level-assignment-in-function
 	runMap = {};
 }
 
@@ -1044,9 +1053,11 @@ function disposeFileSystemWatchers (/** @type {import("vscode").Uri} */ workspac
 
 // Handles the onDidChangeWorkspaceFolders event
 function didChangeWorkspaceFolders (/** @type {import("vscode").WorkspaceFoldersChangeEvent} */ changes) {
+	// eslint-disable-next-line unicorn/no-duplicate-loops
 	for (const workspaceFolderUri of changes.removed.map((folder) => folder.uri)) {
 		disposeFileSystemWatchers(workspaceFolderUri);
 	}
+	// eslint-disable-next-line unicorn/no-duplicate-loops
 	for (const workspaceFolderUri of changes.added.map((folder) => folder.uri)) {
 		createFileSystemWatchers(workspaceFolderUri);
 	}
@@ -1054,6 +1065,7 @@ function didChangeWorkspaceFolders (/** @type {import("vscode").WorkspaceFolders
 
 export function activate (/** @type {import("vscode").ExtensionContext} */ context) {
 	// Create OutputChannel
+	// eslint-disable-next-line unicorn/no-top-level-assignment-in-function
 	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
 	context.subscriptions.push(outputChannel);
 
@@ -1140,6 +1152,7 @@ export function activate (/** @type {import("vscode").ExtensionContext} */ conte
 	);
 
 	// Create DiagnosticCollection
+	// eslint-disable-next-line unicorn/no-top-level-assignment-in-function
 	diagnosticCollection = vscode.languages.createDiagnosticCollection(extensionDisplayName);
 	context.subscriptions.push(diagnosticCollection);
 
