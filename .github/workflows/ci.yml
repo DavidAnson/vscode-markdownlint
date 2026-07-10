@@ -17,7 +17,7 @@ jobs:
     - uses: actions/setup-node@v6
       with:
         node-version: lts/*
-    - run: npm install --no-package-lock
+    - run: npm clean-install
     - run: npm test
     - uses: coactions/setup-xvfb@v1
       with:
