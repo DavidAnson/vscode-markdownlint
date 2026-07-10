@@ -1,12 +1,16 @@
+// @ts-check
+
 /* eslint-disable n/no-unpublished-import */
 
 import js from "@eslint/js";
+import eslintNodeTest from "eslint-node-test";
 import eslintPluginN from "eslint-plugin-n";
 import eslintPluginStylistic from "@stylistic/eslint-plugin";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
 export default [
 	js.configs.all,
+	eslintNodeTest.configs.all,
 	eslintPluginN.configs["flat/recommended"],
 	eslintPluginStylistic.configs.customize({
 		"arrowParens": true,
@@ -68,6 +72,11 @@ export default [
 			"@stylistic/indent": [ "error", "tab", { "ObjectExpression": "first" } ],
 			"@stylistic/operator-linebreak": [ "error", "after" ],
 			"@stylistic/space-before-function-paren": [ "error", "always" ],
+
+			"node-test/consistent-test-filename": "off",
+			"node-test/consistent-test-it": [ "error", { "fn": "test", "withinDescribe": "test" } ],
+			"node-test/prefer-lowercase-title": "off",
+			"node-test/prefer-strict-assert": "off",
 
 			"unicorn/comment-content": "off",
 			"unicorn/consistent-boolean-name": "off",

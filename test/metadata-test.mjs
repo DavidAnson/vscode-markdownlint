@@ -28,13 +28,16 @@ describe("metadata", () => {
 			let match;
 			for (const [ version, githubProjectOrFileRe ] of packages) {
 				while ((match = githubProjectOrFileRe.exec(content)) !== null) {
+					// eslint-disable-next-line node-test/no-conditional-assertion
 					t.assert.equal(match[1], version);
 				}
 			}
 			const firstChangelogRe = /\* (\d+\.\d+\.\d+) - /u;
 			match = firstChangelogRe.exec(content);
+			// eslint-disable-next-line node-test/no-conditional-in-test
 			if (match) {
 				const patchRe = /\.\d+$/u;
+				// eslint-disable-next-line node-test/no-conditional-assertion
 				t.assert.equal(match[1].replace(patchRe, ""), packageJson.version.replace(patchRe, ""));
 			}
 		}
