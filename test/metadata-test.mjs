@@ -9,7 +9,7 @@ import markdownlintPackageJson from "../node_modules/markdownlint/package.json" 
 describe("metadata", () => {
 
 	test("version numbers match", async (t) => {
-		t.plan(291);
+		t.plan(293);
 		const files = [
 			"./package.json",
 			"./CHANGELOG.md",
