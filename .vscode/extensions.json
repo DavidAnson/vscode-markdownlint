@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "ms-vscode.vscode-node-azure-pack"
+        "ms-vscode.vscode-node-azure-pack",
+        "ms-toolsai.vscode-ai-remote"
     ]
 }
