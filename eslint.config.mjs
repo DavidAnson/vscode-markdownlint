@@ -5,12 +5,16 @@
 import { defineConfig } from "eslint/config";
 import js from "@eslint/js";
 import eslintNodeTest from "eslint-node-test";
+import eslintPackageJson from "eslint-package-json";
 import eslintPluginN from "eslint-plugin-n";
 import eslintPluginStylistic from "@stylistic/eslint-plugin";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
 export default defineConfig(
 	{
+		"ignores": [
+			"**/package.json"
+		],
 		"plugins": {
 			js,
 			"n": eslintPluginN,
@@ -129,6 +133,30 @@ export default defineConfig(
 			"n/no-unsupported-features/node-builtins": [ "error", { "ignores": [ "test", "test.describe", "test.test" ] } ],
 
 			"@stylistic/padded-blocks": "off"
+		}
+	},
+	{
+		"files": [
+			"**/package.json"
+		],
+		"plugins": {
+			"package-json": eslintPackageJson
+		},
+		"extends": [
+			"package-json/all"
+		],
+		"rules": {
+			"package-json/dependency-version-range": [ "error", { "range": "exact" } ],
+			"package-json/no-core-module-dependencies": "off",
+			"package-json/no-orphan-types": "off",
+			"package-json/no-redundant-repository-fields": "off",
+			"package-json/prefer-engines-range": "off",
+			"package-json/prefer-exports": "off",
+			"package-json/prefer-files-field": "off",
+			"package-json/prefer-shorthand": "off",
+			"package-json/prefer-type-module": "off",
+			"package-json/require-engines": "off",
+			"package-json/sort-properties": "off"
 		}
 	}
 );

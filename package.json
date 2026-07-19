@@ -23,7 +23,7 @@
 		"ci": "npm test && npm run test-ui",
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
-		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js --no-warn-ignored *.cjs *.mjs *.js test/*.mjs test-ui/*.cjs eslint.config.mjs && markdownlint-cli2 *.md",
+		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js --no-warn-ignored *.cjs *.mjs *.js test/*.mjs test-ui/*.cjs eslint.config.mjs package.json && markdownlint-cli2 *.md",
 		"schema-copy": "cpy ./node_modules/markdownlint/schema/markdownlint-config-schema.json . --flat && cpy ./node_modules/markdownlint-cli2/schema/markdownlint-cli2-config-schema.json . --flat",
 		"schema-embed": "node ./embed-schema.cjs",
 		"schema-update": "replace-in-files --regex='https://raw\\.githubusercontent\\.com/DavidAnson/markdownlint/v\\d+\\.\\d+\\.\\d+/schema/markdownlint-config-schema\\.json' --replacement='./markdownlint-config-schema.json' ./markdownlint-cli2-config-schema.json",
@@ -52,6 +52,7 @@
 		"cpy-cli": "7.0.0",
 		"eslint": "10.6.0",
 		"eslint-node-test": "0.1.0",
+		"eslint-package-json": "0.2.0",
 		"eslint-plugin-n": "18.2.1",
 		"eslint-plugin-unicorn": "71.1.0",
 		"path-browserify": "1.0.1",
@@ -65,7 +66,7 @@
 	"keywords": [
 		"markdown",
 		"lint",
-		"CommonMark",
+		"commonmark",
 		"md",
 		"multi-root ready"
 	],
