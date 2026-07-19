@@ -2,28 +2,38 @@
 
 /* eslint-disable n/no-unpublished-import */
 
+import { defineConfig } from "eslint/config";
 import js from "@eslint/js";
 import eslintNodeTest from "eslint-node-test";
 import eslintPluginN from "eslint-plugin-n";
 import eslintPluginStylistic from "@stylistic/eslint-plugin";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
-export default [
-	js.configs.all,
-	eslintNodeTest.configs.all,
-	eslintPluginN.configs["flat/recommended"],
-	eslintPluginStylistic.configs.customize({
-		"arrowParens": true,
-		"braceStyle": "1tbs",
-		"commaDangle": "never",
-		"indent": "tab",
-		"jsx": false,
-		"quoteProps": "always",
-		"quotes": "double",
-		"semi": true
-	}),
-	eslintPluginUnicorn.configs.all,
+export default defineConfig(
 	{
+		"plugins": {
+			js,
+			"n": eslintPluginN,
+			"node-test": eslintNodeTest,
+			"unicorn": eslintPluginUnicorn,
+			"@stylistic": eslintPluginStylistic
+		},
+		"extends": [
+			"js/all",
+			"n/flat/all",
+			"node-test/all",
+			"unicorn/all",
+			eslintPluginStylistic.configs.customize({
+				"arrowParens": true,
+				"braceStyle": "1tbs",
+				"commaDangle": "never",
+				"indent": "tab",
+				"jsx": false,
+				"quoteProps": "always",
+				"quotes": "double",
+				"semi": true
+			})
+		],
 		"languageOptions": {
 			"sourceType": "commonjs"
 		},
@@ -66,7 +76,9 @@ export default [
 			"sort-imports": "off",
 			"sort-keys": "off",
 
+			"n/no-hide-core-modules": "off",
 			"n/no-missing-require": [ "error", { "allowModules": [ "vscode" ] } ],
+			"n/no-sync": "off",
 
 			"@stylistic/array-bracket-spacing": [ "error", "always" ],
 			"@stylistic/indent": [ "error", "tab", { "ObjectExpression": "first" } ],
@@ -119,4 +131,4 @@ export default [
 			"@stylistic/padded-blocks": "off"
 		}
 	}
-];
+);
