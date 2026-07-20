@@ -17,18 +17,20 @@ import replaceVariables from "./replace-variables.mjs";
 
 // Constants
 const extensionDisplayName = "markdownlint";
-const configFileGlob = ".markdownlint.{jsonc,json,yaml,yml,cjs}";
-const optionsFileGlob = ".markdownlint-cli2.{jsonc,yaml,cjs}";
+const configFileGlob = ".markdownlint.{jsonc,json,yaml,yml,cjs,mjs}";
+const optionsFileGlob = ".markdownlint-cli2.{jsonc,yaml,cjs,mjs}";
 const markdownlintJson = ".markdownlint.json";
 const configFileNames = [
 	".markdownlint-cli2.jsonc",
 	".markdownlint-cli2.yaml",
 	".markdownlint-cli2.cjs",
+	".markdownlint-cli2.mjs",
 	".markdownlint.jsonc",
 	markdownlintJson,
 	".markdownlint.yaml",
 	".markdownlint.yml",
-	".markdownlint.cjs"
+	".markdownlint.cjs",
+	".markdownlint.mjs"
 ];
 const markdownLanguageId = "markdown";
 // Untitled/unsaved document
