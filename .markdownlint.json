@@ -74,6 +74,7 @@
 			"### markdownlint.lintWorkspaceGlobs",
 			"## Suppress",
 			"## Snippets",
+			"## Interoperability",
 			"## Security",
 			"## History"
 		]

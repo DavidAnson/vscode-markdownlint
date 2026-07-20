@@ -6,7 +6,7 @@
 
 The [Markdown](https://wikipedia.org/wiki/Markdown) markup language is designed to be easy to read, write, and understand. It succeeds - and its flexibility is both a benefit and a drawback. Many styles are possible, so formatting can be inconsistent. Some constructs don't work well in all parsers and should be avoided. For example, [here are some common/troublesome Markdown constructs](https://gist.github.com/DavidAnson/006a6c2a2d9d7b21b025).
 
-[markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) is an extension for the [Visual Studio Code editor](https://code.visualstudio.com) that includes a library of rules to encourage standards and consistency for Markdown files. It is powered by the [markdownlint library for Node.js](https://github.com/DavidAnson/markdownlint) (which was inspired by [markdownlint for Ruby](https://github.com/mivok/markdownlint)). Linting is performed by the [`markdownlint-cli2` engine](https://github.com/DavidAnson/markdownlint-cli2), which can be used in conjunction with this extension to provide command-line support for scripts and continuous integration scenarios. The [`markdownlint-cli2-action` GitHub Action](https://github.com/marketplace/actions/markdownlint-cli2-action) uses the same engine and can be integrated with project workflows.
+[markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) is an extension for the [Visual Studio Code editor](https://code.visualstudio.com) that includes a library of rules to encourage standards and consistency for Markdown files. It is powered by the [markdownlint library for Node.js](https://github.com/DavidAnson/markdownlint) (which was inspired by [markdownlint for Ruby](https://github.com/mivok/markdownlint)). Linting is performed by the [`markdownlint-cli2` engine](https://github.com/DavidAnson/markdownlint-cli2), which can be used in conjunction with this extension to provide command-line support for scripts and continuous integration scenarios. The [`markdownlint-cli2-action` GitHub Action](https://github.com/marketplace/actions/markdownlint-cli2-action) uses the same engine and can be integrated with project workflows. (For more, see the [Interoperability section](#interoperability) below.)
 
 ## Install
 
@@ -447,6 +447,10 @@ The following snippets are available when editing a Markdown document (press `Ct
 * `markdownlint-disable-file`
 * `markdownlint-enable-file`
 * `markdownlint-configure-file`
+
+## Interoperability
+
+For scenarios like continuous integration workflows where a project will be using the `markdownlint` VS Code extension along with the `markdownlint-cli2` CLI, the recommended approach is to set everything up using the CLI and [configuration files like `.markdownlint-cli2.jsonc`](https://github.com/DavidAnson/markdownlint-cli2#configuration). Once everything works as intended with the CLI, no other changes should be needed to get the same behavior when opening that project's files within VS Code. (For example, extension-specific user/workspace settings like `config` and `customRules` are redundant and unnecessary for a shared workflow.)
 
 ## Security
 
