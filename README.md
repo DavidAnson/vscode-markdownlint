@@ -6,7 +6,7 @@
 
 The [Markdown](https://wikipedia.org/wiki/Markdown) markup language is designed to be easy to read, write, and understand. It succeeds - and its flexibility is both a benefit and a drawback. Many styles are possible, so formatting can be inconsistent. Some constructs don't work well in all parsers and should be avoided. For example, [here are some common/troublesome Markdown constructs](https://gist.github.com/DavidAnson/006a6c2a2d9d7b21b025).
 
-[markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) is an extension for the [Visual Studio Code editor](https://code.visualstudio.com) that includes a library of rules to encourage standards and consistency for Markdown files. It is powered by the [markdownlint library for Node.js](https://github.com/DavidAnson/markdownlint) (which was inspired by [markdownlint for Ruby](https://github.com/mivok/markdownlint)). Linting is performed by the [`markdownlint-cli2` engine](https://github.com/DavidAnson/markdownlint-cli2), which can be used in conjunction with this extension to provide command-line support for scripts and continuous integration scenarios. The [`markdownlint-cli2-action` GitHub Action](https://github.com/marketplace/actions/markdownlint-cli2-action) uses the same engine and can be integrated with project workflows. (For more, see the [Interoperability section](#interoperability) below.)
+[markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) is an extension for the [Visual Studio Code editor](https://code.visualstudio.com) that includes a library of rules to encourage standards and consistency for Markdown files. It is powered by the [markdownlint library for Node.js](https://github.com/DavidAnson/markdownlint) (which was inspired by [markdownlint for Ruby](https://github.com/mivok/markdownlint)). Linting is performed by the [`markdownlint-cli2` engine](https://github.com/DavidAnson/markdownlint-cli2), which can be used in conjunction with this extension to provide command-line support for scripts and continuous integration scenarios. The [`markdownlint-cli2-action` GitHub Action](https://github.com/marketplace/actions/markdownlint-cli2-action) uses the same engine and can be integrated with project workflows. For more, see the [Interoperability section](#interoperability) below.
 
 ## Install
 
@@ -390,7 +390,7 @@ An example of VS Code's workspace settings for custom rules might look like the 
 }
 ```
 
-For information about authoring custom rules, see [the `markdownlint` documentation for custom rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md).
+For information about authoring custom rules, see [the `markdownlint` documentation for custom rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md). When developing a custom rule, the recommended approach is to write and debug outside VS Code because that avoids limitations like needing to reload to refresh script files. For more, see the [Interoperability section](#interoperability) below.
 
 > **Note**: Custom rules can also be specified (in a portable way other tools will recognize) via the [`customRules` property in `.markdownlint-cli2.{jsonc,yaml,cjs,mjs}`](https://github.com/DavidAnson/markdownlint-cli2#configuration).
 > In `markdownlint-cli2` configuration files, the `modulePaths` property can be used in conjunction to specify one or more additional paths for resolving module references.
