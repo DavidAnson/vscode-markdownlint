@@ -624,7 +624,7 @@ function lint (/** @type {import("vscode").TextDocument} */ document) {
 				) {
 					const ruleName = result.ruleNames[0];
 					const ruleDescription = result.ruleDescription;
-					const ruleInformationUri = result.ruleInformation ? vscode.Uri.parse(result.ruleInformation) : null;
+					const ruleInformationUri = result.ruleInformation ? vscode.Uri.parse(result.ruleInformation, true) : null;
 					ruleNameToInformationUri[ruleName] = ruleInformationUri;
 					let message = result.ruleNames.join("/") + ": " + ruleDescription;
 					if (result.errorDetail) {
@@ -739,7 +739,7 @@ function provideCodeActions (/** @type {import("vscode").TextDocument} */ docume
 		configureInfoAction.command = {
 			"title": clickForConfigureInfo,
 			"command": openCommand,
-			"arguments": [ vscode.Uri.parse(clickForConfigureUrl) ]
+			"arguments": [ vscode.Uri.parse(clickForConfigureUrl, true) ]
 		};
 		addToCodeActions(configureInfoAction);
 	}
