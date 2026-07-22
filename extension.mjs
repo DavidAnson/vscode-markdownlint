@@ -326,7 +326,7 @@ class LintWorkspacePseudoterminal {
 	constructor () {
 		/** @type {import("vscode").EventEmitter<string>} */
 		this.writeEmitter = new vscode.EventEmitter();
-		/** @type {import("vscode").EventEmitter<void>} */
+		/** @type {import("vscode").EventEmitter<number>} */
 		this.closeEmitter = new vscode.EventEmitter();
 	}
 
@@ -348,7 +348,7 @@ class LintWorkspacePseudoterminal {
 
 	close () {
 		this.writeEmitter.dispose();
-		this.closeEmitter.fire();
+		this.closeEmitter.fire(0);
 		this.closeEmitter.dispose();
 	}
 }
