@@ -123,7 +123,7 @@ let outputChannelShown = false;
 /** @type {import("vscode").DiagnosticCollection | null} */
 let diagnosticCollection = null;
 let diagnosticGeneration = 0;
-/** @type {Object.<string, string | undefined>} */
+/** @type {Object.<string, "onSave"|"onType">} */
 let runMap = {};
 let lintingEnabled = true;
 const throttle = {
@@ -911,7 +911,7 @@ function getRun (/** @type {import("vscode").TextDocument} */ document) {
 	}
 	// Read workspace configuration
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
-	runMap[name] = configuration.get(sectionRun);
+	runMap[name] = configuration.get(sectionRun, "onType");
 	outputLine("Linting for \"" + name + "\" will be run \"" + runMap[name] + "\".");
 	return runMap[name];
 }
