@@ -349,7 +349,7 @@
 				},
 				"markdownlint.focusMode": {
 					"description": "Makes it easier to focus while typing by hiding issues on or near the current line.",
-					"scope": "application",
+					"scope": "window",
 					"type": [
 						"boolean",
 						"integer"
