@@ -1,4 +1,5 @@
 .markdownlintignore
+allFiles
 atx
 blockquote
 CLI
@@ -24,10 +25,12 @@ no-missing-space-closed-atx
 no-multiple-space-atx
 no-multiple-space-blockquote
 no-multiple-space-closed-atx
+noFiles
 npm
 ol-prefix
 Pandoc
 parsers
+projectFiles
 reimplement
 single-h1
 suppressions
@@ -36,5 +39,6 @@ UI
 ul-indent
 ul-style
 untrusted
+workspaceFiles
 workspaces
 YAML

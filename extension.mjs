@@ -94,6 +94,7 @@ const clickForConfigureInfo = `Details about configuring ${extensionDisplayName}
 const clickForConfigureUrl = "https://github.com/DavidAnson/vscode-markdownlint#configure";
 const errorExceptionPrefix = "Exception while linting with markdownlint-cli2:\n";
 const openCommand = "vscode.open";
+const sectionAppliesTo = "appliesTo";
 const sectionConfig = "config";
 const sectionConfigFile = "configFile";
 const sectionConfigPointer = "configPointer";
@@ -103,7 +104,7 @@ const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
 const sectionRun = "run";
 const sectionSeverityForError = "severityForError";
 const sectionSeverityForWarning = "severityForWarning";
-const instanceConfigurationSections = [ sectionFocusMode ];
+const instanceConfigurationSections = [ sectionAppliesTo, sectionFocusMode ];
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 const driveLetterRe = /^[A-Za-z]:[/\\]/;
@@ -550,8 +551,18 @@ function shouldLintDocument (/** @type {import("vscode").TextDocument} */ docume
 				.some((folder) => folder.uri.authority === document.uri.authority)
 		)
 	);
+	// Determine isDocumentInScope
+	/** @type {"allFiles"|"projectFiles"|"workspaceFiles"|"noFiles"} */
+	const appliesTo = instanceConfiguration[sectionAppliesTo];
+	let isDocumentInScope = (appliesTo !== "noFiles");
+	if ((appliesTo === "workspaceFiles") || (appliesTo === "projectFiles")) {
+		isDocumentInScope = Boolean(vscode.workspace.getWorkspaceFolder(document.uri));
+		if (appliesTo === "projectFiles") {
+			isDocumentInScope ||= !vscode.workspace.workspaceFolders;
+		}
+	}
 	// Return result
-	return isMarkdownDocument;
+	return isMarkdownDocument && isDocumentInScope;
 }
 
 // Lints Markdown files in the workspace folder tree

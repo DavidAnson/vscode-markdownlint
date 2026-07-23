@@ -66,6 +66,7 @@
 			"### markdownlint.config",
 			"### markdownlint.configFile",
 			"### markdownlint.configPointer",
+			"### markdownlint.appliesTo",
 			"### markdownlint.focusMode",
 			"### markdownlint.run",
 			"### markdownlint.severityForError",

@@ -180,6 +180,18 @@
 			"title": "markdownlint",
 			"type": "object",
 			"properties": {
+				"markdownlint.appliesTo": {
+					"description": "Specifies whether to lint all files, workspace files, \"project\" files, or no files.",
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"allFiles",
+						"projectFiles",
+						"workspaceFiles",
+						"noFiles"
+					],
+					"default": "allFiles"
+				},
 				"markdownlint.config": {
 					"description": "markdownlint configuration object.",
 					"scope": "resource",

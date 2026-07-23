@@ -296,6 +296,28 @@ no-multiple-blanks = false
 
 Could be used by setting `configFile` to `pyproject.toml` and `configPointer` to `/tool/markdownlint-cli2`.
 
+### markdownlint.appliesTo
+
+By default, all files that [VS Code identifies as being `Markdown`](https://code.visualstudio.com/docs/languages/identifiers) are scanned when they're open in the editor.
+
+To avoid reporting issues in some cases, `appliesTo` can be set to any of the following values to lint (✅) or ignore (❌) certain kinds of files:
+
+| Applies to files: | Inside workspace | Outside workspace | No workspace open |
+|-------------------|------------------|-------------------|-------------------|
+| allFiles          | ✅               | ✅                | ✅                |
+| projectFiles      | ✅               | ❌                | ✅                |
+| workspaceFiles    | ✅               | ❌                | ❌                |
+| noFiles           | ❌               | ❌                | ❌                |
+
+Customizing this setting can be useful if it's common to have a mix of files open from inside and outside a workspace - and especially if external files are not consistent with the workspace's lint policies. This looks like the following in VS Code's user settings:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.appliesTo": "workspaceFiles"
+}
+```
+
 ### markdownlint.focusMode
 
 By default, all linting issues are logged and highlighted as you type or edit a document. This includes "transient" issues like `MD009`/`no-trailing-spaces` such as when typing at the end of a line.
