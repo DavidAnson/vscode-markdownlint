@@ -103,7 +103,7 @@ const sectionLintWorkspaceGlobs = "lintWorkspaceGlobs";
 const sectionRun = "run";
 const sectionSeverityForError = "severityForError";
 const sectionSeverityForWarning = "severityForWarning";
-const applicationConfigurationSections = [ sectionFocusMode ];
+const instanceConfigurationSections = [ sectionFocusMode ];
 const throttleDuration = 500;
 const customRuleExtensionPrefixRe = /^\{([^}]+)\}\/(.*)$/iu;
 const driveLetterRe = /^[A-Za-z]:[/\\]/;
@@ -112,7 +112,7 @@ const firstSegmentRe = /^\/{1,2}[^/]+\//;
 
 // Variables
 /** @type {Object.<string, any>} */
-const applicationConfiguration = {};
+const instanceConfiguration = {};
 /** @type {Object.<string, vscode.Uri | null>} */
 const ruleNameToInformationUri = {};
 /** @type {Map<string, Array<vscode.Disposable>>} */
@@ -532,9 +532,10 @@ async function markdownlintWrapper (/** @type {import("vscode").TextDocument} */
 	// .then(() => results.filter((result) => isSchemeUntitled || (result.fileName === path.posix.relative(directory, name))))
 }
 
-// Returns if the document is Markdown
-function isMarkdownDocument (/** @type {import("vscode").TextDocument} */ document) {
-	return (
+// Returns if the document is Markdown and within scope for linting
+function shouldLintDocument (/** @type {import("vscode").TextDocument} */ document) {
+	// Determine isMarkdownDocument
+	const isMarkdownDocument = Boolean(
 		// Markdown document with supported URI scheme
 		// (Filters out problematic custom schemes like "comment" and "svn")
 		(document.languageId === markdownLanguageId) &&
@@ -549,6 +550,8 @@ function isMarkdownDocument (/** @type {import("vscode").TextDocument} */ docume
 				.some((folder) => folder.uri.authority === document.uri.authority)
 		)
 	);
+	// Return result
+	return isMarkdownDocument;
 }
 
 // Lints Markdown files in the workspace folder tree
@@ -595,7 +598,7 @@ function lintWorkspaceViaTask () {
 
 // Lints a Markdown document
 function lint (/** @type {import("vscode").TextDocument} */ document) {
-	if (!lintingEnabled || !isMarkdownDocument(document)) {
+	if (!lintingEnabled || !shouldLintDocument(document)) {
 		return;
 	}
 	/** @type {import("vscode").Diagnostic[]} */
@@ -608,14 +611,14 @@ function lint (/** @type {import("vscode").TextDocument} */ document) {
 			for (const result of results) {
 				// Create Diagnostics
 				const lineNumber = result.lineNumber;
-				const focusMode = applicationConfiguration[sectionFocusMode];
+				const focusMode = instanceConfiguration[sectionFocusMode];
 				const focusModeRange = (!Number.isSafeInteger(focusMode) || (focusMode < 0)) ?
 					0 :
 					focusMode;
 				const severity = (result.severity === "warning") ? warningSeverity : errorSeverity;
 				if (
 					(severity !== null) && (
-						(applicationConfiguration[sectionFocusMode] === false) ||
+						(instanceConfiguration[sectionFocusMode] === false) ||
 						!activeTextEditor ||
 						(activeTextEditor.document !== document) ||
 						(activeTextEditor.selection.active.line < (lineNumber - focusModeRange - 1)) ||
@@ -790,7 +793,7 @@ function fixAll (/** @type {string} */ ruleNameFilter) {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
 			const document = editor.document;
-			if (isMarkdownDocument(document)) {
+			if (shouldLintDocument(document)) {
 				return markdownlintWrapper(document)
 					.then(({ results }) => {
 						const text = document.getText();
@@ -816,7 +819,7 @@ function fixAll (/** @type {string} */ ruleNameFilter) {
 // Formats a range of the document (applying fixes)
 function formatDocument (/** @type {import("vscode").TextDocument} */ document, /** @type {import("vscode").Range} */ range) {
 	return new Promise((resolve, reject) => {
-		if (isMarkdownDocument(document)) {
+		if (shouldLintDocument(document)) {
 			return markdownlintWrapper(document)
 				.then(({ results }) => {
 					const rangeErrors = results.filter((error) => {
@@ -942,17 +945,17 @@ function requestLint (/** @type {import("vscode").TextDocument} */ document) {
 	}, throttleDuration);
 }
 
-// Reads all application-scoped configuration settings
-function getApplicationConfiguration () {
+// Reads all instance-scoped configuration settings
+function getInstanceConfiguration () {
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName);
-	for (const section of applicationConfigurationSections) {
-		applicationConfiguration[section] = configuration.get(section);
+	for (const section of instanceConfigurationSections) {
+		instanceConfiguration[section] = configuration.get(section);
 	}
 }
 
 // Handles the onDidChangeActiveTextEditor event
 function didChangeActiveTextEditor () {
-	if (applicationConfiguration[sectionFocusMode] !== false) {
+	if (instanceConfiguration[sectionFocusMode] !== false) {
 		lintVisibleFiles();
 	}
 }
@@ -961,8 +964,8 @@ function didChangeActiveTextEditor () {
 function didChangeTextEditorSelection (/** @type {import("vscode").TextEditorSelectionChangeEvent} */ change) {
 	const document = change.textEditor.document;
 	if (
-		isMarkdownDocument(document) &&
-		(applicationConfiguration[sectionFocusMode] !== false)
+		shouldLintDocument(document) &&
+		(instanceConfiguration[sectionFocusMode] !== false)
 	) {
 		requestLint(document);
 	}
@@ -977,7 +980,7 @@ function didChangeVisibleTextEditors (/** @type {readonly import("vscode").TextE
 
 // Handles the onDidOpenTextDocument event
 function didOpenTextDocument (/** @type {import("vscode").TextDocument} */ document) {
-	if (isMarkdownDocument(document)) {
+	if (shouldLintDocument(document)) {
 		lint(document);
 		suppressLint(document);
 	}
@@ -986,14 +989,14 @@ function didOpenTextDocument (/** @type {import("vscode").TextDocument} */ docum
 // Handles the onDidChangeTextDocument event
 function didChangeTextDocument (/** @type {import("vscode").TextDocumentChangeEvent} */ change) {
 	const document = change.document;
-	if (isMarkdownDocument(document) && (getRun(document) === "onType")) {
+	if (shouldLintDocument(document) && (getRun(document) === "onType")) {
 		requestLint(document);
 	}
 }
 
 // Handles the onDidSaveTextDocument event
 function didSaveTextDocument (/** @type {import("vscode").TextDocument} */ document) {
-	if (isMarkdownDocument(document) && (getRun(document) === "onSave")) {
+	if (shouldLintDocument(document) && (getRun(document) === "onSave")) {
 		lint(document);
 		suppressLint(document);
 	}
@@ -1009,7 +1012,7 @@ function didCloseTextDocument (/** @type {import("vscode").TextDocument} */ docu
 function didChangeConfiguration (/** @type {import("vscode").ConfigurationChangeEvent | undefined} */ change = undefined) {
 	if (!change || change.affectsConfiguration(extensionDisplayName)) {
 		outputLine("Resetting configuration cache due to setting change.");
-		getApplicationConfiguration();
+		getInstanceConfiguration();
 		clearRunMap();
 		clearDiagnosticsAndLintVisibleFiles();
 	}
@@ -1071,8 +1074,8 @@ export function activate (/** @type {import("vscode").ExtensionContext} */ conte
 	outputChannel = vscode.window.createOutputChannel(extensionDisplayName);
 	context.subscriptions.push(outputChannel);
 
-	// Get application-level configuration
-	getApplicationConfiguration();
+	// Get instance configuration
+	getInstanceConfiguration();
 
 	// Hook up to workspace events
 	context.subscriptions.push(
