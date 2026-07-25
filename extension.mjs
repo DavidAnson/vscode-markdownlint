@@ -630,6 +630,7 @@ function lint (/** @type {import("vscode").TextDocument} */ document) {
 				if (
 					(severity !== null) && (
 						(instanceConfiguration[sectionFocusMode] === false) ||
+						// eslint-disable-next-line unicorn/prefer-simple-condition-first
 						!activeTextEditor ||
 						(activeTextEditor.document !== document) ||
 						(activeTextEditor.selection.active.line < (lineNumber - focusModeRange - 1)) ||

@@ -111,7 +111,8 @@ export default defineConfig(
 			"unicorn/prefer-early-return": "off",
 			"unicorn/prefer-module": "off",
 			"unicorn/prefer-string-replace-all": "off",
-			"unicorn/prefer-temporal": "off"
+			"unicorn/prefer-temporal": "off",
+			"unicorn/prefer-then-catch": "off"
 		}
 	},
 	{
@@ -124,7 +125,8 @@ export default defineConfig(
 	},
 	{
 		"files": [
-			"test/*.mjs"
+			"test/*.mjs",
+			"test-ui/*.cjs"
 		],
 		"rules": {
 			"id-length": "off",
@@ -132,7 +134,9 @@ export default defineConfig(
 			"n/no-unsupported-features/es-syntax": [ "error", { "ignores": [ "error-cause" ] } ],
 			"n/no-unsupported-features/node-builtins": [ "error", { "ignores": [ "test", "test.describe", "test.test" ] } ],
 
-			"@stylistic/padded-blocks": "off"
+			"@stylistic/padded-blocks": "off",
+
+			"unicorn/prefer-simple-condition-first": "off"
 		}
 	},
 	{
@@ -156,6 +160,7 @@ export default defineConfig(
 			"package-json/prefer-shorthand": "off",
 			"package-json/prefer-type-module": "off",
 			"package-json/require-engines": "off",
+			"package-json/require-private": "off",
 			"package-json/sort-properties": "off"
 		}
 	}
