@@ -1078,6 +1078,8 @@ function didChangeWorkspaceFolders (/** @type {import("vscode").WorkspaceFolders
 	for (const workspaceFolderUri of changes.added.map((folder) => folder.uri)) {
 		createFileSystemWatchers(workspaceFolderUri);
 	}
+	// May need to refresh open files due to appliesTo configuration
+	clearDiagnosticsAndLintVisibleFiles();
 }
 
 export function activate (/** @type {import("vscode").ExtensionContext} */ context) {
