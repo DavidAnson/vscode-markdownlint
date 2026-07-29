@@ -3,10 +3,19 @@
 import path from "node:path";
 
 /** @typedef {{ "homedir": () => string }} OsLike */
-/** @typedef {{ "uri": UriLike }} WorkspaceFolderLike */
+/** @typedef {{ "name": string, "uri": UriLike }} WorkspaceFolderLike */
 /** @typedef {{ "scheme": string, "authority": string, "path": string, "query": string, "fragment": string, "fsPath": string, "with": (change: any) => any, "toJSON": () => any }} UriLike */
 /** @typedef {{ "workspace": WorkspaceLike }} VscodeLike */
-/** @typedef {{ "getWorkspaceFolder": (uri: UriLike) => WorkspaceFolderLike | undefined }} WorkspaceLike */
+/** @typedef {{ "getWorkspaceFolder": (uri: UriLike) => WorkspaceFolderLike | undefined, "workspaceFolders": readonly WorkspaceFolderLike[] | undefined }} WorkspaceLike */
+
+/**
+ * Converts an OS-formatted path into a POSIX-formatted path.
+ * @param {string} input OS-formatted path.
+ * @returns {string} POSIX-formatted path.
+ */
+function toPosixPath (input) {
+	return input.split(path.sep).join(path.posix.sep);
+}
 
 /**
  * Replaces supported VS Code variables in a string.
@@ -26,16 +35,28 @@ function replaceVariables (input, uri, vscode, os) {
 			if (homedir) {
 				return homedir;
 			}
+		}
+		const workspaceFolderNameMatch = /^\$\{workspaceFolder:(?<name>.+)\}$/u.exec(match);
+		const workspaceFolderName = workspaceFolderNameMatch?.groups?.name;
+		if (workspaceFolderNameMatch && workspaceFolderName && vscode.workspace.workspaceFolders) {
+			for (const workspaceFolder of vscode.workspace.workspaceFolders) {
+				if (workspaceFolder.name === workspaceFolderName) {
+					return toPosixPath(workspaceFolder.uri.fsPath);
+				}
+			}
+			// Fall through to unnamed behavior if no match found
+		}
 		// eslint-disable-next-line no-template-curly-in-string
-		} else if (match === "${workspaceFolder}") {
+		if (workspaceFolderNameMatch || (match === "${workspaceFolder}")) {
 			const workspaceFolder = vscode && vscode.workspace && vscode.workspace.getWorkspaceFolder && vscode.workspace.getWorkspaceFolder(uri);
 			const fsPath = workspaceFolder ? workspaceFolder.uri.fsPath : path.join(uri.fsPath, "..");
-			return fsPath.split(path.sep).join(path.posix.sep);
+			return toPosixPath(fsPath);
 		}
+		// Return input as-is if unsupported
 		return match;
 	};
 	// eslint-disable-next-line unicorn/no-unsafe-string-replacement
-	return (input || "").replace(/\${[A-Za-z]+}/g, replacer);
+	return (input || "").replace(/\$\{[^}]+\}/gu, replacer);
 }
 
 export default replaceVariables;

@@ -7,6 +7,7 @@ import replaceVariables from "../replace-variables.mjs";
 const folderPath = "/Users/user/folder";
 const documentPath = `${folderPath}/document.txt`;
 const workspacePath = "/Users/user/workspace";
+const workspacePath2 = "/Users/user/workspace2";
 
 const osLike = {
 	"homedir": () => "/home/dir"
@@ -32,11 +33,25 @@ const workspaceUriLike = {
 	"fsPath": workspacePath
 };
 
+const workspaceUriLike2 = {
+	...uriLikeBase,
+	"fsPath": workspacePath2
+};
+
+const workspaceFolderLike = {
+	"name": "folder-name",
+	"uri": workspaceUriLike
+};
+
+const workspaceFolderLike2 = {
+	"name": "folder-name-2",
+	"uri": workspaceUriLike2
+};
+
 const vscodeLike = {
 	"workspace": {
-		"getWorkspaceFolder": () => ({
-			"uri": workspaceUriLike
-		})
+		"getWorkspaceFolder": () => workspaceFolderLike,
+		"workspaceFolders": [ workspaceFolderLike, workspaceFolderLike2 ]
 	}
 };
 
@@ -225,7 +240,7 @@ describe("replace-variables", () => {
 			input,
 			documentUriLike,
 			// @ts-ignore
-			{ "workspace": { "getWorkspaceFolder": undefined } },
+			{ "workspace": { ...vscodeLike.workspace, "getWorkspaceFolder": undefined } },
 			osLike
 		);
 		t.assert.equal(actual, expected);
@@ -239,7 +254,7 @@ describe("replace-variables", () => {
 		const actual = replaceVariables(
 			input,
 			documentUriLike,
-			{ "workspace": { "getWorkspaceFolder": () => undefined } },
+			{ "workspace": { ...vscodeLike.workspace, "getWorkspaceFolder": () => undefined } },
 			osLike
 		);
 		t.assert.equal(actual, expected);
@@ -250,6 +265,61 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "${workspaceFolder}";
 		const expected = workspacePath;
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		t.assert.equal(actual, expected);
+	});
+
+	test("workspaceFolder:name with vscode.workspace.workspaceFolders undefined", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${workspaceFolder:folder-name-2}";
+		const expected = workspacePath;
+		const actual = replaceVariables(
+			input,
+			documentUriLike,
+			{ "workspace": { ...vscodeLike.workspace, "workspaceFolders": undefined } },
+			osLike
+		);
+		t.assert.equal(actual, expected);
+	});
+
+	test("workspaceFolder:name with vscode.workspace.workspaceFolders empty", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${workspaceFolder:folder-name-2}";
+		const expected = workspacePath;
+		const actual = replaceVariables(
+			input,
+			documentUriLike,
+			{ "workspace": { ...vscodeLike.workspace, "workspaceFolders": [] } },
+			osLike
+		);
+		t.assert.equal(actual, expected);
+	});
+
+	test("workspaceFolder:name with vscode shim", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${workspaceFolder:folder-name-2}";
+		const expected = workspacePath2;
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		t.assert.equal(actual, expected);
+	});
+
+	test("workspaceFolder:name not matching with vscode shim", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${workspaceFolder:no-match}";
+		const expected = workspacePath;
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		t.assert.equal(actual, expected);
+	});
+
+	test("workspaceFolder:name missing with vscode shim", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${workspaceFolder:}";
+		const expected = input;
 		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
 		t.assert.equal(actual, expected);
 	});

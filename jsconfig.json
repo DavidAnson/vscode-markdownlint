@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"module": "NodeNext",
-		"target": "es2017",
+		"target": "es2018",
 		"checkJs": true,
 		"resolveJsonModule": true
 	},

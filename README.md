@@ -251,6 +251,7 @@ When using `extends` in this context:
 The default behavior of storing configuration files in the root of a project works well most of the time.
 However, projects that need to store configuration files in a different location can set `configFile` to the project-relative path of that file.
 All [`markdownlint-cli2` configuration files used with `--config`](https://github.com/DavidAnson/markdownlint-cli2?tab=readme-ov-file#command-line) are supported (including TOML files).
+VS Code's predefined variables `${userHome}` and `${workspaceFolder}` are supported (and the latter can be [scoped per workspace folder](https://code.visualstudio.com/docs/reference/variables-reference#_platform-and-workspace-considerations)).
 
 This looks like the following in VS Code's user settings:
 
