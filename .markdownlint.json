@@ -63,7 +63,7 @@
 			"### Workspace",
 			"### Disable",
 			"## Configure",
-			"### markdownlint.config",
+			"### ~~markdownlint.config~~",
 			"### markdownlint.configFile",
 			"### markdownlint.configPointer",
 			"### markdownlint.appliesTo",

@@ -221,11 +221,11 @@ If none of these files exist, a new `.markdownlint.json` containing the default 
 
 > **Note**: Because JavaScript is cached by VS Code after being loaded, edits to `.markdownlint.cjs`/`.markdownlint.mjs`/`.markdownlint-cli2.cjs`/`.markdownlint-cli2.mjs` require a restart of VS Code.
 
-### markdownlint.config
+### ~~markdownlint.config~~
 
-> **Note**: Using a project-local configuration file is preferred because doing so works with command-line tools and is easier for collaboration.
+The `markdownlint.config` property has been deprecated; please use a configuration file instead ([as outlined in the Configure section](#configure)).
 
-The configuration above might look like the following in VS Code's user settings file:
+When `markdownlint.config` is present in workspace context, replacing it can be done by creating a `.markdownlint.json` file in the root of the workspace with the value of the setting as its content. For example, removing this setting from the project's `.vscode/settings.json`:
 
 ```json
 {
@@ -238,13 +238,32 @@ The configuration above might look like the following in VS Code's user settings
 }
 ```
 
-When using `extends` in this context:
+Leaving just:
 
-* File paths referenced by `extends` from configuration files within a workspace are resolved relative to that configuration file.
-* When running VS Code locally:
-  * File paths referenced by `extends` from user settings are resolved relative to the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux).
-  * File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder.
-  * VS Code's [predefined variables](https://code.visualstudio.com/docs/reference/variables-reference) `${userHome}` and `${workspaceFolder}` can be used within an `extends` path from user or workspace settings to override the default behavior.
+```json
+{
+    "editor.someSetting": true
+}
+```
+
+And adding a `.markdownlint.json` file with the corresponding configuration to the root of the project:
+
+```json
+{
+    "MD003": { "style": "atx_closed" },
+    "MD007": { "indent": 4 },
+    "no-hard-tabs": false
+}
+```
+
+When `markdownlint.config` is present in user context, replacing it can be done by creating a `.markdownlint.json` file (as above) in the user's home directory and setting `markdownlint.configFile` to the corresponding path (for example, `${userHome}/.markdownlint.json`). Similar to the scenario above, the user setting from something like `~/Library/Application Support/Code/User/settings.json` would become:
+
+```json
+{
+    "editor.someSetting": true,
+    "markdownlint.configFile": "${userHome}/.markdownlint.json"
+}
+```
 
 ### markdownlint.configFile
 

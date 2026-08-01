@@ -194,6 +194,7 @@
 					"default": "allFiles"
 				},
 				"markdownlint.config": {
+					"deprecationMessage": "This property is deprecated. Please use a configuration file like .markdownlint.json/.markdownlint.yaml instead.",
 					"description": "markdownlint configuration object.",
 					"scope": "resource",
 					"type": "object",
