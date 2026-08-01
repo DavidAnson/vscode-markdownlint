@@ -71,7 +71,7 @@
 			"### markdownlint.run",
 			"### markdownlint.severityForError",
 			"### markdownlint.severityForWarning",
-			"### markdownlint.customRules",
+			"### ~~markdownlint.customRules~~",
 			"### markdownlint.lintWorkspaceGlobs",
 			"## Suppress",
 			"## Snippets",

@@ -353,6 +353,7 @@
 					"default": null
 				},
 				"markdownlint.customRules": {
+					"deprecationMessage": "This property is deprecated. Please use a configuration file like .markdownlint-cli2.jsonc/.markdownlint-cli2.yaml instead.",
 					"description": "Array of paths for custom rules to include when linting.",
 					"scope": "resource",
 					"type": "array",
