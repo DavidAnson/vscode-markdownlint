@@ -41,7 +41,7 @@
 	"main": "./bundle.js",
 	"browser": "./bundle.web.js",
 	"dependencies": {
-		"markdownlint-cli2": "0.23.1"
+		"markdownlint-cli2": "0.23.2"
 	},
 	"devDependencies": {
 		"@eslint/js": "10.0.1",
