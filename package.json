@@ -20,7 +20,7 @@
 	},
 	"funding": "https://github.com/sponsors/DavidAnson",
 	"scripts": {
-		"ci": "npm test && npm run test-ui",
+		"ci": "npm test && npm run test-ui && echo PASS",
 		"compile": "webpack --mode production",
 		"compile-debug": "webpack --mode none",
 		"lint": "eslint --ignore-pattern bundle.js --ignore-pattern bundle.web.js --no-warn-ignored *.cjs *.mjs *.js test/*.mjs test-ui/*.cjs eslint.config.mjs package.json && markdownlint-cli2 *.md",
