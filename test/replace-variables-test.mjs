@@ -10,7 +10,12 @@ const workspacePath = "/Users/user/workspace";
 const workspacePath2 = "/Users/user/workspace2";
 
 const osLike = {
-	"homedir": () => "/home/dir"
+	"homedir": () => "/home/dir",
+	"type": () => "Darwin"
+};
+
+const processLike = {
+	"env": {}
 };
 
 const uriLikeBase = {
@@ -61,7 +66,7 @@ describe("replace-variables", () => {
 		t.plan(1);
 		const input = undefined;
 		const expected = "";
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -69,7 +74,7 @@ describe("replace-variables", () => {
 		t.plan(1);
 		const input = null;
 		const expected = "";
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -77,7 +82,7 @@ describe("replace-variables", () => {
 		t.plan(1);
 		const input = "";
 		const expected = input;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -85,7 +90,7 @@ describe("replace-variables", () => {
 		t.plan(1);
 		const input = "input with no variables";
 		const expected = input;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -94,7 +99,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "${unsupported}";
 		const expected = input;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -103,7 +108,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "input ${with} some #${unsupported}# variables";
 		const expected = input;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -111,7 +116,7 @@ describe("replace-variables", () => {
 		t.plan(1);
 		const input = "{userHome}";
 		const expected = input;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -119,7 +124,7 @@ describe("replace-variables", () => {
 		t.plan(1);
 		const input = "${userHome";
 		const expected = input;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -133,7 +138,8 @@ describe("replace-variables", () => {
 			documentUriLike,
 			vscodeLike,
 			// @ts-ignore
-			undefined
+			undefined,
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -148,7 +154,8 @@ describe("replace-variables", () => {
 			documentUriLike,
 			vscodeLike,
 			// @ts-ignore
-			{}
+			{},
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -163,7 +170,8 @@ describe("replace-variables", () => {
 			documentUriLike,
 			vscodeLike,
 			// @ts-ignore
-			{ "homedir": undefined }
+			{ "homedir": undefined },
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -173,7 +181,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "${userHome}";
 		const expected = osLike.homedir();
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -182,7 +190,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "${userHome}";
 		const expected = os.homedir();
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, os);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, os, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -196,7 +204,8 @@ describe("replace-variables", () => {
 			documentUriLike,
 			// @ts-ignore
 			undefined,
-			osLike
+			osLike,
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -211,7 +220,8 @@ describe("replace-variables", () => {
 			documentUriLike,
 			// @ts-ignore
 			{},
-			osLike
+			osLike,
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -226,7 +236,8 @@ describe("replace-variables", () => {
 			documentUriLike,
 			// @ts-ignore
 			{ "workspace": {} },
-			osLike
+			osLike,
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -241,7 +252,8 @@ describe("replace-variables", () => {
 			documentUriLike,
 			// @ts-ignore
 			{ "workspace": { ...vscodeLike.workspace, "getWorkspaceFolder": undefined } },
-			osLike
+			osLike,
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -255,7 +267,8 @@ describe("replace-variables", () => {
 			input,
 			documentUriLike,
 			{ "workspace": { ...vscodeLike.workspace, "getWorkspaceFolder": () => undefined } },
-			osLike
+			osLike,
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -265,7 +278,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "${workspaceFolder}";
 		const expected = workspacePath;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -278,7 +291,8 @@ describe("replace-variables", () => {
 			input,
 			documentUriLike,
 			{ "workspace": { ...vscodeLike.workspace, "workspaceFolders": undefined } },
-			osLike
+			osLike,
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -292,7 +306,8 @@ describe("replace-variables", () => {
 			input,
 			documentUriLike,
 			{ "workspace": { ...vscodeLike.workspace, "workspaceFolders": [] } },
-			osLike
+			osLike,
+			processLike
 		);
 		t.assert.equal(actual, expected);
 	});
@@ -302,7 +317,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "${workspaceFolder:folder-name-2}";
 		const expected = workspacePath2;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -311,7 +326,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "${workspaceFolder:no-match}";
 		const expected = workspacePath;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -320,8 +335,116 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "${workspaceFolder:}";
 		const expected = input;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
+	});
+
+	test("userSettingsFile with os undefined", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const expected = input;
+		const actual = replaceVariables(
+			input,
+			documentUriLike,
+			vscodeLike,
+			// @ts-ignore
+			undefined,
+			processLike
+		);
+		t.assert.equal(actual, expected);
+	});
+
+	test("userSettingsFile with os empty", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const expected = input;
+		const actual = replaceVariables(
+			input,
+			documentUriLike,
+			vscodeLike,
+			// @ts-ignore
+			{},
+			processLike
+		);
+		t.assert.equal(actual, expected);
+	});
+
+	test("userSettingsFile with os.type undefined", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const expected = input;
+		const actual = replaceVariables(
+			input,
+			documentUriLike,
+			vscodeLike,
+			// @ts-ignore
+			{ "type": undefined },
+			processLike
+		);
+		t.assert.equal(actual, expected);
+	});
+
+	test("userSettingsFile with os shim for macOS", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const expected = "$HOME/Library/Application Support/Code/User/settings.json";
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, { "env": { "HOME": "$HOME" } });
+		t.assert.equal(actual, expected);
+	});
+
+	test("userSettingsFile with os shim for macOS missing HOME", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
+		t.assert.equal(actual, input);
+	});
+
+	test("userSettingsFile with os shim for macOS undefined HOME", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, { "env": { "HOME": undefined } });
+		t.assert.equal(actual, input);
+	});
+
+	test("userSettingsFile with os shim for Linux", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const expected = "$HOME/.config/Code/User/settings.json";
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, { ...osLike, "type": () => "Linux" }, { "env": { "HOME": "$HOME" } });
+		t.assert.equal(actual, expected);
+	});
+
+	test("userSettingsFile with os shim for Windows", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const expected = String.raw`%APPDATA%\Code\User\settings.json`;
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, { ...osLike, "type": () => "Windows_NT" }, { "env": { "APPDATA": "%APPDATA%" } });
+		t.assert.equal(actual, expected);
+	});
+
+	test("userSettingsFile with os shim for UNSUPPORTED", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, { ...osLike, "type": () => "UNSUPPORTED" }, processLike);
+		t.assert.equal(actual, input);
+	});
+
+	test("userSettingsFile with os/process module", (t) => {
+		t.plan(1);
+		// eslint-disable-next-line no-template-curly-in-string
+		const input = "${userSettingsFile}";
+		const expected = /[/\\]settings\.json$/u;
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, os, process);
+		t.assert.match(actual, expected);
 	});
 
 	test("variables embedded", (t) => {
@@ -329,7 +452,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "input with ${userHome} embedded";
 		const expected = `input with ${osLike.homedir()} embedded`;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
@@ -338,7 +461,7 @@ describe("replace-variables", () => {
 		// eslint-disable-next-line no-template-curly-in-string
 		const input = "input ${userHome} with #${userHome}# embedded ${userHome}${workspaceFolder}${userHome} multiple";
 		const expected = `input ${osLike.homedir()} with #${osLike.homedir()}# embedded ${osLike.homedir()}${vscodeLike.workspace.getWorkspaceFolder().uri.fsPath}${osLike.homedir()} multiple`;
-		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike);
+		const actual = replaceVariables(input, documentUriLike, vscodeLike, osLike, processLike);
 		t.assert.equal(actual, expected);
 	});
 
