@@ -221,11 +221,11 @@ If none of these files exist, a new `.markdownlint.json` containing the default 
 
 > **Note**: Because JavaScript is cached by VS Code after being loaded, edits to `.markdownlint.cjs`/`.markdownlint.mjs`/`.markdownlint-cli2.cjs`/`.markdownlint-cli2.mjs` require a restart of VS Code.
 
-### ~~markdownlint.config~~
+### markdownlint.config
 
-The `markdownlint.config` property has been deprecated; please use a configuration file instead ([as outlined in the Configure section](#configure)).
+> **Note**: Using a project-local configuration file (as outlined above) instead of `markdownlint.config` is recommended because file-based configuration also works with command-line tools.
 
-When `markdownlint.config` is present in workspace context, replacing it can be done by creating a `.markdownlint.json` file in the root of the workspace with the value of the setting as its content. For example, removing this setting from the project's `.vscode/settings.json`:
+The configuration above would look like the following if stored in [VS Code's user/workspace settings](https://code.visualstudio.com/docs/configure/settings):
 
 ```json
 {
@@ -238,7 +238,17 @@ When `markdownlint.config` is present in workspace context, replacing it can be 
 }
 ```
 
-Leaving just:
+When using `extends` in this context:
+
+* File paths referenced by `extends` from configuration files within a workspace are resolved relative to that configuration file.
+* When running VS Code locally:
+  * File paths referenced by `extends` from user settings are resolved relative to the user's home directory (e.g., `%USERPROFILE%` on Windows or `$HOME` on macOS/Linux).
+  * File paths referenced by `extends` from workspace settings are resolved relative to the workspace folder.
+  * VS Code's [predefined variables](https://code.visualstudio.com/docs/reference/variables-reference) `${userHome}` and `${workspaceFolder}` can be used within an `extends` path from user or workspace settings to override the default behavior.
+
+#### Alternatives
+
+When `markdownlint.config` is present in workspace context, replacing it can be done by creating a `.markdownlint.json` file in the root of the workspace with the value of the setting as its content. For example, removing the setting from the project's `.vscode/settings.json`:
 
 ```json
 {
@@ -256,7 +266,8 @@ And adding a `.markdownlint.json` file with the corresponding configuration to t
 }
 ```
 
-When `markdownlint.config` is present in user context, replacing it can be done by creating a `.markdownlint.json` file (as above) in the user's home directory and setting `markdownlint.configFile` to the corresponding path (for example, `${userHome}/.markdownlint.json`). Similar to the scenario above, the user setting from something like `~/Library/Application Support/Code/User/settings.json` would become:
+When `markdownlint.config` is present in user context, replacing it can be done by creating a `.markdownlint.json` file (as above) in the user's home directory and setting `markdownlint.configFile` to the corresponding path (for example, `${userHome}/.markdownlint.json`).
+Similar to the scenario above, the user setting in `~/Library/Application Support/Code/User/settings.json` (macOS path) would become:
 
 ```json
 {
@@ -264,6 +275,9 @@ When `markdownlint.config` is present in user context, replacing it can be done 
     "markdownlint.configFile": "${userHome}/.markdownlint.json"
 }
 ```
+
+> **Note**: If [user settings are being synchronized](https://code.visualstudio.com/docs/configure/settings#_settings-sync), `markdownlint.configFile` should point to a location that is available to all environments.
+> If a common location is not available, `markdownlint.configFile` may not be suitable.
 
 ### markdownlint.configFile
 
