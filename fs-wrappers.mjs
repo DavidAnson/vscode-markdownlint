@@ -2,18 +2,12 @@
 
 // eslint-disable-next-line n/no-missing-import
 import vscode from "vscode";
-import path from "node:path";
 import { promisify } from "node:util";
+import posixPath from "./posix-path.mjs";
 
 const driveLetterRe = /^[A-Za-z]:[/\\]/;
 const networkShareRe = /^\\\\[^\\]+\\/;
 const firstSegmentRe = /^\/{1,2}[^/]+\//;
-
-// Converts to a POSIX-style path
-// eslint-disable-next-line id-length
-function posixPath (/** @type {string} */ p) {
-	return p.split(path.sep).join(path.posix.sep);
-}
 
 // A Node-like fs object implemented using vscode.workspace.fs
 export class FsWrapper {
