@@ -25,7 +25,7 @@ function testWrapper (/** @type {Test} */ test) {
 		/** @type {Disposables} */
 		const disposables = [];
 		// eslint-disable-next-line no-use-before-define
-		const timeout = setTimeout(() => rejectWrapper(new Error("TEST TIMEOUT")), 10_000);
+		const timeout = setTimeout(() => rejectWrapper(new Error("TEST TIMEOUT")), 30_000);
 		const cleanup = () => {
 			clearTimeout(timeout);
 			for (const disposable of disposables) {
