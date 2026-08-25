@@ -1,13 +1,45 @@
 // @ts-check
 
-// eslint-disable-next-line n/no-missing-import
-import vscode from "vscode";
 import { promisify } from "node:util";
 import posixPath from "./posix-path.mjs";
 
 const driveLetterRe = /^[A-Za-z]:[/\\]/;
 const networkShareRe = /^\\\\[^\\]+\\/;
 const firstSegmentRe = /^\/{1,2}[^/]+\//;
+
+/** @type {import("vscode").FileType.Unknown} */
+// eslint-disable-next-line no-unused-vars
+const FileTypeUnknown = 0;
+/** @type {import("vscode").FileType.File} */
+const FileTypeFile = 1;
+/** @type {import("vscode").FileType.Directory} */
+const FileTypeDirectory = 2;
+/** @type {import("vscode").FileType.SymbolicLink} */
+const FileTypeSymbolicLink = 64;
+
+/**
+ * @typedef UriChangeLike
+ * @property {string} path
+ */
+
+/**
+ * @typedef UriLike
+ * @property {string} authority
+ * @property {string} fragment
+ * @property {string} fsPath
+ * @property {string} path
+ * @property {string} query
+ * @property {string} scheme
+ * @property {() => any} toJSON
+ * @property {(change: UriChangeLike) => UriLike} with
+ */
+
+/**
+ * @typedef FileSystemLike
+ * @property {(uri: UriLike) => Thenable<[string, FileTypeUnknown|FileTypeFile|FileTypeDirectory|FileTypeSymbolicLink][]>} readDirectory
+ * @property {(uri: UriLike) => Thenable<Uint8Array>} readFile
+ * @property {(uri: UriLike) => Thenable<import("vscode").FileStat>} stat
+ */
 
 // A Node-like fs object implemented using vscode.workspace.fs
 export class FsWrapper {
@@ -52,7 +84,7 @@ export class FsWrapper {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= mode;
-		vscode.workspace.fs.stat(
+		this.fwFs.stat(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			() => callback(null),
@@ -65,7 +97,7 @@ export class FsWrapper {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
-		vscode.workspace.fs.readDirectory(
+		this.fwFs.readDirectory(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			// @ts-ignore
@@ -81,12 +113,12 @@ export class FsWrapper {
 								/* eslint-disable no-bitwise */
 								"isBlockDevice": FsWrapper.fwFalse,
 								"isCharacterDevice": FsWrapper.fwFalse,
-								"isDirectory": (fileType & vscode.FileType.Directory) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
+								"isDirectory": (fileType & FileTypeDirectory) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
 								"isFIFO": FsWrapper.fwFalse,
-								"isFile": (fileType & vscode.FileType.File) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
+								"isFile": (fileType & FileTypeFile) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
 								"isSocket": FsWrapper.fwFalse,
 								"isSymbolicLink":
-									(fileType & vscode.FileType.SymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
+									(fileType & FileTypeSymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse,
 								/* eslint-enable no-bitwise */
 								name
 							} :
@@ -104,7 +136,7 @@ export class FsWrapper {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
-		vscode.workspace.fs.readFile(
+		this.fwFs.readFile(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			(bytes) => callback(null, new TextDecoder().decode(bytes)),
@@ -118,7 +150,7 @@ export class FsWrapper {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
-		vscode.workspace.fs.stat(
+		this.fwFs.stat(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			(/** @type {any} */ fileStat) => {
@@ -126,12 +158,12 @@ export class FsWrapper {
 				/* eslint-disable dot-notation, no-bitwise */
 				fileStat["isBlockDevice"] = FsWrapper.fwFalse;
 				fileStat["isCharacterDevice"] = FsWrapper.fwFalse;
-				fileStat["isDirectory"] = (fileStat.type & vscode.FileType.Directory) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
+				fileStat["isDirectory"] = (fileStat.type & FileTypeDirectory) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
 				fileStat["isFIFO"] = FsWrapper.fwFalse;
-				fileStat["isFile"] = (fileStat.type & vscode.FileType.File) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
+				fileStat["isFile"] = (fileStat.type & FileTypeFile) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
 				fileStat["isSocket"] = FsWrapper.fwFalse;
 				fileStat["isSymbolicLink"] =
-					(fileStat.type & vscode.FileType.SymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
+					(fileStat.type & FileTypeSymbolicLink) ? FsWrapper.fwTrue : FsWrapper.fwFalse;
 				/* eslint-enable dot-notation, no-bitwise */
 				callback(null, fileStat);
 			},
@@ -141,7 +173,8 @@ export class FsWrapper {
 	}
 
 	// Constructs a new instance
-	constructor (/** @type {import("vscode").Uri} */ folderUri) {
+	constructor (/** @type {FileSystemLike} */ fs, /** @type {UriLike} */ folderUri) {
+		this.fwFs = fs;
 		this.fwFolderUri = folderUri;
 		this.access = this.fwAccess.bind(this);
 		this.readdir = this.fwReaddir.bind(this);
@@ -159,7 +192,7 @@ export class FsWrapper {
 // A Node-like fs object for a "null" file system
 export class FsNull {
 	// Implements fs.access/readdir/readFile/stat
-	static fnError (/** @type {import("vscode").Uri} */ pathSegment, /** @type {{}} */ modeOrOptions, /** @type {(err: Error) => void} */ callback) {
+	static fnError (/** @type {UriLike} */ pathSegment, /** @type {{}} */ modeOrOptions, /** @type {(err: Error) => void} */ callback) {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= modeOrOptions;
