@@ -8,14 +8,13 @@ const networkShareRe = /^\\\\[^\\]+\\/;
 const firstSegmentRe = /^\/{1,2}[^/]+\//;
 
 /** @type {import("vscode").FileType.Unknown} */
-// eslint-disable-next-line no-unused-vars
-const FileTypeUnknown = 0;
+export const FileTypeUnknown = 0;
 /** @type {import("vscode").FileType.File} */
-const FileTypeFile = 1;
+export const FileTypeFile = 1;
 /** @type {import("vscode").FileType.Directory} */
-const FileTypeDirectory = 2;
+export const FileTypeDirectory = 2;
 /** @type {import("vscode").FileType.SymbolicLink} */
-const FileTypeSymbolicLink = 64;
+export const FileTypeSymbolicLink = 64;
 
 /**
  * @typedef UriChangeLike
@@ -57,6 +56,10 @@ export class FsWrapper {
 	fwFolderUriWithPathSegment (/** @type {string} */ pathSegment) {
 		// Fix drive letter issues on Windows
 		let posixPathSegment = posixPath(pathSegment);
+
+		// eslint-disable-next-line capitalized-comments
+		/* node:coverage disable */
+
 		if (driveLetterRe.test(posixPathSegment)) {
 			// eslint-disable-next-line unicorn/prefer-ternary
 			if (
@@ -75,12 +78,16 @@ export class FsWrapper {
 			// Path segment has the computer name prefixed, remove it
 			posixPathSegment = posixPathSegment.replace(firstSegmentRe, "/");
 		}
+
+		// eslint-disable-next-line capitalized-comments
+		/* node:coverage enable */
+
 		// Return consistently-formatted Uri with specified path
 		return this.fwFolderUri.with({ "path": posixPathSegment });
 	}
 
 	// Implements fs.access via vscode.workspace.fs
-	fwAccess (/** @type {string} */ pathSegment, /** @type {number} */ mode, /** @type {(stat: import("vscode").FileStat | null) => void} */ callback) {
+	fwAccess (/** @type {string} */ pathSegment, /** @type {number} */ mode, /** @type {(err: Error|null) => void} */ callback) {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= mode;
@@ -93,14 +100,13 @@ export class FsWrapper {
 	}
 
 	// Implements fs.readdir via vscode.workspace.fs
-	fwReaddir (/** @type {string} */ pathSegment, /** @type { { withFileTypes: Boolean} } */ options, /** @type {(err: null, data: any[]) => void} */ callback) {
+	fwReaddir (/** @type {string} */ pathSegment, /** @type { { withFileTypes: Boolean} } */ options, /** @type {(err: Error|null, data?: any[]) => void} */ callback) {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
 		this.fwFs.readDirectory(
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
-			// @ts-ignore
 			(namesAndTypes) => {
 				const namesOrDirents = namesAndTypes.map(
 					(nameAndType) => {
@@ -132,7 +138,7 @@ export class FsWrapper {
 	}
 
 	// Implements fs.readFile via vscode.workspace.fs
-	fwReadFile (/** @type {string} */ pathSegment, /** @type {{}} */ options, /** @type {(err: null, data: string) => Uint8Array<ArrayBufferLike>} */ callback) {
+	fwReadFile (/** @type {string} */ pathSegment, /** @type {{}} */ options, /** @type {(err: Error|null, data?: string) => void} */ callback) {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
@@ -140,13 +146,12 @@ export class FsWrapper {
 			this.fwFolderUriWithPathSegment(pathSegment)
 		).then(
 			(bytes) => callback(null, new TextDecoder().decode(bytes)),
-			// @ts-ignore
 			callback
 		);
 	}
 
 	// Implements fs.stat via vscode.workspace.fs
-	fwStat (/** @type {string} */ pathSegment, /** @type {{}} */ options, /** @type {(err: null, stat: any) => void} */ callback) {
+	fwStat (/** @type {string} */ pathSegment, /** @type {{}} */ options, /** @type {(err: Error|null, stat?: any) => void} */ callback) {
 		// @ts-ignore
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
@@ -167,7 +172,6 @@ export class FsWrapper {
 				/* eslint-enable dot-notation, no-bitwise */
 				callback(null, fileStat);
 			},
-			// @ts-ignore
 			callback
 		);
 	}
