@@ -223,7 +223,7 @@ If none of these files exist, a new `.markdownlint.json` containing the default 
 
 ### Migrating from the deprecated `markdownlint.config`
 
-The `markdownlint.config` property has been deprecated. Please use the following guideline to migrate your settings to a configuration file ([as outlined above](#configure)).
+The `markdownlint.config` property has been deprecated. Please use the following guideline to migrate your settings to a configuration file.
 
 When `markdownlint.config` is present in workspace context, replacing it can be done by creating a `.markdownlint.json` file in the root of the workspace with the value of the setting as its content. For example, removing this setting from the project's `.vscode/settings.json`:
 
