@@ -1,11 +1,6 @@
 // @ts-check
 
 import { promisify } from "node:util";
-import posixPath from "./posix-path.mjs";
-
-const driveLetterRe = /^[A-Za-z]:[/\\]/;
-const networkShareRe = /^\\\\[^\\]+\\/;
-const firstSegmentRe = /^\/{1,2}[^/]+\//;
 
 /** @type {import("vscode").FileType.Unknown} */
 export const FileTypeUnknown = 0;
@@ -33,6 +28,9 @@ export const FileTypeSymbolicLink = 64;
  * @property {(change: UriChangeLike) => UriLike} with
  */
 
+/** @typedef {(path: string) => UriLike} UriFileLike */
+/** @typedef {(...paths: string[]) => string} PathResolveLike */
+
 /**
  * @typedef FileSystemLike
  * @property {(uri: UriLike) => Thenable<[string, FileTypeUnknown|FileTypeFile|FileTypeDirectory|FileTypeSymbolicLink][]>} readDirectory
@@ -54,36 +52,7 @@ export class FsWrapper {
 
 	// Returns a Uri of fwFolderUri with the specified path segment
 	fwFolderUriWithPathSegment (/** @type {string} */ pathSegment) {
-		// Fix drive letter issues on Windows
-		let posixPathSegment = posixPath(pathSegment);
-
-		// eslint-disable-next-line capitalized-comments
-		/* node:coverage disable */
-
-		if (driveLetterRe.test(posixPathSegment)) {
-			// eslint-disable-next-line unicorn/prefer-ternary
-			if (
-				this.fwFolderUri.path.startsWith("/") &&
-				driveLetterRe.test(this.fwFolderUri.path.slice(1))
-			) {
-				// Both paths begin with Windows drive letter, make it consistent
-				posixPathSegment = `/${posixPathSegment}`;
-			} else {
-				// Folder path does not start with Windows drive letter, remove it
-				posixPathSegment = posixPathSegment.replace(driveLetterRe, "/");
-			}
-		}
-		// Fix network share issues on Windows (possibly in addition to drive letter issues)
-		if (networkShareRe.test(this.fwFolderUri.fsPath)) {
-			// Path segment has the computer name prefixed, remove it
-			posixPathSegment = posixPathSegment.replace(firstSegmentRe, "/");
-		}
-
-		// eslint-disable-next-line capitalized-comments
-		/* node:coverage enable */
-
-		// Return consistently-formatted Uri with specified path
-		return this.fwFolderUri.with({ "path": posixPathSegment });
+		return this.fwUriFile(this.fwResolve(this.fwFolderUri.fsPath, pathSegment));
 	}
 
 	// Implements fs.access via vscode.workspace.fs
@@ -177,9 +146,11 @@ export class FsWrapper {
 	}
 
 	// Constructs a new instance
-	constructor (/** @type {FileSystemLike} */ fs, /** @type {UriLike} */ folderUri) {
+	constructor (/** @type {FileSystemLike} */ fs, /** @type {UriLike} */ folderUri, /** @type {UriFileLike} */ uriFile, /** @type {PathResolveLike} */ pathResolve) {
 		this.fwFs = fs;
 		this.fwFolderUri = folderUri;
+		this.fwUriFile = uriFile;
+		this.fwResolve = pathResolve;
 		this.access = this.fwAccess.bind(this);
 		this.readdir = this.fwReaddir.bind(this);
 		this.readFile = this.fwReadFile.bind(this);
