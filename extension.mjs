@@ -300,7 +300,7 @@ async function markdownlintWrapper (/** @type {import("vscode").TextDocument} */
 	const workspaceFolderUri = getDocumentWorkspaceFolderUri(document.uri);
 	const fs = independentDocument ?
 		new FsNull() :
-		new FsWrapper(vscode.workspace.fs, workspaceFolderUri);
+		new FsWrapper(vscode.workspace.fs, workspaceFolderUri, vscode.Uri.file, path.relative, path.resolve);
 	const configuration = vscode.workspace.getConfiguration(extensionDisplayName, document.uri);
 	const errorSeverity = getDiagnosticSeverity(configuration, sectionSeverityForError, diagnosticSeverityWarning);
 	const warningSeverity = getDiagnosticSeverity(configuration, sectionSeverityForWarning, diagnosticSeverityInformation);
@@ -389,7 +389,7 @@ function lintWorkspace (/** @type {(s: string) => void} */ logString) {
 	return workspaceFolderUris.reduce(
 		(previousPromise, workspaceFolderUri) => previousPromise.then(() => {
 			logString(`Linting workspace folder "${workspaceFolderUri.toString()}"...`);
-			const fs = new FsWrapper(vscode.workspace.fs, workspaceFolderUri);
+			const fs = new FsWrapper(vscode.workspace.fs, workspaceFolderUri, vscode.Uri.file, path.relative, path.resolve);
 			const configuration = vscode.workspace.getConfiguration(extensionDisplayName, workspaceFolderUri);
 			return getOptionsDefault(fs, configuration, workspaceFolderUri, undefined)
 				.then((optionsDefault) => {

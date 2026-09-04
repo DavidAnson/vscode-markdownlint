@@ -3,10 +3,6 @@
 import { promisify } from "node:util";
 import posixPath from "./posix-path.mjs";
 
-const driveLetterRe = /^[A-Za-z]:[/\\]/;
-const networkShareRe = /^\\\\[^\\]+\\/;
-const firstSegmentRe = /^\/{1,2}[^/]+\//;
-
 /** @type {import("vscode").FileType.Unknown} */
 export const FileTypeUnknown = 0;
 /** @type {import("vscode").FileType.File} */
@@ -33,6 +29,10 @@ export const FileTypeSymbolicLink = 64;
  * @property {(change: UriChangeLike) => UriLike} with
  */
 
+/** @typedef {(path: string) => UriLike} UriFileLike */
+/** @typedef {(from: string, to: string) => string} PathRelativeLike */
+/** @typedef {(...paths: string[]) => string} PathResolveLike */
+
 /**
  * @typedef FileSystemLike
  * @property {(uri: UriLike) => Thenable<[string, FileTypeUnknown|FileTypeFile|FileTypeDirectory|FileTypeSymbolicLink][]>} readDirectory
@@ -52,38 +52,21 @@ export class FsWrapper {
 		return false;
 	}
 
-	// Returns a Uri of fwFolderUri with the specified path segment
-	fwFolderUriWithPathSegment (/** @type {string} */ pathSegment) {
-		// Fix drive letter issues on Windows
-		let posixPathSegment = posixPath(pathSegment);
-
-		// eslint-disable-next-line capitalized-comments
-		/* node:coverage disable */
-
-		if (driveLetterRe.test(posixPathSegment)) {
-			// eslint-disable-next-line unicorn/prefer-ternary
-			if (
-				this.fwFolderUri.path.startsWith("/") &&
-				driveLetterRe.test(this.fwFolderUri.path.slice(1))
-			) {
-				// Both paths begin with Windows drive letter, make it consistent
-				posixPathSegment = `/${posixPathSegment}`;
-			} else {
-				// Folder path does not start with Windows drive letter, remove it
-				posixPathSegment = posixPathSegment.replace(driveLetterRe, "/");
+	// Returns a Uri resolving fwFolderUri and the specified path segment
+	fwResolvePathSegment (/** @type {string} */ pathSegment) {
+		if (this.fwFolderUri.fsPath.startsWith("\\\\") && pathSegment.startsWith("/") && !pathSegment.startsWith("//")) {
+			// Probing of (Windows) UNC directory content by CLI2 elides the leading "/" of "//server/share/..." in pathSegment.
+			// If pathSegment prepended with "/" is a sub-directory of this.fwFolderUri, use the "fixed" pathSegment.
+			// (User-specified inputs to pathSegment are not affected.)
+			const uncPathSegment = `/${pathSegment}`;
+			const folderPath = posixPath(this.fwFolderUri.fsPath, "\\");
+			const relativePath = this.fwPathRelative(folderPath, uncPathSegment);
+			if (!relativePath.startsWith("\\")) {
+				// eslint-disable-next-line no-param-reassign
+				pathSegment = uncPathSegment;
 			}
 		}
-		// Fix network share issues on Windows (possibly in addition to drive letter issues)
-		if (networkShareRe.test(this.fwFolderUri.fsPath)) {
-			// Path segment has the computer name prefixed, remove it
-			posixPathSegment = posixPathSegment.replace(firstSegmentRe, "/");
-		}
-
-		// eslint-disable-next-line capitalized-comments
-		/* node:coverage enable */
-
-		// Return consistently-formatted Uri with specified path
-		return this.fwFolderUri.with({ "path": posixPathSegment });
+		return this.fwUriFile(this.fwPathResolve(this.fwFolderUri.fsPath, pathSegment));
 	}
 
 	// Implements fs.access via vscode.workspace.fs
@@ -92,7 +75,7 @@ export class FsWrapper {
 		// eslint-disable-next-line no-param-reassign
 		callback ||= mode;
 		this.fwFs.stat(
-			this.fwFolderUriWithPathSegment(pathSegment)
+			this.fwResolvePathSegment(pathSegment)
 		).then(
 			() => callback(null),
 			callback
@@ -105,7 +88,7 @@ export class FsWrapper {
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
 		this.fwFs.readDirectory(
-			this.fwFolderUriWithPathSegment(pathSegment)
+			this.fwResolvePathSegment(pathSegment)
 		).then(
 			(namesAndTypes) => {
 				const namesOrDirents = namesAndTypes.map(
@@ -143,7 +126,7 @@ export class FsWrapper {
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
 		this.fwFs.readFile(
-			this.fwFolderUriWithPathSegment(pathSegment)
+			this.fwResolvePathSegment(pathSegment)
 		).then(
 			(bytes) => callback(null, new TextDecoder().decode(bytes)),
 			callback
@@ -156,7 +139,7 @@ export class FsWrapper {
 		// eslint-disable-next-line no-param-reassign
 		callback ||= options;
 		this.fwFs.stat(
-			this.fwFolderUriWithPathSegment(pathSegment)
+			this.fwResolvePathSegment(pathSegment)
 		).then(
 			(/** @type {any} */ fileStat) => {
 				// Stub required properties for fast-glob
@@ -177,9 +160,12 @@ export class FsWrapper {
 	}
 
 	// Constructs a new instance
-	constructor (/** @type {FileSystemLike} */ fs, /** @type {UriLike} */ folderUri) {
+	constructor (/** @type {FileSystemLike} */ fs, /** @type {UriLike} */ folderUri, /** @type {UriFileLike} */ uriFile, /** @type {PathRelativeLike} */ pathRelative, /** @type {PathResolveLike} */ pathResolve) {
 		this.fwFs = fs;
 		this.fwFolderUri = folderUri;
+		this.fwUriFile = uriFile;
+		this.fwPathRelative = pathRelative;
+		this.fwPathResolve = pathResolve;
 		this.access = this.fwAccess.bind(this);
 		this.readdir = this.fwReaddir.bind(this);
 		this.readFile = this.fwReadFile.bind(this);
