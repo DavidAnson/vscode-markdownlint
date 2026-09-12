@@ -395,7 +395,7 @@ function lintWorkspace (/** @type {(s: string) => void} */ logString) {
 				.then((optionsDefault) => {
 					const parameters = {
 						fs,
-						"argv": configuration.get(sectionLintWorkspaceGlobs),
+						"argv": [ ...configuration.get(sectionLintWorkspaceGlobs), ...getConfigFileArguments(configuration, workspaceFolderUri) ],
 						"directory": posixPath(workspaceFolderUri.fsPath),
 						"logMessage": logString,
 						"logError": logString,
