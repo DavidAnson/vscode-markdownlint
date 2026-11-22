@@ -445,6 +445,7 @@ function lint (/** @type {import("vscode").TextDocument} */ document) {
 					0 :
 					focusMode;
 				const severity = (result.severity === "warning") ? warningSeverity : errorSeverity;
+				// eslint-disable-next-line unicorn/prefer-continue
 				if (
 					(severity !== null) && (
 						(instanceConfiguration[sectionFocusMode] === false) ||
@@ -539,6 +540,7 @@ function provideCodeActions (/** @type {import("vscode").TextDocument} */ docume
 			};
 			addToCodeActions(infoAction);
 		}
+		// eslint-disable-next-line unicorn/prefer-continue
 		if (diagnosticFixInfo) {
 			// Provide code action to fix all similar violations
 			const fixTitle = clickToFixRulePrefix + ruleNameAlias + inTheDocument;

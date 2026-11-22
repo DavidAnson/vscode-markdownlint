@@ -34,7 +34,7 @@ describe("metadata", () => {
 			}
 			const firstChangelogRe = /\* (\d+\.\d+\.\d+) - /u;
 			match = firstChangelogRe.exec(content);
-			// eslint-disable-next-line node-test/no-conditional-in-test
+			// eslint-disable-next-line node-test/no-conditional-in-test, unicorn/prefer-continue
 			if (match) {
 				const patchRe = /\.\d+$/u;
 				// eslint-disable-next-line node-test/no-conditional-assertion

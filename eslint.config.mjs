@@ -84,8 +84,8 @@ export default defineConfig(
 			"n/no-missing-require": [ "error", { "allowModules": [ "vscode" ] } ],
 			"n/no-sync": "off",
 
-			"@stylistic/array-bracket-spacing": [ "error", "always" ],
 			"@stylistic/indent": [ "error", "tab", { "ObjectExpression": "first" } ],
+			"@stylistic/list-style": [ "error", { "singleLine": { "spacing": "never" }, "overrides": { "[]": { "singleLine": { "spacing": "always" } } } } ],
 			"@stylistic/operator-linebreak": [ "error", "after" ],
 			"@stylistic/space-before-function-paren": [ "error", "always" ],
 
@@ -95,6 +95,7 @@ export default defineConfig(
 			"node-test/prefer-strict-assert": "off",
 
 			"unicorn/comment-content": "off",
+			"unicorn/consistent-arrow-return-style": "off",
 			"unicorn/consistent-boolean-name": "off",
 			"unicorn/consistent-class-member-order": "off",
 			"unicorn/default-export-style": "off",
@@ -108,11 +109,13 @@ export default defineConfig(
 			"unicorn/no-unreadable-new-expression": "off",
 			"unicorn/no-useless-undefined": "off",
 			"unicorn/prefer-await": "off",
+			"unicorn/prefer-default-parameters": "off",
 			"unicorn/prefer-early-return": "off",
 			"unicorn/prefer-module": "off",
 			"unicorn/prefer-string-replace-all": "off",
 			"unicorn/prefer-temporal": "off",
-			"unicorn/prefer-then-catch": "off"
+			"unicorn/prefer-then-catch": "off",
+			"unicorn/single-line-block-comment-style": "off"
 		}
 	},
 	{

@@ -70,7 +70,7 @@ const config = [
 			new webpack.NormalModuleReplacementPlugin(
 				/^stream\/(?:consumers|promises)$/u,
 				(resource) => {
-					resource.request = require.resolve("./webworker/module-empty.js");
+					resource.request = require.resolve("./webworker/stream-promises-stub.js");
 				}
 			),
 			// Intercept existing "unicorn-magic" package to provide missing import
@@ -88,13 +88,14 @@ const config = [
 		"resolve": {
 			"conditionNames": [ "markdownlint-imports-node", "..." ],
 			"fallback": {
+				"buffer": false,
 				"fs": false,
 				"os": require.resolve("./webworker/os-stub.js"),
 				"path": require.resolve("path-browserify"),
 				"process": require.resolve("./webworker/process-stub.js"),
 				"process-wrapper": require.resolve("./webworker/process-stub.js"),
 				"stream": require.resolve("stream-browserify"),
-				"url": require.resolve("./webworker/module-empty.js"),
+				"url": require.resolve("./webworker/url-stub.js"),
 				"util": require.resolve("util")
 			}
 		}
