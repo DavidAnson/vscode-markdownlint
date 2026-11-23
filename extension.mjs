@@ -33,7 +33,12 @@ const configFileNames = [
 	".markdownlint.cjs",
 	".markdownlint.mjs"
 ];
-const markdownLanguageId = "markdown";
+const markdownLanguageIdentifiers = [
+	// https://code.visualstudio.com/docs/languages/identifiers
+	"markdown",
+	// https://code.visualstudio.com/docs/agent-customization/custom-instructions
+	"instructions"
+];
 // Untitled/unsaved document
 const schemeUntitled = "untitled";
 // Standard file system workspace
@@ -357,7 +362,7 @@ function shouldLintDocument (/** @type {import("vscode").TextDocument} */ docume
 	const isMarkdownDocument = Boolean(
 		// Markdown document with supported URI scheme
 		// (Filters out problematic custom schemes like "comment" and "svn")
-		(document.languageId === markdownLanguageId) &&
+		markdownLanguageIdentifiers.includes(document.languageId) &&
 		schemeSupported.has(document.uri.scheme) &&
 		(
 			// Non-virtual document or document authority matches an open workspace
@@ -926,7 +931,7 @@ export function activate (/** @type {import("vscode").ExtensionContext} */ conte
 	);
 
 	// Register CodeActionsProvider
-	const documentSelector = { "language": markdownLanguageId };
+	const documentSelector = markdownLanguageIdentifiers.map((identifier) => ({ "language": identifier }));
 	const codeActionProvider = {
 		provideCodeActions
 	};
