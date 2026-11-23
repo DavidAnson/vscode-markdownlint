@@ -1,12 +1,12 @@
 import fs from "node:fs/promises";
-import { describe, test } from "node:test";
+import { test } from "node:test";
 
 // eslint-disable-next-line @stylistic/quote-props
 import packageJson from "../package.json" with { type: "json" };
 // eslint-disable-next-line @stylistic/quote-props, n/no-unpublished-import
 import markdownlintPackageJson from "../node_modules/markdownlint/package.json" with { type: "json" };
 
-describe("metadata", () => {
+test.suite(import.meta.url.replace(/^.*?\/(?<name>[^/]*)$/u, "$<name>"), () => {
 
 	test("version numbers match", async (t) => {
 		t.plan(292);

@@ -1,7 +1,7 @@
 // @ts-check
 
 import os from "node:os";
-import { describe, test } from "node:test";
+import { test } from "node:test";
 import replaceVariables from "../replace-variables.mjs";
 
 const folderPath = "/Users/user/folder";
@@ -55,7 +55,7 @@ const vscodeLike = {
 	}
 };
 
-describe("replace-variables", () => {
+test.suite(import.meta.url.replace(/^.*?\/(?<name>[^/]*)$/u, "$<name>"), () => {
 
 	test("undefined", (t) => {
 		t.plan(1);

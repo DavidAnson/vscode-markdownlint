@@ -1,6 +1,6 @@
 // @ts-check
 
-import { describe, test } from "node:test";
+import { test } from "node:test";
 import stringifyError from "../stringify-error.mjs";
 
 function generalize (/** @type {string} */ output) {
@@ -11,7 +11,7 @@ function generalize (/** @type {string} */ output) {
 		.join("\n");
 }
 
-describe("stringify-error", () => {
+test.suite(import.meta.url.replace(/^.*?\/(?<name>[^/]*)$/u, "$<name>"), () => {
 
 	test("null", (t) => {
 		t.plan(1);

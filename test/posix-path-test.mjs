@@ -2,7 +2,7 @@
 
 import path from "node:path";
 import posixPath from "../posix-path.mjs";
-import { describe, test } from "node:test";
+import { test } from "node:test";
 
 /* eslint-disable unicorn/prefer-string-raw */
 
@@ -17,7 +17,7 @@ const testScenariosWin32 = [
 	[ "\\\\hostname\\c$\\Project\\file.txt", "//hostname/c$/Project/file.txt" ]
 ];
 
-describe("posix-path", () => {
+test.suite(import.meta.url.replace(/^.*?\/(?<name>[^/]*)$/u, "$<name>"), () => {
 
 	test("POSIX scenarios", (t) => {
 		t.plan(testScenariosPosix.length);

@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line unicorn/import-style
 import { posix, win32 } from "node:path";
-import { describe, test } from "node:test";
+import { test } from "node:test";
 import { FsNull, FsWrapper, FileTypeDirectory, FileTypeFile, FileTypeSymbolicLink } from "../fs-wrappers.mjs";
 
 /* eslint-disable class-methods-use-this, node-test/no-done-callback */
@@ -80,7 +80,7 @@ function getTestFsWrapper () {
 	return new FsWrapper(fs, folderUri, UriStub.file, posix.relative, posix.resolve);
 }
 
-describe("FsWrapper", () => {
+test.suite(import.meta.url.replace(/^.*?\/(?<name>[^/]*)$/u, "$<name>"), () => {
 
 	test("new FsWrapper", (t) => {
 		t.plan(1);
