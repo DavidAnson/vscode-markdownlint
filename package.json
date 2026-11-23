@@ -72,8 +72,11 @@
 		"multi-root ready"
 	],
 	"activationEvents": [
+		"onLanguage:chatagent",
 		"onLanguage:instructions",
-		"onLanguage:markdown"
+		"onLanguage:markdown",
+		"onLanguage:prompt",
+		"onLanguage:skill"
 	],
 	"capabilities": {
 		"untrustedWorkspaces": {
