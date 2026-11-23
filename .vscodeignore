@@ -8,8 +8,13 @@ CONTRIBUTING.md
 embed-schema.cjs
 eslint.config.mjs
 extension.mjs
+fs-wrappers.mjs
 jsconfig.json
+language-identifiers.mjs
 node_modules
+posix-path.mjs
+replace-variables.mjs
+stringify-error.mjs
 test
 test-ui
 webpack.config.js
