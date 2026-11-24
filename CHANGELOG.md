@@ -1,6 +1,7 @@
 # Changes
 
-* 0.62.0 - Improved rules, add `overrides`/`configPointer`/`appliesTo`
+* 0.63.0 - Improved rules, lint agent files, improve `lintWorkspace`, better UNC handling, un-deprecate `config`
+* 0.62.0 - Improved rules, add `overrides`/`configPointer`/`appliesTo`, deprecate `config`/`customRules`
 * 0.61.0 - Improved rules, add warnings, add `severityForError`/`Warning`
 * 0.60.0 - Improved rules
 * 0.59.0 - Add `configFile` setting
