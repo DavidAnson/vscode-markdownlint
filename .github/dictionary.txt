@@ -38,6 +38,7 @@ TOML
 UI
 ul-indent
 ul-style
+UNC
 untrusted
 workspaceFiles
 workspaces
