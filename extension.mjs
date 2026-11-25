@@ -46,19 +46,23 @@ const schemeVscodeVfs = "vscode-vfs";
 const schemeVscodeTestWeb = "vscode-test-web";
 // Used by GistPad (vsls-contrib.gistfs)
 const schemeGist = "gist";
+// Used by GitLab Web IDE (VS Code clone)
+const schemeGitlabWebIde = "gitlab-web-ide";
 // Schemes that are okay to lint (as part of a workspace or independently)
 const schemeSupported = new Set([
 	schemeUntitled,
 	schemeFile,
 	schemeVscodeVfs,
 	schemeVscodeTestWeb,
-	schemeGist
+	schemeGist,
+	schemeGitlabWebIde
 ]);
 // Schemes that are file system-like (support probing for configuration files)
 const schemeFileSystemLike = new Set([
 	schemeFile,
 	schemeVscodeVfs,
-	schemeVscodeTestWeb
+	schemeVscodeTestWeb,
+	schemeGitlabWebIde
 ]);
 const codeActionKindQuickFix = vscode.CodeActionKind.QuickFix;
 const codeActionKindSourceFixAll = vscode.CodeActionKind.SourceFixAll;
