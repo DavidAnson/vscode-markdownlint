@@ -82,7 +82,7 @@ const folderUri = UriStub.file(folderPath);
 const filePath = `${folderPath}/file.txt`;
 const fs = new FileSystemStub();
 function getTestFsWrapper () {
-	return new FsWrapper(fs, folderUri, UriStub.file, posix.relative, posix.resolve);
+	return new FsWrapper(fs, folderUri, posix.relative, posix.resolve);
 }
 
 test.suite(import.meta.url.replace(/^.*?\/(?<name>[^/]*)$/u, "$<name>"), () => {
@@ -241,7 +241,7 @@ test.suite(import.meta.url.replace(/^.*?\/(?<name>[^/]*)$/u, "$<name>"), () => {
 		for (const [ pathImplementation, fwFolderUriFilePath, pathSegment, expectedPath ] of fwFolderUriWithPathSegmentScenarios) {
 			const expected = new UriStub("online", expectedPath).toString();
 			const fwFolderUri = new UriStub("online", fwFolderUriFilePath);
-			const fsWrapper = new FsWrapper(fs, fwFolderUri, UriStub.file, pathImplementation.relative, pathImplementation.resolve);
+			const fsWrapper = new FsWrapper(fs, fwFolderUri, pathImplementation.relative, pathImplementation.resolve);
 			const actual = fsWrapper.fwResolvePathSegment(pathSegment).toString();
 			// eslint-disable-next-line node-test/no-conditional-assertion
 			t.assert.equal(actual, expected);

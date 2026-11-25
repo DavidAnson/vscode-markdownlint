@@ -161,10 +161,9 @@ export class FsWrapper {
 	}
 
 	// Constructs a new instance
-	constructor (/** @type {FileSystemLike} */ fs, /** @type {UriLike} */ folderUri, /** @type {UriFileLike} */ uriFile, /** @type {PathRelativeLike} */ pathRelative, /** @type {PathResolveLike} */ pathResolve) {
+	constructor (/** @type {FileSystemLike} */ fs, /** @type {UriLike} */ folderUri, /** @type {PathRelativeLike} */ pathRelative, /** @type {PathResolveLike} */ pathResolve) {
 		this.fwFs = fs;
 		this.fwFolderUri = folderUri;
-		this.fwUriFile = uriFile;
 		this.fwPathRelative = pathRelative;
 		this.fwPathResolve = pathResolve;
 		this.access = this.fwAccess.bind(this);
