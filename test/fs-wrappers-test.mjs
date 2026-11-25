@@ -9,10 +9,11 @@ import { FsNull, FsWrapper, FileTypeDirectory, FileTypeFile, FileTypeSymbolicLin
 
 class UriStub {
 	static file (/** @type {string} */ fsPath) {
-		return new UriStub(fsPath);
+		return new UriStub("file", fsPath);
 	}
 
-	constructor (/** @type {string} */ fsPath) {
+	constructor (/** @type {string} */ fsScheme, /** @type {string} */ fsPath) {
+		this.usFsScheme = fsScheme;
 		this.usFsPath = fsPath;
 	}
 
@@ -44,8 +45,12 @@ class UriStub {
 		return "";
 	}
 
+	toString () {
+		return `${this.usFsScheme}://${this.usFsPath}`;
+	}
+
 	with (/** @type {import("../fs-wrappers.mjs").UriChangeLike} */ change) {
-		return UriStub.file(change.path);
+		return new UriStub(this.usFsScheme, change.path);
 	}
 }
 
@@ -233,10 +238,11 @@ test.suite(import.meta.url.replace(/^.*?\/(?<name>[^/]*)$/u, "$<name>"), () => {
 	];
 	test("FsWrapper.fwResolvePathSegment", (t) => {
 		t.plan(fwFolderUriWithPathSegmentScenarios.length);
-		for (const [ pathImplementation, fwFolderUriFilePath, pathSegment, expected ] of fwFolderUriWithPathSegmentScenarios) {
-			const fwFolderUri = UriStub.file(fwFolderUriFilePath);
+		for (const [ pathImplementation, fwFolderUriFilePath, pathSegment, expectedPath ] of fwFolderUriWithPathSegmentScenarios) {
+			const expected = new UriStub("online", expectedPath).toString();
+			const fwFolderUri = new UriStub("online", fwFolderUriFilePath);
 			const fsWrapper = new FsWrapper(fs, fwFolderUri, UriStub.file, pathImplementation.relative, pathImplementation.resolve);
-			const actual = fsWrapper.fwResolvePathSegment(pathSegment).fsPath;
+			const actual = fsWrapper.fwResolvePathSegment(pathSegment).toString();
 			// eslint-disable-next-line node-test/no-conditional-assertion
 			t.assert.equal(actual, expected);
 		}

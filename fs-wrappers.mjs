@@ -66,7 +66,8 @@ export class FsWrapper {
 				pathSegment = uncPathSegment;
 			}
 		}
-		return this.fwUriFile(this.fwPathResolve(this.fwFolderUri.fsPath, pathSegment));
+		const resolvedPath = this.fwPathResolve(this.fwFolderUri.fsPath, pathSegment);
+		return this.fwFolderUri.with({ "path": resolvedPath });
 	}
 
 	// Implements fs.access via vscode.workspace.fs

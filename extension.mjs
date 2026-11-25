@@ -367,6 +367,8 @@ function shouldLintDocument (/** @type {import("vscode").TextDocument} */ docume
 			// Non-virtual document or document authority matches an open workspace
 			// (Filters out problematic scenarios like source control where vscode
 			// .workspace.fs says documents of any name exist with content "")
+			// Still present in VS Code Web 1.148.0 viewing diff for a new file, see:
+			// https://github.com/DavidAnson/vscode-markdownlint/issues/316
 			(document.uri.scheme !== schemeVscodeVfs) ||
 			vscode.workspace.workspaceFolders
 				?.filter((folder) => folder.uri.scheme === document.uri.scheme)
