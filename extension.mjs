@@ -369,6 +369,7 @@ function shouldLintDocument (/** @type {import("vscode").TextDocument} */ docume
 			// .workspace.fs says documents of any name exist with content "")
 			// Still present in VS Code Web 1.148.0 viewing diff for a new file, see:
 			// https://github.com/DavidAnson/vscode-markdownlint/issues/316
+			// Exception is not needed by GitLab Web IDE 1.94.0
 			(document.uri.scheme !== schemeVscodeVfs) ||
 			vscode.workspace.workspaceFolders
 				?.filter((folder) => folder.uri.scheme === document.uri.scheme)
